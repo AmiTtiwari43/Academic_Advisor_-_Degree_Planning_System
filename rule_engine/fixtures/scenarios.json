@@ -1,0 +1,1901 @@
+[
+  {
+    "id": "SCEN_01",
+    "description": "Basic completed course without min grade passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "C",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_02",
+    "description": "Course not taken fails with blocking reason",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101"
+    },
+    "context": {
+      "completed_courses": []
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course CS 101 has not been completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_03",
+    "description": "Course completed with grade meeting threshold passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_04",
+    "description": "Course completed with exact grade threshold passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "C",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_05",
+    "description": "Course completed below grade threshold fails",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "D",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Course CS 101 completed with grade 'D', but minimum grade 'C' is required."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_06",
+    "description": "Multiple requirements in all_of all satisfied",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101",
+          "min_grade": "C"
+        },
+        {
+          "type": "course_completed",
+          "course_code": "MATH 151",
+          "min_grade": "C"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        },
+        {
+          "course_code": "MATH 151",
+          "grade": "B",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_07",
+    "description": "all_of with one failed condition fails",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101",
+          "min_grade": "C"
+        },
+        {
+          "type": "course_completed",
+          "course_code": "MATH 151",
+          "min_grade": "C"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        },
+        {
+          "course_code": "MATH 151",
+          "grade": "D",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Course MATH 151 completed with grade 'D', but minimum grade 'C' is required."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_08",
+    "description": "any_of with first option satisfied passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "any_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "MATH 151",
+          "min_grade": "C"
+        },
+        {
+          "type": "course_completed",
+          "course_code": "MATH 155",
+          "min_grade": "C"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "MATH 151",
+          "grade": "B",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_09",
+    "description": "any_of with second option satisfied passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "any_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "MATH 151",
+          "min_grade": "C"
+        },
+        {
+          "type": "course_completed",
+          "course_code": "MATH 155",
+          "min_grade": "C"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "MATH 155",
+          "grade": "A",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_10",
+    "description": "any_of with neither option satisfied fails",
+    "rule": {
+      "schema_version": 1,
+      "type": "any_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "MATH 151",
+          "min_grade": "C"
+        },
+        {
+          "type": "course_completed",
+          "course_code": "MATH 155",
+          "min_grade": "C"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": []
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course MATH 151 has not been completed.",
+        "Required course MATH 155 has not been completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_11",
+    "description": "Nested level 2: all_of containing any_of satisfied",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "any_of",
+          "conditions": [
+            {
+              "type": "course_completed",
+              "course_code": "MATH 151"
+            },
+            {
+              "type": "course_completed",
+              "course_code": "MATH 155"
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0"
+        },
+        {
+          "course_code": "MATH 155",
+          "grade": "A",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_12",
+    "description": "Nested level 3: all_of -> any_of -> all_of satisfied",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "any_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "course_completed",
+                  "course_code": "MATH 151"
+                },
+                {
+                  "type": "course_completed",
+                  "course_code": "PHYS 101"
+                }
+              ]
+            },
+            {
+              "type": "course_completed",
+              "course_code": "MATH 155"
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        },
+        {
+          "course_code": "MATH 151",
+          "grade": "B",
+          "credits": "4.0"
+        },
+        {
+          "course_code": "PHYS 101",
+          "grade": "C",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_13",
+    "description": "Nested level 3: all_of -> any_of -> all_of partial alternative fails to other option",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "any_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "course_completed",
+                  "course_code": "MATH 151"
+                },
+                {
+                  "type": "course_completed",
+                  "course_code": "PHYS 101"
+                }
+              ]
+            },
+            {
+              "type": "course_completed",
+              "course_code": "MATH 155"
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        },
+        {
+          "course_code": "MATH 151",
+          "grade": "B",
+          "credits": "4.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course PHYS 101 has not been completed.",
+        "Required course MATH 155 has not been completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_14",
+    "description": "Nested level 4: deep combinators satisfied",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "any_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "any_of",
+                  "conditions": [
+                    {
+                      "type": "course_completed",
+                      "course_code": "BIO 101"
+                    },
+                    {
+                      "type": "course_completed",
+                      "course_code": "CHEM 101"
+                    }
+                  ]
+                },
+                {
+                  "type": "course_completed",
+                  "course_code": "CS 101"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CHEM 101",
+          "grade": "A",
+          "credits": "4.0"
+        },
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_15",
+    "description": "Nested level 5 tree evaluated deterministically",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "all_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "all_of",
+                  "conditions": [
+                    {
+                      "type": "course_completed",
+                      "course_code": "ENG 101"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "ENG 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_16",
+    "description": "Nested level 6 tree evaluated deterministically",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "all_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "all_of",
+                  "conditions": [
+                    {
+                      "type": "all_of",
+                      "conditions": [
+                        {
+                          "type": "course_completed",
+                          "course_code": "ENG 101"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "ENG 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_17",
+    "description": "Nested level 7 tree evaluated deterministically",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "all_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "all_of",
+                  "conditions": [
+                    {
+                      "type": "all_of",
+                      "conditions": [
+                        {
+                          "type": "all_of",
+                          "conditions": [
+                            {
+                              "type": "course_completed",
+                              "course_code": "ENG 101"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "ENG 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_18",
+    "description": "Nested level 8 (exact max depth) accepted and evaluated",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "all_of",
+          "conditions": [
+            {
+              "type": "all_of",
+              "conditions": [
+                {
+                  "type": "all_of",
+                  "conditions": [
+                    {
+                      "type": "all_of",
+                      "conditions": [
+                        {
+                          "type": "all_of",
+                          "conditions": [
+                            {
+                              "type": "all_of",
+                              "conditions": [
+                                {
+                                  "type": "course_completed",
+                                  "course_code": "ENG 101"
+                                }
+                              ]
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "ENG 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_19",
+    "description": "Total credits min - 0.5 shortfall fails",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "60.0"
+    },
+    "context": {
+      "total_credits": "59.5"
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Insufficient total credits: 59.5 earned, 60.0 required (0.5 remaining)."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_20",
+    "description": "Total credits exactly at threshold passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "60.0"
+    },
+    "context": {
+      "total_credits": "60.0"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_21",
+    "description": "Total credits min + 0.5 surplus passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "60.0"
+    },
+    "context": {
+      "total_credits": "60.5"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_22",
+    "description": "Category credits min - 0.5 shortfall fails",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "30.0",
+      "category": "CORE_CS"
+    },
+    "context": {
+      "credits_by_category": {
+        "CORE_CS": "29.5"
+      }
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Insufficient credits in category 'CORE_CS': 29.5 earned, 30.0 required (0.5 remaining)."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_23",
+    "description": "Category credits exactly at threshold passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "30.0",
+      "category": "CORE_CS"
+    },
+    "context": {
+      "credits_by_category": {
+        "CORE_CS": "30.0"
+      }
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_24",
+    "description": "Category credits min + 0.5 surplus passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "30.0",
+      "category": "CORE_CS"
+    },
+    "context": {
+      "credits_by_category": {
+        "CORE_CS": "30.5"
+      }
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_25",
+    "description": "CGPA threshold 2-decimal shortfall fails (2.99 vs 3.00)",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "3.00"
+    },
+    "context": {
+      "cgpa": "2.99"
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Cumulative GPA 2.99 is below required threshold of 3.00."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_26",
+    "description": "CGPA exactly at threshold passes (3.00 vs 3.00)",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "3.00"
+    },
+    "context": {
+      "cgpa": "3.00"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_27",
+    "description": "CGPA slightly above threshold passes (3.01 vs 3.00)",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "3.00"
+    },
+    "context": {
+      "cgpa": "3.01"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_28",
+    "description": "CGPA 3-decimal threshold exact match passes (3.250 vs 3.250)",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "3.250"
+    },
+    "context": {
+      "cgpa": "3.250"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_29",
+    "description": "CGPA 3-decimal shortfall fails (3.249 vs 3.250)",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "3.250"
+    },
+    "context": {
+      "cgpa": "3.249"
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Cumulative GPA 3.249 is below required threshold of 3.250."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_30",
+    "description": "CGPA minimum 0.0 passes any valid non-negative GPA",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "0.0"
+    },
+    "context": {
+      "cgpa": "2.1"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_31",
+    "description": "Missing CGPA yields INDETERMINATE with blocking reason",
+    "rule": {
+      "schema_version": 1,
+      "type": "cgpa_min",
+      "value": "2.5"
+    },
+    "context": {
+      "cgpa": null
+    },
+    "expected": {
+      "eligible": false,
+      "status": "INDETERMINATE",
+      "blocking_reasons": [
+        "Cumulative GPA is not available."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_32",
+    "description": "all_of with missing CGPA and satisfied course yields INDETERMINATE",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "2.5"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ],
+      "cgpa": null
+    },
+    "expected": {
+      "eligible": false,
+      "status": "INDETERMINATE",
+      "blocking_reasons": [
+        "Cumulative GPA is not available."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_33",
+    "description": "all_of with missing CGPA and failed course yields UNSATISFIED",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "2.5"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [],
+      "cgpa": null
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course CS 101 has not been completed.",
+        "Cumulative GPA is not available."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_34",
+    "description": "any_of with satisfied option and missing CGPA yields SATISFIED",
+    "rule": {
+      "schema_version": 1,
+      "type": "any_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "3.5"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0"
+        }
+      ],
+      "cgpa": null
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_35",
+    "description": "any_of with failed course and missing CGPA yields INDETERMINATE",
+    "rule": {
+      "schema_version": 1,
+      "type": "any_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 101"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "3.5"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [],
+      "cgpa": null
+    },
+    "expected": {
+      "eligible": false,
+      "status": "INDETERMINATE",
+      "blocking_reasons": [
+        "Required course CS 101 has not been completed.",
+        "Cumulative GPA is not available."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_36",
+    "description": "Missing category credit data yields INDETERMINATE",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "12.0",
+      "category": "HONORS"
+    },
+    "context": {
+      "credits_by_category": {},
+      "completed_courses": [],
+      "total_credits": null
+    },
+    "expected": {
+      "eligible": false,
+      "status": "INDETERMINATE",
+      "blocking_reasons": [
+        "Credit data not available for category 'HONORS'."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_37",
+    "description": "In-progress course does NOT satisfy course_completed",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 201"
+    },
+    "context": {
+      "in_progress_courses": [
+        "CS 201"
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Course CS 201 is currently in progress; completed course required."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_38",
+    "description": "In-progress course DOES satisfy corequisite",
+    "rule": {
+      "schema_version": 1,
+      "type": "corequisite",
+      "course_code": "PHYS 101L"
+    },
+    "context": {
+      "in_progress_courses": [
+        "PHYS 101L"
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_39",
+    "description": "Planned same term course satisfies corequisite",
+    "rule": {
+      "schema_version": 1,
+      "type": "corequisite",
+      "course_code": "PHYS 101L"
+    },
+    "context": {
+      "planned_same_term_courses": [
+        "PHYS 101L"
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_40",
+    "description": "Completed course satisfies corequisite",
+    "rule": {
+      "schema_version": 1,
+      "type": "corequisite",
+      "course_code": "PHYS 101L"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "PHYS 101L",
+          "grade": "B",
+          "credits": "1.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_41",
+    "description": "Verified transfer credit satisfies course_completed",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "MATH 151"
+    },
+    "context": {
+      "transfer_credits": [
+        {
+          "course_code": "MATH 151",
+          "credits": "4.0",
+          "verified": true
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_42",
+    "description": "Unverified transfer credit does NOT satisfy course_completed",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "MATH 151"
+    },
+    "context": {
+      "transfer_credits": [
+        {
+          "course_code": "MATH 151",
+          "credits": "4.0",
+          "verified": false
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course MATH 151 has not been completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_43",
+    "description": "Verified exemption satisfies course_completed with min grade",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "MATH 151",
+      "min_grade": "A"
+    },
+    "context": {
+      "exemptions": [
+        {
+          "course_code": "MATH 151",
+          "verified": true
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_44",
+    "description": "Transfer credit counts toward total credits automatically",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "7.0"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ],
+      "transfer_credits": [
+        {
+          "course_code": "MATH 151",
+          "credits": "4.0",
+          "verified": true
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_45",
+    "description": "Transfer credit and completed course for same code does NOT double count credits",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "6.0"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ],
+      "transfer_credits": [
+        {
+          "course_code": "CS 101",
+          "credits": "3.0",
+          "verified": true
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Insufficient total credits: 3.0 earned, 6.0 required (3.0 remaining)."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_46",
+    "description": "best_grade policy chooses higher grade (F then B meets C min)",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "repeated_course_policy": "best_grade",
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "F",
+          "credits": "3.0",
+          "attempt_number": 1
+        },
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0",
+          "attempt_number": 2
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_47",
+    "description": "best_grade policy chooses higher grade (B then D meets C min)",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "repeated_course_policy": "best_grade",
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0",
+          "attempt_number": 1
+        },
+        {
+          "course_code": "CS 101",
+          "grade": "D",
+          "credits": "3.0",
+          "attempt_number": 2
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_48",
+    "description": "latest policy fails when latest attempt is below min (B then D misses C min)",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "repeated_course_policy": "latest",
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "B",
+          "credits": "3.0",
+          "attempt_number": 1
+        },
+        {
+          "course_code": "CS 101",
+          "grade": "D",
+          "credits": "3.0",
+          "attempt_number": 2
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Course CS 101 completed with grade 'D', but minimum grade 'C' is required."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_49",
+    "description": "latest policy passes when latest attempt meets min (F then A meets C min)",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "repeated_course_policy": "latest",
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "F",
+          "credits": "3.0",
+          "attempt_number": 1
+        },
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0",
+          "attempt_number": 2
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_50",
+    "description": "Anti-requisite not taken passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "anti_requisite",
+      "course_code": "CS 100"
+    },
+    "context": {
+      "completed_courses": []
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_51",
+    "description": "Anti-requisite completed blocks eligibility",
+    "rule": {
+      "schema_version": 1,
+      "type": "anti_requisite",
+      "course_code": "CS 100"
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 100",
+          "grade": "B",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Anti-requisite CS 100 has already been completed or is currently in progress."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_52",
+    "description": "Anti-requisite in progress blocks eligibility",
+    "rule": {
+      "schema_version": 1,
+      "type": "anti_requisite",
+      "course_code": "CS 100"
+    },
+    "context": {
+      "in_progress_courses": [
+        "CS 100"
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Anti-requisite CS 100 has already been completed or is currently in progress."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_53",
+    "description": "Anti-requisite transferred blocks eligibility",
+    "rule": {
+      "schema_version": 1,
+      "type": "anti_requisite",
+      "course_code": "CS 100"
+    },
+    "context": {
+      "transfer_credits": [
+        {
+          "course_code": "CS 100",
+          "credits": "3.0",
+          "verified": true
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Anti-requisite CS 100 has already been completed or is currently in progress."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_54",
+    "description": "Custom grade scale with Pass/Fail evaluation",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "SEM 101",
+      "min_grade": "P"
+    },
+    "context": {
+      "grade_scale": {
+        "P": 1.0,
+        "NP": 0.0
+      },
+      "completed_courses": [
+        {
+          "course_code": "SEM 101",
+          "grade": "P",
+          "credits": "1.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_55",
+    "description": "Custom grade scale where grade NP misses P threshold",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "SEM 101",
+      "min_grade": "P"
+    },
+    "context": {
+      "grade_scale": {
+        "P": 1.0,
+        "NP": 0.0
+      },
+      "completed_courses": [
+        {
+          "course_code": "SEM 101",
+          "grade": "NP",
+          "credits": "1.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Course SEM 101 completed with grade 'NP', but minimum grade 'P' is required."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_56",
+    "description": "Grade scale missing student grade yields INDETERMINATE",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "min_grade": "C"
+    },
+    "context": {
+      "grade_scale": {
+        "A": 4.0,
+        "B": 3.0,
+        "C": 2.0
+      },
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "S",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "INDETERMINATE",
+      "blocking_reasons": [
+        "Grade scale comparison unavailable for grade 'S' vs required 'C'."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_57",
+    "description": "Python import injection in course code treated safely as literal string",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "__import__('os').system('ls')"
+    },
+    "context": {
+      "completed_courses": []
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course __import__('os').system('ls') has not been completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_58",
+    "description": "Shell injection in course code treated safely as literal string",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "${ENV_VAR}; rm -rf /"
+    },
+    "context": {
+      "completed_courses": []
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course ${ENV_VAR}; rm -rf / has not been completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_59",
+    "description": "SQL injection string in category treated safely as literal string",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "10.0",
+      "category": "'; DROP TABLE courses; --"
+    },
+    "context": {
+      "credits_by_category": {
+        "'; DROP TABLE courses; --": "15.0"
+      }
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_60",
+    "description": "Complex realistic degree requirement combination passes",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 201",
+          "min_grade": "C"
+        },
+        {
+          "type": "course_completed",
+          "course_code": "MATH 201",
+          "min_grade": "C"
+        },
+        {
+          "type": "corequisite",
+          "course_code": "CS 201L"
+        },
+        {
+          "type": "anti_requisite",
+          "course_code": "CS 200"
+        },
+        {
+          "type": "credits_completed",
+          "min_credits": "45.0"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "2.5"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 201",
+          "grade": "B",
+          "credits": "4.0"
+        },
+        {
+          "course_code": "MATH 201",
+          "grade": "A",
+          "credits": "4.0"
+        }
+      ],
+      "planned_same_term_courses": [
+        "CS 201L"
+      ],
+      "total_credits": "48.0",
+      "cgpa": "3.10"
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  },
+  {
+    "id": "SCEN_61",
+    "description": "Realistic complex requirement with one failure reports specific blocking reason",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 201",
+          "min_grade": "C"
+        },
+        {
+          "type": "credits_completed",
+          "min_credits": "45.0"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "2.5"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [
+        {
+          "course_code": "CS 201",
+          "grade": "B",
+          "credits": "4.0"
+        }
+      ],
+      "total_credits": "48.0",
+      "cgpa": "2.40"
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Cumulative GPA 2.40 is below required threshold of 2.5."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_62",
+    "description": "Corequisite unscheduled fails with clear message",
+    "rule": {
+      "schema_version": 1,
+      "type": "corequisite",
+      "course_code": "CHEM 101L"
+    },
+    "context": {
+      "planned_same_term_courses": [],
+      "in_progress_courses": [],
+      "completed_courses": []
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Corequisite CHEM 101L is not scheduled, in progress, or completed."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_63",
+    "description": "Category credits zero earned reports clear remaining deficit",
+    "rule": {
+      "schema_version": 1,
+      "type": "credits_completed",
+      "min_credits": "9.0",
+      "category": "UPPER_ELECTIVE"
+    },
+    "context": {
+      "credits_by_category": {
+        "UPPER_ELECTIVE": "0.0"
+      },
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Insufficient credits in category 'UPPER_ELECTIVE': 0.0 earned, 9.0 required (9.0 remaining)."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_64",
+    "description": "all_of with three failures lists all distinct reasons deterministically",
+    "rule": {
+      "schema_version": 1,
+      "type": "all_of",
+      "conditions": [
+        {
+          "type": "course_completed",
+          "course_code": "CS 301"
+        },
+        {
+          "type": "cgpa_min",
+          "value": "3.0"
+        },
+        {
+          "type": "credits_completed",
+          "min_credits": "60.0"
+        }
+      ]
+    },
+    "context": {
+      "completed_courses": [],
+      "cgpa": "2.8",
+      "total_credits": "45.0"
+    },
+    "expected": {
+      "eligible": false,
+      "status": "UNSATISFIED",
+      "blocking_reasons": [
+        "Required course CS 301 has not been completed.",
+        "Cumulative GPA 2.8 is below required threshold of 3.0.",
+        "Insufficient total credits: 45.0 earned, 60.0 required (15.0 remaining)."
+      ]
+    }
+  },
+  {
+    "id": "SCEN_65",
+    "description": "Curriculum version tracking preserved in evaluation result",
+    "rule": {
+      "schema_version": 1,
+      "type": "course_completed",
+      "course_code": "CS 101",
+      "rule_id": "RULE_CS101_REQ"
+    },
+    "context": {
+      "curriculum_version_id": "CURR_2025_V1",
+      "completed_courses": [
+        {
+          "course_code": "CS 101",
+          "grade": "A",
+          "credits": "3.0"
+        }
+      ]
+    },
+    "expected": {
+      "eligible": true,
+      "status": "SATISFIED",
+      "blocking_reasons": []
+    }
+  }
+]

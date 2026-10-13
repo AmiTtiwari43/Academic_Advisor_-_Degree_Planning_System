@@ -76,9 +76,9 @@ class UserMeSerializer(serializers.ModelSerializer):
         return profile.phone_number if profile else ""
 
     def get_memberships(self, obj: User) -> list[dict]:
-        memberships = InstitutionMembership.objects.filter(
-            user=obj, is_active=True
-        ).select_related("institution")
+        memberships = InstitutionMembership.objects.filter(user=obj, is_active=True).select_related(
+            "institution"
+        )
         return list(InstitutionMembershipSummarySerializer(memberships, many=True).data)
 
 
