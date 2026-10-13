@@ -1,0 +1,30 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.errorCode {
+  font-family: var(--font-family-serif);
+  font-size: 5rem;
+  line-height: 1;
+  color: var(--color-slate-400);
+  margin-bottom: 12px;
+}
+
+.title {
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-2xl);
+  color: var(--color-foundation-navy-900);
+  margin-bottom: 8px;
+}
+
+.description {
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-500);
+  max-width: 440px;
+  margin-bottom: 24px;
+}

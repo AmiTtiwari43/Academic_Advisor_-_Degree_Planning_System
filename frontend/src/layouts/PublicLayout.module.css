@@ -1,0 +1,113 @@
+.publicShell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: var(--color-surface-ivory);
+}
+
+.header {
+  background-color: var(--color-foundation-navy-900);
+  border-bottom: 1px solid var(--color-foundation-navy-700);
+  padding: 16px 0;
+}
+
+.headerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  text-decoration: none;
+}
+
+.logoBadge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: var(--color-accent-teal-600);
+  color: #ffffff;
+  border-radius: var(--radius-md);
+}
+
+.brandText {
+  display: flex;
+  flex-direction: column;
+}
+
+.brandTitle {
+  font-family: var(--font-family-serif);
+  font-weight: 700;
+  font-size: var(--font-size-lg);
+  color: #ffffff;
+}
+
+.brandSubtitle {
+  font-size: 11px;
+  color: var(--color-slate-400);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navLink {
+  color: #ffffff;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  padding: 8px 16px;
+  background-color: var(--color-accent-teal-600);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: background-color var(--transition-fast);
+}
+
+.navLink:hover {
+  background-color: var(--color-accent-teal-700);
+  text-decoration: none;
+}
+
+.main {
+  flex: 1;
+}
+
+.footer {
+  background-color: var(--color-surface-pure);
+  border-top: 1px solid var(--color-slate-200);
+  padding: 24px 0;
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+}
+
+.footerContainer {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.footerLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.shieldIcon {
+  color: var(--color-accent-teal-600);
+}

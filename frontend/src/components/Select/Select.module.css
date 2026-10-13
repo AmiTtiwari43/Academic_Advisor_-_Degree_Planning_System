@@ -1,0 +1,73 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.label {
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  color: var(--color-slate-700);
+}
+
+.selectWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface-pure);
+  transition: all var(--transition-fast);
+}
+
+.selectWrapper:focus-within {
+  border-color: var(--color-accent-teal-600);
+  box-shadow: 0 0 0 3px var(--color-accent-teal-100);
+}
+
+.hasError {
+  border-color: var(--color-status-danger-border);
+}
+
+.disabled {
+  background-color: var(--color-surface-muted);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.select {
+  width: 100%;
+  appearance: none;
+  border: none;
+  background: transparent;
+  padding: 8px 32px 8px 12px;
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-900);
+  outline: none;
+  cursor: pointer;
+}
+
+.select:disabled {
+  cursor: not-allowed;
+}
+
+.arrow {
+  position: absolute;
+  right: 12px;
+  font-size: 10px;
+  color: var(--color-slate-500);
+  pointer-events: none;
+}
+
+.errorText {
+  font-size: var(--font-size-xs);
+  color: var(--color-status-danger-text);
+  margin-top: 2px;
+}
+
+.helperText {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+  margin-top: 2px;
+}

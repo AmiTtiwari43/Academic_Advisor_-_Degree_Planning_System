@@ -1,0 +1,41 @@
+.errorState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 24px;
+  text-align: center;
+  background-color: var(--color-surface-pure);
+  border: 1px solid var(--color-status-danger-border);
+  border-radius: var(--radius-lg);
+}
+
+.iconContainer {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: var(--color-status-danger-bg);
+  margin-bottom: 14px;
+}
+
+.alertIcon {
+  color: var(--color-status-danger-text);
+}
+
+.title {
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-lg);
+  color: var(--color-foundation-navy-900);
+  margin-bottom: 6px;
+}
+
+.message {
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-700);
+  max-width: 440px;
+  margin-bottom: 20px;
+  line-height: var(--line-height-base);
+}
