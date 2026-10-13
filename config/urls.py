@@ -3,7 +3,7 @@ URL configuration for Academic Advisor & Degree Planning System.
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from accounts.views import (
@@ -63,4 +63,7 @@ urlpatterns = [
         CurriculumManageTestStubView.as_view(),
         name="curriculum-manage-test",
     ),
+    # Curriculum and Requirement Authoring
+    path("api/v1/", include("curriculum.urls")),
+    path("api/", include("curriculum.urls")),
 ]

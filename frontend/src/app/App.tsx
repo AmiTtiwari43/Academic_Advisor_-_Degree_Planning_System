@@ -11,6 +11,7 @@ import { ForgotPasswordPage } from '../routes/ForgotPasswordPage';
 import { ResetPasswordPage } from '../routes/ResetPasswordPage';
 import { AccessDeniedPage } from '../routes/AccessDeniedPage';
 import { DashboardPage } from '../routes/DashboardPage';
+import { CurriculumWorkspacePage } from '../routes/CurriculumWorkspacePage';
 import { NotFoundPage } from '../routes/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -40,7 +41,7 @@ export const App: React.FC = () => {
               {/* Authenticated Application Shell */}
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/curriculum" element={<DashboardPage />} />
+                <Route path="/curriculum" element={<CurriculumWorkspacePage />} />
                 <Route path="/plan" element={<DashboardPage />} />
                 <Route path="/audit" element={<DashboardPage />} />
                 <Route path="/advising" element={<DashboardPage />} />
