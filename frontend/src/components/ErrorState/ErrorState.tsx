@@ -7,6 +7,8 @@ export interface ErrorStateProps {
   title?: string;
   message?: string;
   onRetry?: () => void;
+  action?: React.ReactNode;
+  children?: React.ReactNode;
   className?: string;
 }
 
@@ -14,6 +16,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
   title = 'Unable to Load Academic Data',
   message = 'An unexpected server error occurred while retrieving this record. Please verify your connection or try again.',
   onRetry,
+  action,
+  children,
   className = '',
 }) => {
   return (
@@ -33,6 +37,8 @@ export const ErrorState: React.FC<ErrorStateProps> = ({
           Retry Request
         </Button>
       )}
+      {action && <div style={{ marginTop: 'var(--space-4)' }}>{action}</div>}
+      {children}
     </div>
   );
 };

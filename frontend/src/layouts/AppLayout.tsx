@@ -1,16 +1,19 @@
 import React, { useState } from 'react';
-import { Outlet } from 'react-router-dom';
-import { Menu, ShieldCheck } from 'lucide-react';
+import { Outlet, useNavigate } from 'react-router-dom';
+import { LogOut, Menu, ShieldCheck } from 'lucide-react';
 import styles from './AppLayout.module.css';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Badge } from '../components/Badge/Badge';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
+import { useAuth } from '../context/AuthContext';
 
 export const AppLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const { user, activeMembership, activeRole, logout } = useAuth();
+  const navigate = useNavigate();
 
   // Health check query proves backend connectivity
   const { data: healthData, isSuccess } = useQuery({
@@ -18,6 +21,20 @@ export const AppLayout: React.FC = () => {
     queryFn: () => apiClient.checkHealth(),
     refetchInterval: 60000,
   });
+
+  const handleLogout = async () => {
+    await logout();
+    navigate('/login');
+  };
+
+  const displayName =
+    user?.preferred_name ||
+    (user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username) ||
+    'Authenticated User';
+
+  const userInitials = user?.first_name
+    ? `${user.first_name[0]}${user.last_name ? user.last_name[0] : ''}`.toUpperCase()
+    : (user?.username ? user.username.slice(0, 2).toUpperCase() : 'AU');
 
   return (
     <div className={styles.appShell}>
@@ -43,7 +60,9 @@ export const AppLayout: React.FC = () => {
             </div>
             <div className={styles.institutionContext}>
               <span className={styles.instLabel}>Active Institution</span>
-              <span className={styles.instName}>Metropolitan State University</span>
+              <span className={styles.instName}>
+                {activeMembership?.institution_name || 'Metropolitan State University'}
+              </span>
             </div>
           </div>
 
@@ -63,12 +82,21 @@ export const AppLayout: React.FC = () => {
             )}
 
             <div className={styles.userProfile}>
-              <div className={styles.userAvatar}>EV</div>
+              <div className={styles.userAvatar}>{userInitials}</div>
               <div className={styles.userInfo}>
-                <span className={styles.userName}>Dr. E. Vance</span>
-                <span className={styles.userRole}>Faculty Advisor</span>
+                <span className={styles.userName}>{displayName}</span>
+                <span className={styles.userRole}>
+                  {activeRole ? activeRole.replace('_', ' ') : 'Academic Portal'}
+                </span>
               </div>
             </div>
+
+            <IconButton
+              icon={<LogOut size={18} />}
+              aria-label="Sign out"
+              onClick={handleLogout}
+              size="sm"
+            />
           </div>
         </header>
 

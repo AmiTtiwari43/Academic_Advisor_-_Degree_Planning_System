@@ -40,5 +40,7 @@ def test_no_hardcoded_secret_keys():
         for line in content.splitlines():
             line_stripped = line.strip()
             # Flag any line assigning SECRET_KEY = "..." or '...'
-            if line_stripped.startswith("SECRET_KEY = \"") or line_stripped.startswith("SECRET_KEY = '"):
+            if line_stripped.startswith('SECRET_KEY = "') or line_stripped.startswith(
+                "SECRET_KEY = '"
+            ):
                 raise AssertionError(f"Hardcoded secret key found in {py_file}: {line_stripped}")

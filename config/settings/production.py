@@ -30,7 +30,9 @@ SECURE_HSTS_PRELOAD = env.bool("SECURE_HSTS_PRELOAD", default=True)
 # Strict cookie attributes
 SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
-CSRF_COOKIE_HTTPONLY = False  # Allows frontend to read CSRF cookie for X-CSRFToken header in same-site SPA
+CSRF_COOKIE_HTTPONLY = (
+    False  # Allows frontend to read CSRF cookie for X-CSRFToken header in same-site SPA
+)
 CSRF_COOKIE_SAMESITE = "Lax"
 
 # Logging in production
