@@ -167,12 +167,16 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 25,
 }
 
-# OpenAPI Documentation
 SPECTACULAR_SETTINGS = {
     "TITLE": "Academic Advisor & Degree Planning System API",
     "DESCRIPTION": "Multi-institution curriculum rules, degree audit, multi-semester planning, and advisor workflow platform.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
+    "ENUM_NAME_OVERRIDES": {
+        "CurriculumStatusEnum": "curriculum.models.CurriculumStatus",
+        "StudentRecordStatusEnum": "academic_records.models.StudentRecordStatus",
+        "TranscriptEntryStatusEnum": "academic_records.models.TranscriptEntryStatus",
+    },
 }
 
 # Session & Cookie Defaults

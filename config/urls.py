@@ -66,4 +66,7 @@ urlpatterns = [
     # Curriculum and Requirement Authoring
     path("api/v1/", include("curriculum.urls")),
     path("api/", include("curriculum.urls")),
+    # Academic Records, Degree Audit and Eligibility
+    path("api/v1/", include("academic_records.urls")),
+    path("api/", include("academic_records.urls")),
 ]

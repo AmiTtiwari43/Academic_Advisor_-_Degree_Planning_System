@@ -1,0 +1,137 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.section {
+  background-color: var(--color-surface-pure);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.sectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sectionTitle {
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
+  margin: 0;
+}
+
+.countBadge {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  background-color: var(--color-slate-100);
+  color: var(--color-slate-600);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.emptyState {
+  padding: 24px;
+  background-color: var(--color-surface-muted);
+  border-radius: var(--radius-md);
+  text-align: center;
+  color: var(--color-slate-500);
+  font-size: var(--font-size-sm);
+}
+
+.tableResponsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.table th {
+  text-align: left;
+  padding: 10px 14px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  color: var(--color-slate-500);
+  border-bottom: 2px solid var(--color-slate-200);
+}
+
+.table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--color-slate-100);
+  color: var(--color-slate-700);
+}
+
+.termCell {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+}
+
+.codeCell {
+  font-family: var(--font-family-mono);
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
+}
+
+.gradeCell {
+  font-family: var(--font-family-mono);
+}
+
+.earnedCredits {
+  color: var(--color-status-success-text);
+}
+
+.badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  display: inline-block;
+}
+
+.statusCompleted {
+  background-color: var(--color-status-success-bg);
+  color: var(--color-status-success-text);
+}
+
+.statusInProgress {
+  background-color: var(--color-status-info-bg);
+  color: var(--color-status-info-text);
+}
+
+.statusFailed {
+  background-color: var(--color-status-danger-bg);
+  color: var(--color-status-danger-text);
+}
+
+.statusOther {
+  background-color: var(--color-slate-200);
+  color: var(--color-slate-700);
+}
+
+.vBadgeVerified {
+  background-color: var(--color-accent-teal-100);
+  color: var(--color-accent-teal-700);
+}
+
+.vBadgePending {
+  background-color: var(--color-status-warning-bg);
+  color: var(--color-status-warning-text);
+}
+
+.vBadgeUnverified {
+  background-color: var(--color-slate-200);
+  color: var(--color-slate-600);
+}
