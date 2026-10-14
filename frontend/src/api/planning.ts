@@ -1,7 +1,27 @@
 import { apiClient } from './client';
 
-export type PlanStatus = 'DRAFT' | 'SUBMITTED' | 'APPROVED' | 'REJECTED' | 'ARCHIVED';
-export type PlanVersionStatus = 'SUBMITTED' | 'SUPERSEDED' | 'ARCHIVED';
+export type PlanStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'UNDER_REVIEW'
+  | 'APPROVED'
+  | 'RETURNED'
+  | 'REJECTED'
+  | 'RESUBMITTED'
+  | 'SUPERSEDED'
+  | 'ARCHIVED';
+
+export type PlanVersionStatus =
+  | 'DRAFT'
+  | 'SUBMITTED'
+  | 'UNDER_REVIEW'
+  | 'APPROVED'
+  | 'RETURNED'
+  | 'REJECTED'
+  | 'RESUBMITTED'
+  | 'SUPERSEDED'
+  | 'ARCHIVED';
+
 
 export interface PlanItem {
   id: string;

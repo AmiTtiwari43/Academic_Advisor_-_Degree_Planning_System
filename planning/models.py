@@ -15,10 +15,20 @@ class PlanVersionImmutabilityError(ValidationError):
     pass
 
 
+class OverrideImmutabilityError(ValidationError):
+    """Raised when an attempt is made to mutate or delete an immutable OverrideEvent."""
+    pass
+
+
 class PlanStatus(models.TextChoices):
     DRAFT = "DRAFT", "Draft"
     SUBMITTED = "SUBMITTED", "Submitted"
+    UNDER_REVIEW = "UNDER_REVIEW", "Under Review"
     APPROVED = "APPROVED", "Approved"
+    RETURNED = "RETURNED", "Returned for Revision"
+    REJECTED = "REJECTED", "Rejected"
+    RESUBMITTED = "RESUBMITTED", "Resubmitted"
+    SUPERSEDED = "SUPERSEDED", "Superseded"
     ARCHIVED = "ARCHIVED", "Archived"
 
 
@@ -26,8 +36,11 @@ class PlanVersionStatus(models.TextChoices):
     SUBMITTED = "SUBMITTED", "Submitted"
     UNDER_REVIEW = "UNDER_REVIEW", "Under Review"
     APPROVED = "APPROVED", "Approved"
-    RETURNED = "RETURNED", "Returned"
+    RETURNED = "RETURNED", "Returned for Revision"
+    REJECTED = "REJECTED", "Rejected"
+    RESUBMITTED = "RESUBMITTED", "Resubmitted"
     SUPERSEDED = "SUPERSEDED", "Superseded"
+    ARCHIVED = "ARCHIVED", "Archived"
 
 
 class Plan(models.Model):
@@ -188,3 +201,129 @@ class PlanVersion(models.Model):
         raise PlanVersionImmutabilityError(
             "Submitted plan version snapshots are immutable and cannot be deleted."
         )
+
+
+class ReviewAction(models.TextChoices):
+    START_REVIEW = "START_REVIEW", "Start Review"
+    APPROVE = "APPROVE", "Approve"
+    RETURN = "RETURN", "Return for Revision"
+    REJECT = "REJECT", "Reject"
+
+
+class PlanReviewDecision(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.ForeignKey(
+        Institution, on_delete=models.CASCADE, related_name="plan_reviews", db_index=True
+    )
+    plan = models.ForeignKey(
+        Plan, on_delete=models.CASCADE, related_name="review_decisions", db_index=True
+    )
+    plan_version = models.ForeignKey(
+        PlanVersion, on_delete=models.CASCADE, related_name="review_decisions", db_index=True
+    )
+    reviewer = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="plan_review_decisions"
+    )
+    action = models.CharField(max_length=32, choices=ReviewAction.choices)
+    from_status = models.CharField(max_length=32)
+    to_status = models.CharField(max_length=32)
+    comments = models.TextField(blank=True, default="")
+    idempotency_key = models.CharField(max_length=64, null=True, blank=True, db_index=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"{self.action} on {self.plan.name} v{self.plan_version.version_number} by {self.reviewer.username}"
+
+
+class OverrideType(models.TextChoices):
+    PREREQUISITE_OVERRIDE = "PREREQUISITE_OVERRIDE", "Prerequisite Requirement Override"
+    CREDIT_CEILING_OVERRIDE = "CREDIT_CEILING_OVERRIDE", "Term Credit Ceiling Override"
+    OFFERING_OVERRIDE = "OFFERING_OVERRIDE", "Course Offering Schedule Override"
+    GENERAL_OVERRIDE = "GENERAL_OVERRIDE", "General Degree Requirement Override"
+
+
+class OverrideEvent(models.Model):
+    """
+    Immutable override record. Once recorded, overrides can never be modified or deleted.
+    Overrides require role authorization, non-empty justification (min 15 chars), and
+    never mutate official transcript records.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.ForeignKey(
+        Institution, on_delete=models.CASCADE, related_name="override_events", db_index=True
+    )
+    plan = models.ForeignKey(
+        Plan, on_delete=models.CASCADE, related_name="override_events", db_index=True
+    )
+    plan_version = models.ForeignKey(
+        PlanVersion, on_delete=models.CASCADE, related_name="override_events", db_index=True
+    )
+    actor = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="overrides_performed"
+    )
+    override_type = models.CharField(max_length=64, choices=OverrideType.choices)
+    justification = models.TextField(
+        help_text="Mandatory detailed academic justification for this override."
+    )
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def clean(self) -> None:
+        super().clean()
+        if not self.justification or len(self.justification.strip()) < 15:
+            raise ValidationError(
+                "A non-empty justification of at least 15 characters is required for an academic override."
+            )
+
+    def save(self, *args: Any, **kwargs: Any) -> None:
+        self.clean()
+        if self.pk and OverrideEvent.objects.filter(pk=self.pk).exists():
+            raise OverrideImmutabilityError(
+                "OverrideEvent records are immutable once recorded and cannot be modified."
+            )
+        super().save(*args, **kwargs)
+
+    def delete(self, *args: Any, **kwargs: Any) -> tuple[int, dict[str, int]]:
+        raise OverrideImmutabilityError(
+            "OverrideEvent records are append-only and cannot be deleted."
+        )
+
+    def __str__(self) -> str:
+        return f"{self.override_type} on {self.plan.name} by {self.actor.username}"
+
+
+class PlanAuditLog(models.Model):
+    """
+    Append-only audit record tracking all status transitions, decisions, and overrides.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    institution = models.ForeignKey(
+        Institution, on_delete=models.CASCADE, related_name="plan_audit_logs", db_index=True
+    )
+    plan = models.ForeignKey(
+        Plan, on_delete=models.CASCADE, related_name="audit_logs", db_index=True
+    )
+    plan_version = models.ForeignKey(
+        PlanVersion, on_delete=models.SET_NULL, null=True, blank=True, related_name="audit_logs"
+    )
+    actor = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True, related_name="plan_audit_entries"
+    )
+    action = models.CharField(max_length=64)
+    from_status = models.CharField(max_length=32, blank=True, default="")
+    to_status = models.CharField(max_length=32, blank=True, default="")
+    comment = models.TextField(blank=True, default="")
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["-created_at"]
+
+    def __str__(self) -> str:
+        return f"Audit: {self.action} ({self.from_status} -> {self.to_status}) on {self.plan.name}"

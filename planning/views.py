@@ -1,4 +1,5 @@
 
+from django.core.exceptions import ValidationError as DjangoValidationError
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, status, viewsets
 from rest_framework.decorators import action
@@ -12,16 +13,25 @@ from accounts.models import AdvisorAssignment, Role
 from accounts.permissions import can_view_student_record, get_user_roles_for_institution
 from curriculum.models import Course, CurriculumVersion
 from institutions.models import Institution
-from planning.models import Plan
+from planning.models import (
+    Plan,
+    PlanVersion,
+)
 from planning.serializers import (
     AddCoursePayloadSerializer,
     MoveCoursePayloadSerializer,
+    OverrideEventSerializer,
+    OverridePayloadSerializer,
+    PlanAuditLogSerializer,
     PlanDetailSerializer,
     PlanItemSerializer,
+    PlanReviewDecisionSerializer,
     PlanSerializer,
     PlanUpdatePayloadSerializer,
     PlanVersionSerializer,
     RemoveCoursePayloadSerializer,
+    ReviewActionPayloadSerializer,
+    ReviewQueueItemSerializer,
     SubmitPlanPayloadSerializer,
     WhatIfPayloadSerializer,
 )
@@ -40,6 +50,15 @@ from planning.services.snapshot_service import (
     create_plan_version_snapshot,
 )
 from planning.services.what_if_service import simulate_what_if
+from planning.services.workflow_service import (
+    WorkflowTransitionError,
+    approve_plan_version,
+    get_advisor_review_queue,
+    record_plan_override,
+    reject_plan_version,
+    return_plan_version,
+    start_review,
+)
 
 
 class PlanViewSet(viewsets.ModelViewSet):
@@ -313,6 +332,182 @@ class PlanViewSet(viewsets.ModelViewSet):
         diff_res = compare_plan_versions(v1, v2)
         return Response(diff_res, status=status.HTTP_200_OK)
 
+    def _get_target_version(
+        self, plan: Plan, version_number: int | None = None
+    ) -> PlanVersion:
+        if version_number:
+            version = plan.versions.filter(version_number=version_number).first()
+        else:
+            version = plan.versions.order_by("-version_number").first()
+
+        if not version:
+            raise DRFValidationError({"detail": "Plan has no submitted version snapshot to act on."})
+        return version
+
+    @action(detail=True, methods=["post"], url_path="start-review")
+    def start_review(self, request, pk=None):
+        plan = self.get_object()
+        serializer = ReviewActionPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        target_version = self._get_target_version(
+            plan, serializer.validated_data.get("version_number")
+        )
+        try:
+            decision = start_review(
+                plan=plan,
+                version=target_version,
+                advisor=request.user,
+                expected_row_version=serializer.validated_data.get("expected_row_version"),
+                idempotency_key=serializer.validated_data.get("idempotency_key"),
+            )
+            return Response(PlanReviewDecisionSerializer(decision).data, status=status.HTTP_200_OK)
+        except PlanConcurrencyError as exc:
+            return Response(
+                {"code": "CONCURRENCY_CONFLICT", "message": str(exc)},
+                status=status.HTTP_409_CONFLICT,
+            )
+        except (WorkflowTransitionError, DjangoValidationError) as exc:
+            return Response(
+                {"code": "WORKFLOW_ERROR", "message": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=True, methods=["post"], url_path="approve")
+    def approve(self, request, pk=None):
+        plan = self.get_object()
+        serializer = ReviewActionPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        target_version = self._get_target_version(
+            plan, serializer.validated_data.get("version_number")
+        )
+        try:
+            decision = approve_plan_version(
+                plan=plan,
+                version=target_version,
+                advisor=request.user,
+                comments=serializer.validated_data.get("comments", ""),
+                expected_row_version=serializer.validated_data.get("expected_row_version"),
+                idempotency_key=serializer.validated_data.get("idempotency_key"),
+            )
+            return Response(PlanReviewDecisionSerializer(decision).data, status=status.HTTP_200_OK)
+        except PlanConcurrencyError as exc:
+            return Response(
+                {"code": "CONCURRENCY_CONFLICT", "message": str(exc)},
+                status=status.HTTP_409_CONFLICT,
+            )
+        except (WorkflowTransitionError, DjangoValidationError) as exc:
+            return Response(
+                {"code": "WORKFLOW_ERROR", "message": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=True, methods=["post"], url_path="return")
+    def return_plan(self, request, pk=None):
+        plan = self.get_object()
+        serializer = ReviewActionPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        target_version = self._get_target_version(
+            plan, serializer.validated_data.get("version_number")
+        )
+        try:
+            decision = return_plan_version(
+                plan=plan,
+                version=target_version,
+                advisor=request.user,
+                comments=serializer.validated_data.get("comments", ""),
+                expected_row_version=serializer.validated_data.get("expected_row_version"),
+                idempotency_key=serializer.validated_data.get("idempotency_key"),
+            )
+            return Response(PlanReviewDecisionSerializer(decision).data, status=status.HTTP_200_OK)
+        except PlanConcurrencyError as exc:
+            return Response(
+                {"code": "CONCURRENCY_CONFLICT", "message": str(exc)},
+                status=status.HTTP_409_CONFLICT,
+            )
+        except (WorkflowTransitionError, DjangoValidationError) as exc:
+            return Response(
+                {"code": "WORKFLOW_ERROR", "message": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=True, methods=["post"], url_path="reject")
+    def reject(self, request, pk=None):
+        plan = self.get_object()
+        serializer = ReviewActionPayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        target_version = self._get_target_version(
+            plan, serializer.validated_data.get("version_number")
+        )
+        try:
+            decision = reject_plan_version(
+                plan=plan,
+                version=target_version,
+                advisor=request.user,
+                comments=serializer.validated_data.get("comments", ""),
+                expected_row_version=serializer.validated_data.get("expected_row_version"),
+                idempotency_key=serializer.validated_data.get("idempotency_key"),
+            )
+            return Response(PlanReviewDecisionSerializer(decision).data, status=status.HTTP_200_OK)
+        except PlanConcurrencyError as exc:
+            return Response(
+                {"code": "CONCURRENCY_CONFLICT", "message": str(exc)},
+                status=status.HTTP_409_CONFLICT,
+            )
+        except (WorkflowTransitionError, DjangoValidationError) as exc:
+            return Response(
+                {"code": "WORKFLOW_ERROR", "message": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=True, methods=["post"], url_path="override")
+    def override(self, request, pk=None):
+        plan = self.get_object()
+        serializer = OverridePayloadSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        target_version = self._get_target_version(
+            plan, serializer.validated_data.get("version_number")
+        )
+        try:
+            override_evt = record_plan_override(
+                plan=plan,
+                version=target_version,
+                actor=request.user,
+                override_type=serializer.validated_data["override_type"],
+                justification=serializer.validated_data["justification"],
+                metadata=serializer.validated_data.get("metadata", {}),
+            )
+            return Response(
+                OverrideEventSerializer(override_evt).data, status=status.HTTP_201_CREATED
+            )
+        except DjangoValidationError as exc:
+            return Response(
+                {"code": "VALIDATION_ERROR", "message": str(exc)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+    @action(detail=True, methods=["get"], url_path="audit-history")
+    def audit_history(self, request, pk=None):
+        plan = self.get_object()
+        logs = plan.audit_logs.all().order_by("-created_at")
+        return Response(PlanAuditLogSerializer(logs, many=True).data)
+
+    @action(detail=True, methods=["get"], url_path="reviews")
+    def reviews(self, request, pk=None):
+        plan = self.get_object()
+        decisions = plan.review_decisions.all().order_by("-created_at")
+        return Response(PlanReviewDecisionSerializer(decisions, many=True).data)
+
+    @action(detail=True, methods=["get"], url_path="overrides")
+    def overrides(self, request, pk=None):
+        plan = self.get_object()
+        events = plan.override_events.all().order_by("-created_at")
+        return Response(OverrideEventSerializer(events, many=True).data)
+
 
 class WhatIfSimulationView(GenericAPIView):
     """
@@ -361,3 +556,31 @@ class WhatIfSimulationView(GenericAPIView):
             plan=plan,
         )
         return Response(report, status=status.HTTP_200_OK)
+
+
+class AdvisorQueueView(GenericAPIView):
+    """
+    Fetches the review queue for authorized advisors, coordinators, or administrators.
+    Filtered by status and programme code if provided.
+    """
+    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = ReviewQueueItemSerializer
+    queryset = Plan.objects.none()
+
+    @extend_schema(responses={200: ReviewQueueItemSerializer(many=True)})
+    def get(self, request, *args, **kwargs):
+        membership = request.user.institution_memberships.first()
+        if not membership:
+            raise PermissionDenied("User does not belong to any institution.")
+
+        status_filter = request.query_params.get("status")
+        programme_filter = request.query_params.get("programme")
+
+        queue = get_advisor_review_queue(
+            user=request.user,
+            institution=membership.institution,
+            status_filter=status_filter,
+            programme_filter=programme_filter,
+        )
+        return Response(queue, status=status.HTTP_200_OK)
+

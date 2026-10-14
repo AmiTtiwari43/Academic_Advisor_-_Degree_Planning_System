@@ -147,3 +147,135 @@ class WhatIfPayloadSerializer(serializers.Serializer):
     student_record_id = serializers.UUIDField(required=True)
     target_curriculum_version_id = serializers.UUIDField(required=True)
     plan_id = serializers.UUIDField(required=False, allow_null=True)
+
+
+class ReviewActionPayloadSerializer(serializers.Serializer):
+    comments = serializers.CharField(required=False, allow_blank=True, default="")
+    expected_row_version = serializers.IntegerField(required=False)
+    idempotency_key = serializers.CharField(required=False, allow_null=True, max_length=128)
+    version_number = serializers.IntegerField(required=False)
+
+
+class OverridePayloadSerializer(serializers.Serializer):
+    override_type = serializers.ChoiceField(
+        choices=[
+            ("PREREQUISITE_OVERRIDE", "Prerequisite Requirement Override"),
+            ("CREDIT_CEILING_OVERRIDE", "Term Credit Ceiling Override"),
+            ("OFFERING_OVERRIDE", "Course Offering Schedule Override"),
+            ("GENERAL_OVERRIDE", "General Degree Requirement Override"),
+        ]
+    )
+    justification = serializers.CharField(required=True, min_length=15)
+    version_number = serializers.IntegerField(required=False)
+    metadata = serializers.DictField(required=False, default=dict)
+
+
+class PlanReviewDecisionSerializer(serializers.ModelSerializer):
+    reviewer_username = serializers.CharField(source="reviewer.username", read_only=True)
+    reviewer_first_name = serializers.CharField(source="reviewer.first_name", read_only=True)
+    reviewer_last_name = serializers.CharField(source="reviewer.last_name", read_only=True)
+    version_number = serializers.IntegerField(source="plan_version.version_number", read_only=True)
+
+    class Meta:
+        from planning.models import PlanReviewDecision
+        model = PlanReviewDecision
+        fields = [
+            "id",
+            "institution",
+            "plan",
+            "plan_version",
+            "version_number",
+            "reviewer",
+            "reviewer_username",
+            "reviewer_first_name",
+            "reviewer_last_name",
+            "action",
+            "from_status",
+            "to_status",
+            "comments",
+            "idempotency_key",
+            "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+
+class OverrideEventSerializer(serializers.ModelSerializer):
+    actor_username = serializers.CharField(source="actor.username", read_only=True)
+    actor_first_name = serializers.CharField(source="actor.first_name", read_only=True)
+    actor_last_name = serializers.CharField(source="actor.last_name", read_only=True)
+    version_number = serializers.IntegerField(source="plan_version.version_number", read_only=True)
+
+    class Meta:
+        from planning.models import OverrideEvent
+        model = OverrideEvent
+        fields = [
+            "id",
+            "institution",
+            "plan",
+            "plan_version",
+            "version_number",
+            "actor",
+            "actor_username",
+            "actor_first_name",
+            "actor_last_name",
+            "override_type",
+            "justification",
+            "metadata",
+            "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+
+class PlanAuditLogSerializer(serializers.ModelSerializer):
+    actor_username = serializers.CharField(source="actor.username", read_only=True)
+    actor_first_name = serializers.CharField(source="actor.first_name", read_only=True)
+    actor_last_name = serializers.CharField(source="actor.last_name", read_only=True)
+    version_number = serializers.IntegerField(
+        source="plan_version.version_number", read_only=True, allow_null=True
+    )
+
+    class Meta:
+        from planning.models import PlanAuditLog
+        model = PlanAuditLog
+        fields = [
+            "id",
+            "institution",
+            "plan",
+            "plan_version",
+            "version_number",
+            "actor",
+            "actor_username",
+            "actor_first_name",
+            "actor_last_name",
+            "action",
+            "from_status",
+            "to_status",
+            "comment",
+            "metadata",
+            "created_at",
+        ]
+        read_only_fields = ["id", "created_at"]
+
+
+
+class ReviewQueueItemSerializer(serializers.Serializer):
+    plan_id = serializers.UUIDField()
+    plan_name = serializers.CharField()
+    status = serializers.CharField()
+    row_version = serializers.IntegerField()
+    student_id = serializers.UUIDField()
+    student_username = serializers.CharField()
+    student_email = serializers.EmailField()
+    programme_code = serializers.CharField()
+    programme_name = serializers.CharField()
+    latest_version_id = serializers.UUIDField(allow_null=True)
+    latest_version_number = serializers.IntegerField()
+    latest_version_status = serializers.CharField()
+    submitted_at = serializers.CharField()
+    waiting_days = serializers.IntegerField()
+    override_count = serializers.IntegerField()
+    hard_constraints_count = serializers.IntegerField()
+    warnings_count = serializers.IntegerField()
+    is_valid_for_submission = serializers.BooleanField()
+    projected_graduation_term = serializers.CharField(allow_null=True)
+

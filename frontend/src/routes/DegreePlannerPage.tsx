@@ -374,6 +374,46 @@ export const DegreePlannerPage: React.FC = () => {
         </div>
       )}
 
+      {/* Advisor Feedback & Revision Banners */}
+      {activePlan?.status === 'RETURNED' && (
+        <div
+          style={{
+            background: 'rgba(245, 158, 11, 0.1)',
+            border: '1px solid rgba(245, 158, 11, 0.3)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-3) var(--space-4)',
+            color: '#b45309',
+            fontSize: 'var(--font-size-sm)',
+          }}
+          data-testid="returned-revision-banner"
+        >
+          <span>
+            <strong>Action Required:</strong> Your degree plan was returned by your academic advisor
+            for revision. Please update your semester course loads and submit an updated plan.
+          </span>
+        </div>
+      )}
+
+      {activePlan?.status === 'APPROVED' && (
+        <div
+          style={{
+            background: 'rgba(16, 185, 129, 0.1)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            borderRadius: 'var(--radius-md)',
+            padding: 'var(--space-3) var(--space-4)',
+            color: '#065f46',
+            fontSize: 'var(--font-size-sm)',
+          }}
+          data-testid="approved-plan-banner"
+        >
+          <span>
+            <strong>Official Approval:</strong> This academic plan has been reviewed and officially
+            approved by your academic advisor.
+          </span>
+        </div>
+      )}
+
+
       {error && (
         <div
           style={{

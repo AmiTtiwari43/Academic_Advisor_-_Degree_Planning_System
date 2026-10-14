@@ -1,0 +1,151 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  background: var(--color-surface-pure);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.filterBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  padding-bottom: var(--space-4);
+  border-bottom: var(--border-subtle);
+}
+
+.filterGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.pillButton {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  border: 1px solid var(--color-slate-200);
+  background: var(--color-surface-pure);
+  color: var(--color-slate-600);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.pillButton:hover {
+  background: var(--color-slate-100);
+  color: var(--color-foundation-navy-900);
+}
+
+.pillButtonActive {
+  background: var(--color-accent-teal-700);
+  color: #ffffff;
+  border-color: var(--color-accent-teal-700);
+}
+
+.searchInput {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  min-width: 240px;
+  background: var(--color-surface-pure);
+  color: var(--color-foundation-navy-900);
+}
+
+.tableWrapper {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: var(--font-size-sm);
+}
+
+.table th {
+  padding: var(--space-3);
+  background: var(--color-slate-50);
+  color: var(--color-slate-700);
+  font-weight: 600;
+  border-bottom: 2px solid var(--color-slate-200);
+  white-space: nowrap;
+}
+
+.table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-slate-100);
+  vertical-align: middle;
+}
+
+.row:hover {
+  background-color: var(--color-slate-50);
+}
+
+.selectedRow {
+  background-color: rgba(13, 148, 136, 0.08) !important;
+}
+
+.studentInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.studentName {
+  font-weight: 600;
+  color: var(--color-foundation-navy-900);
+}
+
+.studentMeta {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+}
+
+.waitBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+}
+
+.waitNormal {
+  background: var(--color-slate-100);
+  color: var(--color-slate-700);
+}
+
+.waitUrgent {
+  background: rgba(239, 68, 68, 0.12);
+  color: var(--color-accent-crimson-600);
+}
+
+.actionBtn {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-accent-teal-600);
+  background: #ffffff;
+  color: var(--color-accent-teal-700);
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.actionBtn:hover {
+  background: var(--color-accent-teal-600);
+  color: #ffffff;
+}
+
+.emptyState {
+  padding: var(--space-6);
+  text-align: center;
+  color: var(--color-slate-500);
+}

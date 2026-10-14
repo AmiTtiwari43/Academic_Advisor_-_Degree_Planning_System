@@ -1,0 +1,104 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-surface-pure);
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.planContext {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.planTitle {
+  font-size: var(--font-size-base);
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
+}
+
+.metaBadge {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+  background: var(--color-slate-100);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+  font-family: monospace;
+}
+
+.actionsGroup {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.btnAction {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+}
+
+.btnAction:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btnStartReview {
+  background: var(--color-foundation-navy-900);
+  color: #ffffff;
+}
+
+.btnStartReview:hover:not(:disabled) {
+  background: var(--color-slate-800);
+}
+
+.btnApprove {
+  background: var(--color-accent-teal-700);
+  color: #ffffff;
+}
+
+.btnApprove:hover:not(:disabled) {
+  background: var(--color-accent-teal-600);
+}
+
+.btnReturn {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.btnReturn:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.btnReject {
+  background: var(--color-accent-crimson-600);
+  color: #ffffff;
+}
+
+.btnReject:hover:not(:disabled) {
+  background: #b91c1c;
+}
+
+.btnOverride {
+  background: #8b5cf6;
+  color: #ffffff;
+}
+
+.btnOverride:hover:not(:disabled) {
+  background: #7c3aed;
+}

@@ -14,6 +14,7 @@ import { DashboardPage } from '../routes/DashboardPage';
 import { CurriculumWorkspacePage } from '../routes/CurriculumWorkspacePage';
 import { DegreePlannerPage } from '../routes/DegreePlannerPage';
 import { DegreeAuditPage } from '../routes/DegreeAuditPage';
+import { AdvisorWorkspacePage } from '../routes/AdvisorWorkspacePage';
 import { NotFoundPage } from '../routes/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -46,7 +47,7 @@ export const App: React.FC = () => {
                 <Route path="/curriculum" element={<CurriculumWorkspacePage />} />
                 <Route path="/plan" element={<DegreePlannerPage />} />
                 <Route path="/audit" element={<DegreeAuditPage />} />
-                <Route path="/advising" element={<DashboardPage />} />
+                <Route path="/advising" element={<AdvisorWorkspacePage />} />
                 <Route path="/careers" element={<DashboardPage />} />
                 <Route path="/admin" element={<DashboardPage />} />
               </Route>
