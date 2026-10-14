@@ -1,0 +1,182 @@
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 20, 36, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: var(--space-4);
+}
+
+.modalContent {
+  background: var(--color-surface-pure);
+  border: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 20px 25px -5px rgba(10, 20, 36, 0.2);
+  width: 100%;
+  max-width: 800px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.modalHeader {
+  padding: var(--space-4) var(--space-6);
+  background: var(--color-surface-muted);
+  border-bottom: var(--border-subtle);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.modalTitle {
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-foundation-navy-900);
+  margin: 0;
+}
+
+.closeBtn {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--color-slate-500);
+  cursor: pointer;
+  padding: var(--space-1) var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.closeBtn:hover {
+  background: var(--color-slate-200);
+  color: var(--color-slate-900);
+}
+
+.modalBody {
+  padding: var(--space-6);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.disclaimerBanner {
+  background: var(--color-foundation-navy-100);
+  border: 1px solid var(--color-foundation-navy-700);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--font-size-xs);
+  color: var(--color-foundation-navy-900);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.selectionRow {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.selectLabel {
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-foundation-navy-900);
+}
+
+.selectInput {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-sm);
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-pure);
+}
+
+.selectInput:focus {
+  border-color: var(--color-accent-teal-600);
+  outline: none;
+}
+
+.resultsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-top: var(--space-2);
+}
+
+.metricCards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--space-3);
+}
+
+.card {
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  border: var(--border-subtle);
+  background: var(--color-surface-ivory);
+}
+
+.cardLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+  text-transform: uppercase;
+}
+
+.cardValue {
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  font-family: var(--font-family-mono);
+  color: var(--color-foundation-navy-900);
+  margin-top: var(--space-1);
+}
+
+.groupAuditList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.groupItem {
+  padding: var(--space-3);
+  border: var(--border-subtle);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: var(--font-size-sm);
+}
+
+.groupSatisfied {
+  background: #F0FDF4;
+  border-left: 4px solid #16A34A;
+}
+
+.groupUnsatisfied {
+  background: #FEF2F2;
+  border-left: 4px solid #DC2626;
+}
+
+.runBtn {
+  align-self: flex-start;
+  padding: var(--space-2) var(--space-5);
+  background: var(--color-accent-teal-600);
+  color: #ffffff;
+  border: none;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: background 0.15s ease;
+}
+
+.runBtn:hover:not(:disabled) {
+  background: var(--color-accent-teal-700);
+}
+
+.runBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

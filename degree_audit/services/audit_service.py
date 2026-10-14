@@ -51,7 +51,12 @@ class DegreeAuditReport:
         return asdict(self)
 
 
-def run_degree_audit(student_record: StudentRecord) -> DegreeAuditReport:
+def run_degree_audit(
+    student_record: StudentRecord,
+    simulated_context: Any = None,
+    target_curriculum: Any = None,
+    is_simulation: bool = False,
+) -> DegreeAuditReport:
     """
     Authoritative degree audit against the student's pinned curriculum version.
     Strict Allocation Rules:
@@ -61,8 +66,8 @@ def run_degree_audit(student_record: StudentRecord) -> DegreeAuditReport:
     4. Each completed course is allocated to at most ONE requirement group (no double counting).
     5. Mandatory group courses are fulfilled first, followed by electives and category groups.
     """
-    curriculum = student_record.pinned_curriculum
-    context = build_rule_context(student_record)
+    curriculum = target_curriculum or student_record.pinned_curriculum
+    context = simulated_context or build_rule_context(student_record)
 
     # 1. Build pool of completed courses available for allocation
     # Track which course codes have been allocated to avoid double-counting
@@ -311,8 +316,8 @@ def run_degree_audit(student_record: StudentRecord) -> DegreeAuditReport:
 
     overall_cgpa_val = context.cgpa if context.cgpa is not None else Decimal("0.00")
 
-    # Update cached totals on student record if different
-    if (
+    # Update cached totals on student record if different (and not in simulation mode)
+    if not is_simulation and (
         student_record.cached_total_credits != total_earned
         or student_record.cached_cgpa != overall_cgpa_val
     ):

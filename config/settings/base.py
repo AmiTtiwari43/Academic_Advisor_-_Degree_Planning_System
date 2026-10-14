@@ -176,6 +176,8 @@ SPECTACULAR_SETTINGS = {
         "CurriculumStatusEnum": "curriculum.models.CurriculumStatus",
         "StudentRecordStatusEnum": "academic_records.models.StudentRecordStatus",
         "TranscriptEntryStatusEnum": "academic_records.models.TranscriptEntryStatus",
+        "PlanStatusEnum": "planning.models.PlanStatus",
+        "PlanVersionStatusEnum": "planning.models.PlanVersionStatus",
     },
 }
 

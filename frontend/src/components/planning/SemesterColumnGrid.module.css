@@ -1,0 +1,44 @@
+.gridContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.columnsWrapper {
+  display: flex;
+  gap: var(--space-4);
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
+  scroll-behavior: smooth;
+}
+
+.columnsWrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.columnsWrapper::-webkit-scrollbar-track {
+  background: var(--color-surface-muted);
+  border-radius: 4px;
+}
+
+.columnsWrapper::-webkit-scrollbar-thumb {
+  background: var(--color-slate-300);
+  border-radius: 4px;
+}
+
+.columnsWrapper::-webkit-scrollbar-thumb:hover {
+  background: var(--color-slate-500);
+}
+
+.gridActions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-2) 0;
+}
+
+.termCount {
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-500);
+}

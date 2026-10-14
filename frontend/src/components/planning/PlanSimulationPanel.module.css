@@ -1,0 +1,177 @@
+.panelContainer {
+  background: var(--color-surface-pure);
+  border: var(--border-subtle);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-4) var(--space-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.topRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.timelineSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.gradBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-foundation-navy-100);
+  color: var(--color-foundation-navy-900);
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-serif);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+}
+
+.gradIcon {
+  font-size: 1.1rem;
+}
+
+.metricsRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.metricItem {
+  display: flex;
+  flex-direction: column;
+}
+
+.metricLabel {
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.metricValue {
+  font-family: var(--font-family-mono);
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
+}
+
+.actionsSection {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.actionBtn {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  transition: all 0.15s ease;
+}
+
+.btnSecondary {
+  background: var(--color-surface-pure);
+  border: var(--border-default);
+  color: var(--color-slate-700);
+}
+
+.btnSecondary:hover:not(:disabled) {
+  background: var(--color-surface-hover);
+  border-color: var(--color-slate-500);
+}
+
+.btnPrimary {
+  background: var(--color-accent-teal-600);
+  border: 1px solid var(--color-accent-teal-700);
+  color: #ffffff;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: var(--color-accent-teal-700);
+}
+
+.btnSubmit {
+  background: var(--color-foundation-navy-800);
+  border: 1px solid var(--color-foundation-navy-900);
+  color: #ffffff;
+}
+
+.btnSubmit:hover:not(:disabled) {
+  background: var(--color-foundation-navy-900);
+}
+
+.actionBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.issuesContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.hardBanner {
+  background: var(--color-status-danger-bg);
+  border: 1px solid var(--color-status-danger-border);
+  color: var(--color-status-danger-text);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.warningBanner {
+  background: var(--color-status-warning-bg);
+  border: 1px solid var(--color-status-warning-border);
+  color: var(--color-status-warning-text);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
+}
+
+.bannerTitle {
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--space-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.constraintList {
+  margin: var(--space-1) 0 0 0;
+  padding-left: var(--space-4);
+  font-size: var(--font-size-xs);
+}
+
+.constraintItem {
+  margin-bottom: var(--space-1);
+}
+
+.validBanner {
+  background: var(--color-status-success-bg);
+  border: 1px solid var(--color-status-success-border);
+  color: var(--color-status-success-text);
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}

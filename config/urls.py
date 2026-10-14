@@ -69,4 +69,7 @@ urlpatterns = [
     # Academic Records, Degree Audit and Eligibility
     path("api/v1/", include("academic_records.urls")),
     path("api/", include("academic_records.urls")),
+    # Multi-Semester Planning and What-If Simulation
+    path("api/v1/", include("planning.urls")),
+    path("api/", include("planning.urls")),
 ]

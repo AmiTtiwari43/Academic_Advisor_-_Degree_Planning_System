@@ -12,6 +12,7 @@ import { ResetPasswordPage } from '../routes/ResetPasswordPage';
 import { AccessDeniedPage } from '../routes/AccessDeniedPage';
 import { DashboardPage } from '../routes/DashboardPage';
 import { CurriculumWorkspacePage } from '../routes/CurriculumWorkspacePage';
+import { DegreePlannerPage } from '../routes/DegreePlannerPage';
 import { DegreeAuditPage } from '../routes/DegreeAuditPage';
 import { NotFoundPage } from '../routes/NotFoundPage';
 
@@ -43,7 +44,7 @@ export const App: React.FC = () => {
               <Route element={<AppLayout />}>
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/curriculum" element={<CurriculumWorkspacePage />} />
-                <Route path="/plan" element={<DashboardPage />} />
+                <Route path="/plan" element={<DegreePlannerPage />} />
                 <Route path="/audit" element={<DegreeAuditPage />} />
                 <Route path="/advising" element={<DashboardPage />} />
                 <Route path="/careers" element={<DashboardPage />} />

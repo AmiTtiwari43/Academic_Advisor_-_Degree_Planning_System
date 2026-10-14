@@ -189,6 +189,9 @@ export const academicRecordsApi = {
   getTerms: () =>
     apiClient.get<AcademicTerm[]>('/api/v1/terms/'),
 
+  getAcademicTerms: () =>
+    apiClient.get<AcademicTerm[]>('/api/v1/terms/'),
+
   getTransferCredits: (recordId?: string) =>
     apiClient.get<TransferCredit[]>('/api/v1/transfer-credits/', recordId ? { params: { student_record: recordId } } : undefined),
 
