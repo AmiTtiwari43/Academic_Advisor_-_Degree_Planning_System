@@ -185,11 +185,11 @@ def validate_curriculum_version(version: CurriculumVersion) -> ValidationReport:
                 )
             )
 
-    # 3. Prerequisite Rules Validation & Circularity
-    rules = list(version.prerequisite_rules.select_related("course").all())
+    # 3. Prerequisite Rules Validation, Circularity & Missing References (via curriculum.graph)
+    from curriculum.graph import detect_cycles
+    from curriculum.services.graph_service import build_curriculum_version_graph
 
-    # Course -> list of prerequisite course codes
-    prereq_graph: dict[str, list[str]] = {}
+    rules = list(version.prerequisite_rules.select_related("course").all())
 
     for rule in rules:
         course_code = rule.course.code.upper()
@@ -205,43 +205,33 @@ def validate_curriculum_version(version: CurriculumVersion) -> ValidationReport:
                     entity_id=str(rule.id),
                 )
             )
-            continue
 
-        # Extract referenced courses
-        prereqs = _extract_referenced_courses(rule.rule_json)
-        prereq_graph[course_code] = list(prereqs)
-
-    # Detect cycles in prerequisite dependency graph
-    visited_global: set[str] = set()
-
-    def dfs(node: str, path: list[str]) -> bool:
-        if node in path:
-            cycle_start_idx = path.index(node)
-            cycle_path = path[cycle_start_idx:] + [node]
-            cycle_str = " -> ".join(cycle_path)
+    # Build CurriculumGraph and detect cycles
+    graph = build_curriculum_version_graph(version)
+    cycle_check = detect_cycles(graph)
+    if cycle_check.has_cycle:
+        for cycle in cycle_check.cycles:
+            cycle_str = " -> ".join(cycle)
             errors.append(
                 ValidationErrorDetail(
                     code="CIRCULAR_PREREQUISITE",
                     message=f"Circular prerequisite detected: {cycle_str}",
                     entity_type="PrerequisiteRule",
-                    details={"cycle": cycle_path},
+                    details={"cycle": cycle},
                 )
             )
-            return True
-        if node in visited_global:
-            return False
 
-        path.append(node)
-        for neighbor in prereq_graph.get(node, []):
-            if dfs(neighbor, path):
-                return True
-        path.pop()
-        visited_global.add(node)
-        return False
-
-    for course_node in list(prereq_graph.keys()):
-        if course_node not in visited_global:
-            dfs(course_node, [])
+    # Audit missing course references in prerequisite rules
+    missing_courses = graph.get_missing_course_references()
+    for missing_code in missing_courses:
+        warnings.append(
+            ValidationWarningDetail(
+                code="MISSING_COURSE_REFERENCE",
+                message=f"Prerequisite rule references course '{missing_code}' which is not in this curriculum version's courses.",
+                entity_type="PrerequisiteRule",
+                details={"course_code": missing_code},
+            )
+        )
 
     return ValidationReport(
         is_valid=len(errors) == 0,

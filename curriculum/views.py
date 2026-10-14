@@ -249,6 +249,181 @@ class CurriculumVersionViewSet(BaseTenantViewSet):
         diff_data = compare_curriculum_versions(version, other_version)
         return Response(diff_data, status=status.HTTP_200_OK)
 
+    @action(detail=True, methods=["get"], url_path="graph")
+    def graph(self, request, pk=None):
+        """Returns the full prerequisite and requirement dependency graph for this version."""
+        from curriculum.graph import detect_cycles
+        from curriculum.serializers import CurriculumGraphResponseSerializer
+        from curriculum.services.graph_service import build_curriculum_version_graph
+
+        version = self.get_object()
+        c_graph = build_curriculum_version_graph(version)
+        cycle_result = detect_cycles(c_graph)
+
+        nodes_data = [
+            {
+                "code": n.code,
+                "title": n.title,
+                "credits": n.credits,
+                "is_offered": n.is_offered,
+                "metadata": n.metadata,
+            }
+            for n in c_graph.nodes.values()
+        ]
+        edges_data = [
+            {
+                "dependent": e.dependent,
+                "prerequisite": e.prerequisite,
+                "dependency_type": e.dependency_type.value,
+                "min_grade": e.min_grade,
+                "group_type": e.group_type,
+                "group_id": e.group_id,
+            }
+            for e in c_graph.get_all_edges()
+        ]
+
+        payload = {
+            "node_count": c_graph.node_count,
+            "edge_count": c_graph.edge_count,
+            "has_cycle": cycle_result.has_cycle,
+            "cycles": cycle_result.cycles,
+            "missing_references": c_graph.get_missing_course_references(),
+            "nodes": nodes_data,
+            "edges": edges_data,
+        }
+        return Response(CurriculumGraphResponseSerializer(payload).data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="course_code",
+                type=str,
+                location=OpenApiParameter.PATH,
+                description="Code of the course (e.g. CS-101)",
+            )
+        ]
+    )
+    @action(detail=True, methods=["get"], url_path="courses/(?P<course_code>[^/.]+)/dependency_paths")
+    def dependency_paths(self, request, pk=None, course_code=None):
+        """Returns explainable prerequisite dependency chains for a given course."""
+        from curriculum.serializers import ExplainablePathSerializer
+        from curriculum.services.graph_service import get_course_dependency_paths
+
+        version = self.get_object()
+        paths = get_course_dependency_paths(version, course_code)
+        paths_data = [
+            {
+                "target_course": p.target_course,
+                "root_prerequisite": p.root_prerequisite,
+                "path": p.path,
+                "steps": [
+                    {
+                        "course_code": s.course_code,
+                        "course_title": s.course_title,
+                        "dependency_type": s.dependency_type.value,
+                        "min_grade": s.min_grade,
+                        "depth": s.depth,
+                    }
+                    for s in p.steps
+                ],
+                "explanation": p.explanation,
+            }
+            for p in paths
+        ]
+        return Response(ExplainablePathSerializer(paths_data, many=True).data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="course_code",
+                type=str,
+                location=OpenApiParameter.PATH,
+                description="Code of the course (e.g. CS-101)",
+            )
+        ]
+    )
+    @action(detail=True, methods=["get"], url_path="courses/(?P<course_code>[^/.]+)/visualize")
+    def visualize(self, request, pk=None, course_code=None):
+        """Returns SVG visualization and accessible text alternative for a course subgraph."""
+        from curriculum.serializers import GraphVisualizationSerializer
+        from curriculum.services.graph_service import get_course_subgraph_visualization
+
+        version = self.get_object()
+        upstream_depth = int(request.query_params.get("upstream_depth", 2))
+        downstream_depth = int(request.query_params.get("downstream_depth", 1))
+
+        payload = get_course_subgraph_visualization(
+            version,
+            course_code,
+            upstream_depth=upstream_depth,
+            downstream_depth=downstream_depth,
+        )
+        return Response(GraphVisualizationSerializer(payload).data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="course_code",
+                type=str,
+                location=OpenApiParameter.PATH,
+                description="Code of the course (e.g. CS-101)",
+            )
+        ]
+    )
+    @action(detail=True, methods=["get"], url_path="courses/(?P<course_code>[^/.]+)/blocked_by")
+    def blocked_by(self, request, pk=None, course_code=None):
+        """Returns reasons and courses that currently block a student from taking course_code."""
+        from academic_records.models import StudentRecord
+        from curriculum.serializers import BlockedByResponseSerializer
+        from curriculum.services.graph_service import get_student_blocked_by
+
+        version = self.get_object()
+        student_id = request.query_params.get("student_id")
+
+        if student_id:
+            student_record = StudentRecord.objects.filter(
+                id=student_id, institution=version.institution
+            ).first()
+            if not student_record:
+                return Response(
+                    {"detail": "Student record not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+        else:
+            student_record = StudentRecord.objects.filter(
+                student=request.user, institution=version.institution
+            ).first()
+            if not student_record:
+                return Response(
+                    {"detail": "No student record associated with current user."},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+
+        result = get_student_blocked_by(version, course_code, student_record)
+
+        def serialize_reason(r):
+            return {
+                "course_code": r.course_code,
+                "missing_prerequisite": r.missing_prerequisite,
+                "dependency_type": r.dependency_type.value,
+                "required_min_grade": r.required_min_grade,
+                "student_status": r.student_status,
+                "student_grade": r.student_grade,
+                "is_direct": r.is_direct,
+                "blocking_chain": r.blocking_chain,
+                "message": r.message,
+            }
+
+        payload = {
+            "course_code": result.course_code,
+            "is_blocked": result.is_blocked,
+            "direct_blockers": [serialize_reason(r) for r in result.direct_blockers],
+            "indirect_blockers": [serialize_reason(r) for r in result.indirect_blockers],
+            "all_blocking_courses": sorted(list(result.all_blocking_courses)),
+            "unlocked_courses": result.unlocked_courses,
+        }
+        return Response(BlockedByResponseSerializer(payload).data, status=status.HTTP_200_OK)
+
 
 class CourseViewSet(BaseTenantViewSet):
     queryset = Course.objects.all().select_related("default_credit_category")

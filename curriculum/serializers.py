@@ -241,3 +241,72 @@ class StudentCurriculumAssignmentSerializer(serializers.ModelSerializer):
             "is_active",
         ]
         read_only_fields = ["id", "assigned_at"]
+
+
+class GraphNodeSerializer(serializers.Serializer):
+    code = serializers.CharField()
+    title = serializers.CharField()
+    credits = serializers.FloatField()
+    is_offered = serializers.BooleanField()
+    metadata = serializers.DictField(required=False)
+
+
+class GraphEdgeSerializer(serializers.Serializer):
+    dependent = serializers.CharField()
+    prerequisite = serializers.CharField()
+    dependency_type = serializers.CharField()
+    min_grade = serializers.CharField(allow_null=True)
+    group_type = serializers.CharField()
+    group_id = serializers.CharField(allow_null=True)
+
+
+class CurriculumGraphResponseSerializer(serializers.Serializer):
+    node_count = serializers.IntegerField()
+    edge_count = serializers.IntegerField()
+    has_cycle = serializers.BooleanField()
+    cycles = serializers.ListField(child=serializers.ListField(child=serializers.CharField()))
+    missing_references = serializers.ListField(child=serializers.CharField())
+    nodes = GraphNodeSerializer(many=True)
+    edges = GraphEdgeSerializer(many=True)
+
+
+class DependencyChainStepSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    course_title = serializers.CharField()
+    dependency_type = serializers.CharField()
+    min_grade = serializers.CharField(allow_null=True)
+    depth = serializers.IntegerField()
+
+
+class ExplainablePathSerializer(serializers.Serializer):
+    target_course = serializers.CharField()
+    root_prerequisite = serializers.CharField()
+    path = serializers.ListField(child=serializers.CharField())
+    steps = DependencyChainStepSerializer(many=True)
+    explanation = serializers.CharField()
+
+
+class GraphVisualizationSerializer(serializers.Serializer):
+    svg = serializers.CharField()
+    accessible_text = serializers.CharField()
+
+
+class BlockedReasonSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    missing_prerequisite = serializers.CharField()
+    dependency_type = serializers.CharField()
+    required_min_grade = serializers.CharField(allow_null=True)
+    student_status = serializers.CharField(allow_null=True)
+    student_grade = serializers.CharField(allow_null=True)
+    is_direct = serializers.BooleanField()
+    blocking_chain = serializers.ListField(child=serializers.CharField())
+    message = serializers.CharField()
+
+
+class BlockedByResponseSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    is_blocked = serializers.BooleanField()
+    direct_blockers = BlockedReasonSerializer(many=True)
+    indirect_blockers = BlockedReasonSerializer(many=True)
+    all_blocking_courses = serializers.ListField(child=serializers.CharField())
+    unlocked_courses = serializers.ListField(child=serializers.CharField())
