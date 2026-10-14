@@ -17,14 +17,22 @@ from planning.models import (
     Plan,
     PlanVersion,
 )
+from planning.optimizer.models import (
+    CandidatePlan,
+    ScheduledCourse,
+    TradeOffSummary,
+)
 from planning.serializers import (
     AddCoursePayloadSerializer,
+    ApplyOptimizedPlanSerializer,
     MoveCoursePayloadSerializer,
     OverrideEventSerializer,
     OverridePayloadSerializer,
     PlanAuditLogSerializer,
     PlanDetailSerializer,
     PlanItemSerializer,
+    PlanOptimizeRequestSerializer,
+    PlanOptimizeResponseSerializer,
     PlanReviewDecisionSerializer,
     PlanSerializer,
     PlanUpdatePayloadSerializer,
@@ -34,6 +42,11 @@ from planning.serializers import (
     ReviewQueueItemSerializer,
     SubmitPlanPayloadSerializer,
     WhatIfPayloadSerializer,
+)
+from planning.services.optimizer_service import (
+    OptimizerThrottledError,
+    apply_candidate_plan,
+    run_plan_optimization,
 )
 from planning.services.plan_management_service import (
     PlanConcurrencyError,
@@ -507,6 +520,136 @@ class PlanViewSet(viewsets.ModelViewSet):
         plan = self.get_object()
         events = plan.override_events.all().order_by("-created_at")
         return Response(OverrideEventSerializer(events, many=True).data)
+
+    @action(detail=False, methods=["post"], url_path="optimize")
+    def optimize(self, request):
+        """
+        Runs the constraint-based degree plan optimizer for a student.
+        """
+        serializer = PlanOptimizeRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        inst = self._get_user_institution()
+
+        student_record_id = data.get("student_record_id")
+        if student_record_id:
+            student_record = StudentRecord.objects.filter(
+                id=student_record_id, institution=inst
+            ).first()
+            if not student_record:
+                raise NotFound("Student record not found in institution.")
+            if not can_view_student_record(request.user, student_record.student, inst):
+                raise PermissionDenied("You do not have permission to optimize for this student.")
+        else:
+            student_record = StudentRecord.objects.filter(
+                student=request.user, institution=inst
+            ).first()
+            if not student_record:
+                raise NotFound("No student record found for current user.")
+
+        curriculum_version = None
+        if data.get("curriculum_version_id"):
+            curriculum_version = CurriculumVersion.objects.filter(
+                id=data["curriculum_version_id"], institution=inst
+            ).first()
+            if not curriculum_version:
+                raise NotFound("Curriculum version not found.")
+
+        try:
+            result = run_plan_optimization(
+                student_record=student_record,
+                curriculum_version=curriculum_version,
+                target_credits_per_term=data.get("target_credits_per_term", 15.0),
+                max_plans=data.get("max_plans", 3),
+                timeout_seconds=data.get("timeout_seconds", 5.0),
+                enforce_min_credits=data.get("enforce_min_credits", True),
+                user=request.user,
+            )
+            return Response(PlanOptimizeResponseSerializer(result).data, status=status.HTTP_200_OK)
+        except OptimizerThrottledError as exc:
+            return Response(
+                {"code": "RATE_LIMIT_EXCEEDED", "message": str(exc)},
+                status=status.HTTP_429_TOO_MANY_REQUESTS,
+            )
+
+    @action(detail=False, methods=["post"], url_path="apply-optimized")
+    def apply_optimized(self, request):
+        """
+        Saves a selected candidate plan as a new DRAFT plan for the student.
+        """
+        serializer = ApplyOptimizedPlanSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        data = serializer.validated_data
+
+        inst = self._get_user_institution()
+
+        student_record_id = data.get("student_record_id")
+        if student_record_id:
+            student_record = StudentRecord.objects.filter(
+                id=student_record_id, institution=inst
+            ).first()
+            if not student_record:
+                raise NotFound("Student record not found in institution.")
+            if not can_view_student_record(request.user, student_record.student, inst):
+                raise PermissionDenied("You do not have permission to apply a plan for this student.")
+        else:
+            student_record = StudentRecord.objects.filter(
+                student=request.user, institution=inst
+            ).first()
+            if not student_record:
+                raise NotFound("No student record found for current user.")
+
+        curriculum_version = None
+        if data.get("curriculum_version_id"):
+            curriculum_version = CurriculumVersion.objects.filter(
+                id=data["curriculum_version_id"], institution=inst
+            ).first()
+            if not curriculum_version:
+                raise NotFound("Curriculum version not found.")
+
+        cand_data = data["candidate_plan"]
+        sched_courses = [
+            ScheduledCourse(
+                course_code=sc["course_code"],
+                term_index=sc["term_index"],
+                term_code=sc["term_code"],
+                credits=sc["credits"],
+            )
+            for sc in cand_data["scheduled_courses"]
+        ]
+        trade_data = cand_data["trade_offs"]
+        trade_offs = TradeOffSummary(
+            plan_label=trade_data["plan_label"],
+            total_terms_used=trade_data["total_terms_used"],
+            graduation_term_code=trade_data.get("graduation_term_code", ""),
+            total_credits=trade_data["total_credits"],
+            average_credits_per_term=trade_data["average_credits_per_term"],
+            workload_variance=trade_data["workload_variance"],
+            max_term_credits=trade_data["max_term_credits"],
+            min_term_credits=trade_data["min_term_credits"],
+            trade_off_explanation=trade_data["trade_off_explanation"],
+        )
+        candidate_plan = CandidatePlan(
+            plan_index=cand_data["plan_index"],
+            plan_label=cand_data["plan_label"],
+            scheduled_courses=sched_courses,
+            terms_used=cand_data["terms_used"],
+            term_loads=cand_data["term_loads"],
+            trade_offs=trade_offs,
+            is_validated=cand_data.get("is_validated", False),
+            validation_notes=cand_data.get("validation_notes", []),
+        )
+
+        plan = apply_candidate_plan(
+            student_record=student_record,
+            candidate_plan=candidate_plan,
+            plan_name=data.get("plan_name", "Optimized Academic Plan"),
+            curriculum_version=curriculum_version,
+            is_primary=data.get("is_primary", False),
+            user=request.user,
+        )
+        return Response(PlanDetailSerializer(plan).data, status=status.HTTP_201_CREATED)
 
 
 class WhatIfSimulationView(GenericAPIView):

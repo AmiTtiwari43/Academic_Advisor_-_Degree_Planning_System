@@ -279,3 +279,58 @@ class ReviewQueueItemSerializer(serializers.Serializer):
     is_valid_for_submission = serializers.BooleanField()
     projected_graduation_term = serializers.CharField(allow_null=True)
 
+
+class ScheduledCourseSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    term_index = serializers.IntegerField()
+    term_code = serializers.CharField()
+    credits = serializers.FloatField()
+
+
+class TradeOffSummarySerializer(serializers.Serializer):
+    plan_label = serializers.CharField()
+    total_terms_used = serializers.IntegerField()
+    graduation_term_code = serializers.CharField(allow_blank=True)
+    total_credits = serializers.FloatField()
+    average_credits_per_term = serializers.FloatField()
+    workload_variance = serializers.FloatField()
+    max_term_credits = serializers.FloatField()
+    min_term_credits = serializers.FloatField()
+    trade_off_explanation = serializers.CharField()
+
+
+class CandidatePlanSerializer(serializers.Serializer):
+    plan_index = serializers.IntegerField()
+    plan_label = serializers.CharField()
+    scheduled_courses = ScheduledCourseSerializer(many=True)
+    terms_used = serializers.ListField(child=serializers.CharField())
+    term_loads = serializers.DictField(child=serializers.FloatField())
+    trade_offs = TradeOffSummarySerializer()
+    is_validated = serializers.BooleanField()
+    validation_notes = serializers.ListField(child=serializers.CharField(), required=False)
+
+
+class PlanOptimizeRequestSerializer(serializers.Serializer):
+    student_record_id = serializers.CharField(required=False, allow_null=True)
+    curriculum_version_id = serializers.UUIDField(required=False, allow_null=True)
+    target_credits_per_term = serializers.FloatField(default=15.0, required=False)
+    max_plans = serializers.IntegerField(default=3, min_value=1, max_value=5, required=False)
+    timeout_seconds = serializers.FloatField(default=5.0, min_value=0.5, max_value=30.0, required=False)
+    enforce_min_credits = serializers.BooleanField(default=True, required=False)
+
+
+class PlanOptimizeResponseSerializer(serializers.Serializer):
+    is_feasible = serializers.BooleanField()
+    candidate_plans = CandidatePlanSerializer(many=True)
+    blocking_constraints = serializers.ListField(child=serializers.CharField())
+    solver_status = serializers.CharField()
+    solve_time_seconds = serializers.FloatField()
+
+
+class ApplyOptimizedPlanSerializer(serializers.Serializer):
+    student_record_id = serializers.CharField(required=False, allow_null=True)
+    curriculum_version_id = serializers.UUIDField(required=False, allow_null=True)
+    plan_name = serializers.CharField(default="Optimized Academic Plan", required=False)
+    is_primary = serializers.BooleanField(default=False, required=False)
+    candidate_plan = CandidatePlanSerializer()
+
