@@ -178,8 +178,10 @@ SPECTACULAR_SETTINGS = {
         "TranscriptEntryStatusEnum": "academic_records.models.TranscriptEntryStatus",
         "PlanStatusEnum": "planning.models.PlanStatus",
         "PlanVersionStatusEnum": "planning.models.PlanVersionStatus",
+        "ProficiencyLevelEnum": "career_mapping.models.ProficiencyLevel",
     },
 }
+
 
 # Session & Cookie Defaults
 SESSION_COOKIE_HTTPONLY = True

@@ -72,4 +72,8 @@ urlpatterns = [
     # Multi-Semester Planning and What-If Simulation
     path("api/v1/", include("planning.urls")),
     path("api/", include("planning.urls")),
+    # Career and Skill Mapping
+    path("api/v1/", include("career_mapping.urls")),
+    path("api/", include("career_mapping.urls")),
 ]
+
