@@ -28,6 +28,7 @@ from curriculum.serializers import (
     CourseOfferingSerializer,
     CourseSerializer,
     CreditCategorySerializer,
+    CurriculumImpactReportSerializer,
     CurriculumVersionSerializer,
     CurriculumVersionSummarySerializer,
     PrerequisiteRuleSerializer,
@@ -423,6 +424,67 @@ class CurriculumVersionViewSet(BaseTenantViewSet):
             "unlocked_courses": result.unlocked_courses,
         }
         return Response(BlockedByResponseSerializer(payload).data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="compare_to",
+                type=uuid.UUID,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description="Optional ID of specific curriculum version to compare against (defaults to active published version).",
+            )
+        ],
+        description="Run pre-publication impact analysis comparing a draft curriculum version with a published version.",
+        responses={200: CurriculumImpactReportSerializer},
+    )
+    @action(detail=True, methods=["get"], url_path="impact-analysis")
+    def impact_analysis(self, request, pk=None):
+        """
+        Evaluates the potential impact of draft curriculum changes on active students and plans.
+        Strictly read-only; alters zero database records.
+        Authorized only for Coordinator, HoD, and Admin.
+        """
+        from curriculum.serializers import CurriculumImpactReportSerializer
+        from curriculum.services.impact_service import analyze_curriculum_change_impact
+
+        version = self.get_object()
+
+        # Permission check: Coordinators, HoDs, and Admins only; Students denied
+        if not can_manage_curriculum(request.user, version.institution):
+            raise permissions.exceptions.PermissionDenied(
+                "You do not have permission to run curriculum impact analysis."
+            )
+
+        compare_to_id = request.query_params.get("compare_to")
+        published_version = None
+        if compare_to_id:
+            user_insts = get_user_institutions(request.user)
+            published_version = CurriculumVersion.objects.filter(
+                id=compare_to_id, institution_id__in=user_insts
+            ).first()
+            if not published_version:
+                return Response(
+                    {"detail": "Comparison curriculum version not found."},
+                    status=status.HTTP_404_NOT_FOUND,
+                )
+
+        try:
+            report = analyze_curriculum_change_impact(
+                draft_version=version,
+                published_version=published_version,
+            )
+        except ValueError as err:
+            return Response(
+                {"detail": str(err)},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        return Response(
+            CurriculumImpactReportSerializer(report.to_dict()).data,
+            status=status.HTTP_200_OK,
+        )
+
 
 
 class CourseViewSet(BaseTenantViewSet):

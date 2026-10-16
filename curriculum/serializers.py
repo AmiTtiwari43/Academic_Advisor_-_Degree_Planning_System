@@ -310,3 +310,79 @@ class BlockedByResponseSerializer(serializers.Serializer):
     indirect_blockers = BlockedReasonSerializer(many=True)
     all_blocking_courses = serializers.ListField(child=serializers.CharField())
     unlocked_courses = serializers.ListField(child=serializers.CharField())
+
+
+class ImpactSummarySerializer(serializers.Serializer):
+    total_students_assessed = serializers.IntegerField()
+    total_students_affected = serializers.IntegerField()
+    total_plans_assessed = serializers.IntegerField()
+    total_plans_affected = serializers.IntegerField()
+    students_delayed_count = serializers.IntegerField()
+    high_impact_count = serializers.IntegerField()
+    moderate_impact_count = serializers.IntegerField()
+    low_impact_count = serializers.IntegerField()
+
+
+class RequirementDiffSerializer(serializers.Serializer):
+    group_id = serializers.CharField()
+    group_name = serializers.CharField()
+    change_type = serializers.CharField()
+    old_min_credits = serializers.FloatField(allow_null=True)
+    new_min_credits = serializers.FloatField(allow_null=True)
+    old_min_courses = serializers.IntegerField(allow_null=True)
+    new_min_courses = serializers.IntegerField(allow_null=True)
+    added_mandatory_courses = serializers.ListField(child=serializers.CharField())
+    removed_mandatory_courses = serializers.ListField(child=serializers.CharField())
+    description = serializers.CharField()
+
+
+class PrerequisiteChangeSerializer(serializers.Serializer):
+    course_code = serializers.CharField()
+    course_title = serializers.CharField()
+    change_type = serializers.CharField()
+    old_rule_summary = serializers.CharField()
+    new_rule_summary = serializers.CharField()
+    description = serializers.CharField()
+
+
+class StudentImpactDetailSerializer(serializers.Serializer):
+    student_id = serializers.CharField()
+    student_username = serializers.CharField()
+    student_name = serializers.CharField()
+    severity = serializers.CharField()
+    is_degree_satisfaction_lost = serializers.BooleanField()
+    remaining_credits_increase = serializers.FloatField()
+    newly_unmet_groups = serializers.ListField(child=serializers.CharField())
+    prerequisite_ineligibilities = serializers.ListField(child=serializers.CharField())
+    reasons = serializers.ListField(child=serializers.CharField())
+
+
+class PlanImpactDetailSerializer(serializers.Serializer):
+    plan_id = serializers.CharField()
+    plan_name = serializers.CharField()
+    student_username = serializers.CharField()
+    severity = serializers.CharField()
+    graduation_delay_terms = serializers.IntegerField()
+    old_projected_grad_term = serializers.CharField(allow_null=True)
+    new_projected_grad_term = serializers.CharField(allow_null=True)
+    new_hard_constraints_count = serializers.IntegerField()
+    new_hard_constraint_messages = serializers.ListField(child=serializers.CharField())
+    offering_conflicts_count = serializers.IntegerField()
+    offering_conflict_messages = serializers.ListField(child=serializers.CharField())
+    reasons = serializers.ListField(child=serializers.CharField())
+
+
+class CurriculumImpactReportSerializer(serializers.Serializer):
+    draft_version_id = serializers.CharField()
+    draft_version_number = serializers.IntegerField()
+    published_version_id = serializers.CharField()
+    published_version_number = serializers.IntegerField()
+    programme_code = serializers.CharField()
+    programme_name = serializers.CharField()
+    summary = ImpactSummarySerializer()
+    requirement_changes = RequirementDiffSerializer(many=True)
+    prerequisite_changes = PrerequisiteChangeSerializer(many=True)
+    affected_students = StudentImpactDetailSerializer(many=True)
+    affected_plans = PlanImpactDetailSerializer(many=True)
+    analyzed_at = serializers.CharField()
+
