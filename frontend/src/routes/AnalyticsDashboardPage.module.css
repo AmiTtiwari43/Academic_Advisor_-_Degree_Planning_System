@@ -1,0 +1,262 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6, 1.5rem);
+  padding: var(--space-6, 1.5rem);
+  max-width: 1440px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.kpiGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--space-4, 1rem);
+}
+
+.kpiCard {
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 0.75rem);
+  padding: var(--space-4, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.kpiCard:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.kpiHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--color-text-muted, #64748b);
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.kpiIcon {
+  color: var(--color-primary, #1e40af);
+}
+
+.kpiValue {
+  font-size: 1.875rem;
+  font-weight: 700;
+  color: var(--color-text-main, #0f172a);
+  line-height: 1.1;
+}
+
+.kpiSubtext {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.bottlenecksBanner {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md, 0.5rem);
+  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3, 0.75rem);
+  color: #991b1b;
+  font-size: 0.875rem;
+}
+
+.bottleneckList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2, 0.5rem);
+  align-items: center;
+}
+
+.reportWorkspace {
+  background: var(--color-bg-surface, #ffffff);
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-lg, 0.75rem);
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.reportToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+  background: var(--color-bg-subtle, #f8fafc);
+}
+
+.reportMeta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 0.5rem);
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.reportActions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3, 0.75rem);
+}
+
+.reportContent {
+  padding: var(--space-5, 1.25rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5, 1.25rem);
+}
+
+.visualGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--space-4, 1rem);
+}
+
+.visualCard {
+  background: #ffffff;
+  border: 1px solid var(--color-border-subtle, #e2e8f0);
+  border-radius: var(--radius-md, 0.5rem);
+  padding: var(--space-4, 1rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.visualTitle {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--color-text-main, #0f172a);
+}
+
+.progressBarContainer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2, 0.5rem);
+}
+
+.progressBarHeader {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--color-text-muted, #64748b);
+}
+
+.progressBarTrack {
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressBarFill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.fillBlue {
+  background: #3b82f6;
+}
+
+.fillEmerald {
+  background: #10b981;
+}
+
+.fillAmber {
+  background: #f59e0b;
+}
+
+.fillRose {
+  background: #ef4444;
+}
+
+.fillPurple {
+  background: #8b5cf6;
+}
+
+.tableSection {
+  margin-top: var(--space-2, 0.5rem);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3, 0.75rem);
+}
+
+.tableSectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-main, #0f172a);
+}
+
+.filtersRow {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3, 0.75rem);
+  padding: var(--space-3, 0.75rem) var(--space-5, 1.25rem);
+  border-bottom: 1px solid var(--color-border-subtle, #e2e8f0);
+  background: #ffffff;
+}
+
+.filterInput {
+  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
+  border: 1px solid var(--color-border-subtle, #cbd5e1);
+  border-radius: var(--radius-sm, 0.375rem);
+  font-size: 0.875rem;
+  background: #ffffff;
+}
+
+.filterInput:focus {
+  outline: none;
+  border-color: var(--color-primary, #2563eb);
+}
+
+.conversionGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: var(--space-3, 0.75rem);
+}
+
+.conversionCard {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-md, 0.5rem);
+  padding: var(--space-3, 0.75rem);
+  text-align: center;
+}
+
+.conversionRate {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-primary, #1e40af);
+}
+
+.conversionLabel {
+  font-size: 0.75rem;
+  color: var(--color-text-muted, #64748b);
+  margin-top: 0.25rem;
+}
+
+@media (max-width: 768px) {
+  .pageContainer {
+    padding: var(--space-3, 0.75rem);
+  }
+
+  .reportToolbar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .reportActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}

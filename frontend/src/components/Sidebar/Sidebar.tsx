@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   ShieldCheck,
+  BarChart3,
   X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -51,6 +52,12 @@ const ALL_NAV_ITEMS: NavItem[] = [
     to: '/advising',
     label: 'Advisor Workspace',
     icon: <Users size={20} />,
+    allowedRoles: ['ADVISOR', 'COORDINATOR', 'HOD', 'ADMIN'],
+  },
+  {
+    to: '/analytics',
+    label: 'Institutional Analytics',
+    icon: <BarChart3 size={20} />,
     allowedRoles: ['ADVISOR', 'COORDINATOR', 'HOD', 'ADMIN'],
   },
   {

@@ -78,5 +78,10 @@ urlpatterns = [
     # Advising & Academic Risk Indicators
     path("api/v1/", include("advising.urls")),
     path("api/", include("advising.urls")),
+    # Institutional Analytics and Reporting
+    path("api/v1/", include("analytics.urls")),
+    path("api/", include("analytics.urls")),
 ]
+
+
 
