@@ -179,6 +179,10 @@ SPECTACULAR_SETTINGS = {
         "PlanStatusEnum": "planning.models.PlanStatus",
         "PlanVersionStatusEnum": "planning.models.PlanVersionStatus",
         "ProficiencyLevelEnum": "career_mapping.models.ProficiencyLevel",
+        "RiskSeverityEnum": "advising.models.RiskSeverity",
+        "RiskCategoryEnum": "advising.models.RiskCategory",
+        "OverallRiskLevelEnum": "advising.models.OverallRiskLevel",
+        "AcknowledgmentStatusEnum": "advising.models.AcknowledgmentStatus",
     },
 }
 

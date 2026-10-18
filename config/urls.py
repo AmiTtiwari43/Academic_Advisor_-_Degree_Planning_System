@@ -75,5 +75,8 @@ urlpatterns = [
     # Career and Skill Mapping
     path("api/v1/", include("career_mapping.urls")),
     path("api/", include("career_mapping.urls")),
+    # Advising & Academic Risk Indicators
+    path("api/v1/", include("advising.urls")),
+    path("api/", include("advising.urls")),
 ]
 
