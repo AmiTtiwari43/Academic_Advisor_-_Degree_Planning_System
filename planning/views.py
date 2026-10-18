@@ -197,6 +197,12 @@ class PlanViewSet(viewsets.ModelViewSet):
                 submitted_by=request.user,
                 submission_note=note,
             )
+            try:
+                from notifications.services import notify_plan_submitted
+
+                notify_plan_submitted(plan=plan, submitted_by=request.user)
+            except Exception:
+                pass
             return Response(
                 PlanVersionSerializer(version).data,
                 status=status.HTTP_201_CREATED,

@@ -81,6 +81,9 @@ urlpatterns = [
     # Institutional Analytics and Reporting
     path("api/v1/", include("analytics.urls")),
     path("api/", include("analytics.urls")),
+    # In-App Notifications Engine
+    path("api/v1/", include("notifications.urls")),
+    path("api/", include("notifications.urls")),
 ]
 
 

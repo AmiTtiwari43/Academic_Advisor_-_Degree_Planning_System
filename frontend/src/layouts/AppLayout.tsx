@@ -5,6 +5,7 @@ import styles from './AppLayout.module.css';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Badge } from '../components/Badge/Badge';
+import { NotificationBell } from '../components/Notifications';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -80,6 +81,8 @@ export const AppLayout: React.FC = () => {
                 Connecting...
               </Badge>
             )}
+
+            <NotificationBell />
 
             <div className={styles.userProfile}>
               <div className={styles.userAvatar}>{userInitials}</div>

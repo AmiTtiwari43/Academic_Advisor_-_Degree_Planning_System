@@ -198,6 +198,18 @@ def transition_plan_version(
             },
         )
 
+        # 9. Trigger In-App Notification (Idempotent)
+        try:
+            from notifications.services import notify_plan_review_decision
+
+            notify_plan_review_decision(
+                plan=locked_plan,
+                decision_action=decision.action,
+                reviewer=actor,
+            )
+        except Exception:
+            pass
+
         return decision
 
 

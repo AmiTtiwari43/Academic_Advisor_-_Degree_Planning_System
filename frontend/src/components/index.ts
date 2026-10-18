@@ -14,3 +14,4 @@ export * from './ErrorState/ErrorState';
 export * from './PageHeader/PageHeader';
 export * from './Sidebar/Sidebar';
 export * from './Breadcrumbs/Breadcrumbs';
+export * from './Notifications';
