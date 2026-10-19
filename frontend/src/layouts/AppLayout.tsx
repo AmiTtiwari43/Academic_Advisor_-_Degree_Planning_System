@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
-import { LogOut, Menu, ShieldCheck } from 'lucide-react';
+import { LogOut, Menu, ShieldCheck, Sparkles } from 'lucide-react';
 import styles from './AppLayout.module.css';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { IconButton } from '../components/IconButton/IconButton';
 import { Badge } from '../components/Badge/Badge';
 import { NotificationBell } from '../components/Notifications';
+import { AssistantDrawer } from '../components/Assistant';
 import { useQuery } from '@tanstack/react-query';
 import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
@@ -13,6 +14,7 @@ import { useAuth } from '../context/AuthContext';
 export const AppLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const { user, activeMembership, activeRole, logout } = useAuth();
   const navigate = useNavigate();
 
@@ -82,6 +84,16 @@ export const AppLayout: React.FC = () => {
               </Badge>
             )}
 
+            <button
+              type="button"
+              className={styles.assistantButton}
+              onClick={() => setIsAssistantOpen(true)}
+              aria-label="Open AI Advisor Assistant"
+            >
+              <Sparkles size={14} />
+              <span>AI Advisor</span>
+            </button>
+
             <NotificationBell />
 
             <div className={styles.userProfile}>
@@ -108,6 +120,12 @@ export const AppLayout: React.FC = () => {
           <Outlet />
         </main>
       </div>
+
+      {/* AI Assistant Drawer */}
+      <AssistantDrawer
+        isOpen={isAssistantOpen}
+        onClose={() => setIsAssistantOpen(false)}
+      />
     </div>
   );
 };

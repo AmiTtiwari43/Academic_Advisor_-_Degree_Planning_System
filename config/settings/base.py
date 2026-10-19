@@ -67,6 +67,7 @@ LOCAL_APPS = [
     "analytics.apps.AnalyticsConfig",
     "notifications.apps.NotificationsConfig",
     "audit_log.apps.AuditLogConfig",
+    "ai_assistant.apps.AiAssistantConfig",
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -156,6 +157,7 @@ REST_FRAMEWORK = {
         "user": "1000/day",
         "login": "5/minute",
         "password_reset": "5/minute",
+        "assistant": "20/minute",
     },
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend",

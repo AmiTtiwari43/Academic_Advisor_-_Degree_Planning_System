@@ -84,6 +84,9 @@ urlpatterns = [
     # In-App Notifications Engine
     path("api/v1/", include("notifications.urls")),
     path("api/", include("notifications.urls")),
+    # Curriculum-Grounded AI Assistant
+    path("api/v1/", include("ai_assistant.urls")),
+    path("api/", include("ai_assistant.urls")),
 ]
 
 
