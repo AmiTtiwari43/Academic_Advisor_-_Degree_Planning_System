@@ -325,6 +325,8 @@ def apply_candidate_plan(
         or getattr(student_record, "pinned_curriculum", None)
         or getattr(student_record, "curriculum_version", None)
     )
+    if target_curriculum is None:
+        raise ValueError("A valid curriculum version must be associated with the plan.")
     institution = student_record.institution
 
     # Build DB lookups

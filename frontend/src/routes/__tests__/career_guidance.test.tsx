@@ -211,7 +211,15 @@ describe('CareerGuidancePage', () => {
     vi.spyOn(careerApi, 'getRecommendations').mockResolvedValue(mockRecommendations);
     vi.spyOn(careerApi, 'getSkills').mockResolvedValue(mockSkills);
     vi.spyOn(careerApi, 'getCourseSkills').mockResolvedValue(mockMappings);
-    vi.spyOn(careerApi, 'createPreference').mockResolvedValue({} as any);
+    vi.spyOn(careerApi, 'createPreference').mockResolvedValue({
+      id: 'pref-new',
+      student_record: 'sr-1',
+      career_objective: 'obj-1',
+      career_objective_code: 'SWE_CLOUD',
+      career_objective_title: 'Cloud Software Engineer',
+      priority: 1,
+      notes: '',
+    });
     vi.spyOn(careerApi, 'createSkill').mockResolvedValue({
       id: 'sk-new',
       code: 'RUST_DEV',
@@ -267,9 +275,9 @@ describe('CareerGuidancePage', () => {
     fireEvent.click(taxonomyTab);
 
     expect(await screen.findByText('Master Skill Taxonomy')).toBeInTheDocument();
-    expect(screen.getByText('DISTRIBUTED_SYS')).toBeInTheDocument();
-    expect(screen.getByText('Course-to-Skill Mappings')).toBeInTheDocument();
-    expect(screen.getByText('CS101')).toBeInTheDocument();
+    expect(await screen.findByText('DISTRIBUTED_SYS')).toBeInTheDocument();
+    expect(await screen.findByText('Course-to-Skill Mappings')).toBeInTheDocument();
+    expect(await screen.findByText('CS101')).toBeInTheDocument();
   });
 
   it('allows coordinator to open Add Skill dialog and save new competency', async () => {

@@ -60,15 +60,15 @@ export const AdvisorWorkspacePage: React.FC = () => {
         status: statusFilter !== 'ALL' ? statusFilter : undefined,
       });
       setQueue(data);
-      if (data.length > 0 && !selectedPlanId) {
-        setSelectedPlanId(data[0].plan_id);
+      if (data.length > 0) {
+        setSelectedPlanId((prev) => prev || data[0].plan_id);
       }
     } catch (err) {
       console.error('Failed to fetch advisor review queue:', err);
     } finally {
       setIsQueueLoading(false);
     }
-  }, [statusFilter, selectedPlanId]);
+  }, [statusFilter]);
 
   useEffect(() => {
     loadQueue();

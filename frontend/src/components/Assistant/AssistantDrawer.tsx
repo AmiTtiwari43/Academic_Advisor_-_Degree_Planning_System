@@ -69,13 +69,14 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
       };
       setMessages((prev) => [...prev, assistantMsg]);
     },
-    onError: (err: any) => {
+    onError: (err: unknown) => {
+      const axiosErr = err as { response?: { data?: { detail?: string; error?: string } } };
       const errMsg: Message = {
         id: `assistant-err-${Date.now()}`,
         role: 'assistant',
         text:
-          err.response?.data?.detail ||
-          err.response?.data?.error ||
+          axiosErr?.response?.data?.detail ||
+          axiosErr?.response?.data?.error ||
           'Unable to complete query. Please ensure you are logged in with an active institutional context.',
       };
       setMessages((prev) => [...prev, errMsg]);

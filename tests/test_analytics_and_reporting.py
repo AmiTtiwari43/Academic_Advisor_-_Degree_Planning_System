@@ -81,7 +81,7 @@ def analytics_setup(db):
         code="CS-BS",
         name="Bachelor of Science in Computer Science",
     )
-    prog_math = Programme.objects.create(
+    Programme.objects.create(
         institution=inst1,
         code="MATH-BS",
         name="Bachelor of Science in Mathematics",
@@ -96,11 +96,9 @@ def analytics_setup(db):
         total_credits_required=Decimal("120.00"),
     )
 
-
-
-    course_cs101 = Course.objects.create(institution=inst1, code="CS101", title="Intro to CS", credits=Decimal("4.00"))
+    Course.objects.create(institution=inst1, code="CS101", title="Intro to CS", credits=Decimal("4.00"))
     course_cs201 = Course.objects.create(institution=inst1, code="CS201", title="Data Structures", credits=Decimal("4.00"))
-    course_cs301 = Course.objects.create(institution=inst1, code="CS301", title="Algorithms", credits=Decimal("4.00"))
+    Course.objects.create(institution=inst1, code="CS301", title="Algorithms", credits=Decimal("4.00"))
     course_ai401 = Course.objects.create(institution=inst1, code="AI401", title="Artificial Intelligence", credits=Decimal("4.00"))
 
 
@@ -252,7 +250,7 @@ def analytics_setup(db):
 
 
 
-    plan3 = Plan.objects.create(
+    Plan.objects.create(
         institution=inst1,
         student_record=sr3,
         curriculum_version=curriculum_cs,
