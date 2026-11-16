@@ -29,6 +29,7 @@ export interface TranscriptEntry {
   term: string;
   term_code: string;
   grade?: string;
+  grade_points?: string | number | null;
   credits_attempted: string | number;
   credits_earned: string | number;
   status: TranscriptEntryStatus;

@@ -129,7 +129,7 @@ class ProgrammeViewSet(BaseTenantViewSet):
         self.check_mutation_permission(programme)
         academic_year = request.data.get("academic_year", "2026-2027")
         credits_req = request.data.get("total_credits_required", 120.00)
-        cgpa_req = request.data.get("min_cgpa_required", 2.000)
+        cgpa_req = request.data.get("min_cgpa_required", 5.000)
 
         max_v = (
             programme.curriculum_versions.order_by("-version_number")

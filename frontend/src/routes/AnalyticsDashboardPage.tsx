@@ -173,7 +173,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
     { key: 'total_students', header: 'Enrolled Students', sortable: true, align: 'right' },
     {
       key: 'avg_cgpa',
-      header: 'Avg CGPA',
+      header: 'Avg CGPA (10.0 Scale)',
       sortable: true,
       align: 'right',
       render: (item) => (item.avg_cgpa ?? 0).toFixed(2),

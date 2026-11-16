@@ -176,7 +176,7 @@ def assistant_setup(db):
         programme=prog,
         pinned_curriculum=curr_v1,
         enrollment_term=term_fall,
-        cached_cgpa=3.60,
+        cached_cgpa=9.00,
         cached_total_credits=4.0,
         status=StudentRecordStatus.ACTIVE,
     )
@@ -186,7 +186,7 @@ def assistant_setup(db):
         programme=prog,
         pinned_curriculum=curr_v1,
         enrollment_term=term_fall,
-        cached_cgpa=2.20,
+        cached_cgpa=5.50,
         cached_total_credits=0.0,
         status=StudentRecordStatus.ACTIVE,
     )
@@ -427,7 +427,7 @@ class TestCurriculumAIAssistantGrounding:
 
         assert "Degree Progress Summary" in data["answer"]
         assert "Credits Earned" in data["answer"]
-        assert "Cumulative GPA: 3.60" in data["answer"]
+        assert "Cumulative GPA: 9.00" in data["answer"]
 
         audit_citation = next(
             (c for c in data["citations"] if c["source_type"] == "DEGREE_AUDIT"),

@@ -41,7 +41,7 @@ export const DegreeAuditProgressBar: React.FC<DegreeAuditProgressBarProps> = ({
         </div>
 
         <div className={styles.cgpaGroup}>
-          <span className={styles.label}>Cumulative GPA</span>
+          <span className={styles.label}>Cumulative GPA (10.0 Scale)</span>
           <div className={styles.valueRow}>
             <span className={styles.mainValue} data-testid="audit-cgpa">{Number(cgpa).toFixed(2)}</span>
             <span className={styles.subValue}>/ {Number(minCgpa).toFixed(2)} Min Required</span>

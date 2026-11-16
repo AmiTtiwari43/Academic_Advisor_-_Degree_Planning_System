@@ -98,11 +98,11 @@ def validate_curriculum_version(version: CurriculumVersion) -> ValidationReport:
                 entity_id=str(version.id),
             )
         )
-    if version.min_cgpa_required < 0 or version.min_cgpa_required > 4.0:
+    if version.min_cgpa_required < 0 or version.min_cgpa_required > 10.0:
         errors.append(
             ValidationErrorDetail(
                 code="INVALID_CGPA_THRESHOLD",
-                message=f"Minimum required CGPA must be between 0.0 and 4.0, got {version.min_cgpa_required}.",
+                message=f"Minimum required CGPA must be between 0.0 and 10.0, got {version.min_cgpa_required}.",
                 entity_type="CurriculumVersion",
                 entity_id=str(version.id),
             )

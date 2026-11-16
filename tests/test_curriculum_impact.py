@@ -136,7 +136,7 @@ def impact_setup(db):
         version_number=1,
         academic_year="2025-2026",
         total_credits_required=Decimal("12.00"),
-        min_cgpa_required=Decimal("2.00"),
+        min_cgpa_required=Decimal("5.00"),
         status=CurriculumStatus.DRAFT,
     )
     req_group1 = RequirementGroup.objects.create(
@@ -178,7 +178,7 @@ def impact_setup(db):
         version_number=2,
         academic_year="2026-2027",
         total_credits_required=Decimal("16.00"),
-        min_cgpa_required=Decimal("2.00"),
+        min_cgpa_required=Decimal("5.00"),
         status=CurriculumStatus.DRAFT,
     )
     req_group2 = RequirementGroup.objects.create(

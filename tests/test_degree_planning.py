@@ -101,7 +101,7 @@ def planning_environment():
         academic_year="2026-2027",
         status=CurriculumStatus.DRAFT,
         total_credits_required=Decimal("16.00"),
-        min_cgpa_required=Decimal("2.00"),
+        min_cgpa_required=Decimal("5.00"),
     )
 
     # Courses
@@ -162,7 +162,7 @@ def planning_environment():
         academic_year="2026-2027",
         status=CurriculumStatus.DRAFT,
         total_credits_required=Decimal("12.00"),
-        min_cgpa_required=Decimal("2.50"),
+        min_cgpa_required=Decimal("6.00"),
     )
     ds_group = RequirementGroup.objects.create(
         institution=inst,

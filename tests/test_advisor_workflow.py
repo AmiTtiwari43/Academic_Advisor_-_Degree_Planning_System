@@ -80,7 +80,7 @@ def workflow_environment(db):
         academic_year="2026-2027",
         status=CurriculumStatus.DRAFT,
         total_credits_required=Decimal("120.00"),
-        min_cgpa_required=Decimal("2.000"),
+        min_cgpa_required=Decimal("5.000"),
     )
     req_group = RequirementGroup.objects.create(
         institution=inst,

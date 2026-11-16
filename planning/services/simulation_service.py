@@ -112,7 +112,7 @@ def simulate_plan(
     base_context = build_rule_context(student_record)
     simulated_completed: list[CompletedCourse] = list(base_context.completed_courses)
     simulated_total_credits = base_context.total_credits or Decimal("0.00")
-    simulated_cgpa = base_context.cgpa or Decimal("3.00")
+    simulated_cgpa = base_context.cgpa if (base_context.cgpa and base_context.cgpa > Decimal("0.00")) else Decimal("7.50")
 
     # 2. Fetch all plan items sorted chronologically
     items_qs = (

@@ -71,6 +71,11 @@ class RequirementGroupSerializer(serializers.ModelSerializer):
     group_courses = RequirementGroupCourseSerializer(many=True, read_only=True)
     credit_category_code = serializers.CharField(source="credit_category.code", read_only=True)
 
+    def validate_min_cgpa(self, value):
+        if value is not None and (value < 0 or value > 10.0):
+            raise serializers.ValidationError("Minimum CGPA threshold must be between 0.00 and 10.00 on the 10-point scale.")
+        return value
+
     class Meta:
         model = RequirementGroup
         fields = [
@@ -165,6 +170,11 @@ class CurriculumVersionSerializer(serializers.ModelSerializer):
     published_by_username = serializers.CharField(source="published_by.username", read_only=True)
     requirement_groups = RequirementGroupSerializer(many=True, read_only=True)
     prerequisite_rules = PrerequisiteRuleSerializer(many=True, read_only=True)
+
+    def validate_min_cgpa_required(self, value):
+        if value < 0 or value > 10.0:
+            raise serializers.ValidationError("Minimum required CGPA must be between 0.00 and 10.00 on the 10-point scale.")
+        return value
 
     class Meta:
         model = CurriculumVersion

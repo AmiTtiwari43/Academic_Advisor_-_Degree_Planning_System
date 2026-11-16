@@ -54,6 +54,7 @@ from advising.models import (
     StudentRiskProfile, OverallRiskLevel, RiskSeverity, RiskCategory
 )
 from advising.services import evaluate_student_risks
+from degree_audit.services import run_degree_audit
 from career_mapping.models import (
     Skill, SkillCategory, ProficiencyLevel, CareerObjective,
     CareerSkillRequirement, CourseSkillMapping, StudentCareerPreference
@@ -318,9 +319,11 @@ def seed_database():
                 "academic_year": "2024-2028",
                 "status": CurriculumStatus.DRAFT,
                 "total_credits_required": Decimal("120.00"),
-                "min_cgpa_required": Decimal("2.000"),
+                "min_cgpa_required": Decimal("5.000"),
             }
         )
+        CurriculumVersion.objects.filter(id=curr.id).update(min_cgpa_required=Decimal("5.000"))
+        curr.refresh_from_db()
         curriculums[p_code] = curr
 
     # Build Requirement Groups for CS-BS
@@ -549,15 +552,19 @@ def seed_database():
         "advisor_robert", "robert.sterling@agu.edu", "Prof. Robert", "Sterling", Role.ADVISOR,
         is_staff=True, phone="+1 (555) 019-7712", pref="Prof. Sterling"
     )
+    hod_user, hod_mem = get_or_create_user(
+        "hod_alan", "alan.sterling@agu.edu", "Dr. Alan", "Sterling", Role.HOD,
+        is_staff=True, phone="+1 (555) 019-3301", pref="Dr. Sterling"
+    )
 
     # Student Personas
     students = {}
     students_meta = [
-        ("student_elena", "elena.rostova@agu.edu", "Elena", "Rostova", "CS-BS", "FA2024", "SP2027", "3.91", "102.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
-        ("student_alex", "alex.rivera@agu.edu", "Alex", "Rivera", "CS-BS", "FA2024", "SP2028", "3.72", "55.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
-        ("student_marcus", "marcus.vance@agu.edu", "Marcus", "Vance", "SE-BS", "FA2025", "SP2028", "2.38", "26.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
-        ("student_priya", "priya.sharma@agu.edu", "Priya", "Sharma", "DS-BS", "FA2026", "SP2028", "3.82", "36.00", StudentRecordStatus.ACTIVE, advisor_robert, adv_robert_mem),
-        ("student_jordan", "jordan.taylor@agu.edu", "Jordan", "Taylor", "CS-BS", "FA2024", "SP2027", "3.65", "88.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
+        ("student_elena", "elena.rostova@agu.edu", "Elena", "Rostova", "CS-BS", "FA2024", "SP2027", "9.85", "102.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
+        ("student_alex", "alex.rivera@agu.edu", "Alex", "Rivera", "CS-BS", "FA2024", "SP2028", "9.20", "55.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
+        ("student_marcus", "marcus.vance@agu.edu", "Marcus", "Vance", "SE-BS", "FA2025", "SP2028", "5.75", "26.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
+        ("student_priya", "priya.sharma@agu.edu", "Priya", "Sharma", "DS-BS", "FA2026", "SP2028", "9.80", "36.00", StudentRecordStatus.ACTIVE, advisor_robert, adv_robert_mem),
+        ("student_jordan", "jordan.taylor@agu.edu", "Jordan", "Taylor", "CS-BS", "FA2024", "SP2027", "9.15", "88.00", StudentRecordStatus.ACTIVE, advisor_alice, adv_alice_mem),
     ]
 
     for u_name, email, first, last, p_code, enrol_term, grad_term, gpa, credits_earned, rec_status, adv_user, adv_mem in students_meta:
@@ -727,6 +734,15 @@ def seed_database():
         add_transcript(jordan_rec, c_code, t_code, gr, cr)
 
     print("✓ Transcripts: Realistic collegiate histories, transfer evaluations, and in-progress entries populated")
+
+    # Authoritatively synchronize CGPA and credits via deterministic degree audit
+    for s_info in students.values():
+        rec = s_info["record"]
+        audit = run_degree_audit(rec)
+        rec.cached_cgpa = audit.overall_cgpa
+        rec.cached_total_credits = audit.total_credits_earned
+        rec.save(update_fields=["cached_cgpa", "cached_total_credits"])
+    print("✓ Degree Audits: Authoritatively computed 10-point CGPAs and progress synchronized across records")
 
     # -------------------------------------------------------------------------
     # 10. DEGREE PLANS, PLAN VERSIONS & ADVISOR TRIAGE
@@ -1011,12 +1027,17 @@ def seed_database():
     print("   Role:     System Administrator & Registrar (Django Superuser)")
     print("   Features: Full system access, Django Admin (/admin/), system audit logs")
     print()
-    print("2. DEPARTMENT CHAIR / CURRICULUM COORDINATOR")
+    print("2. HEAD OF DEPARTMENT (HOD)")
+    print("   Username: hod_alan")
+    print("   Role:     Head of Department (HOD) - Computer Science & Systems")
+    print("   Features: Department-wide academic performance, risk distribution, curriculum oversight")
+    print()
+    print("3. PROGRAMME COORDINATOR")
     print("   Username: coordinator_cora")
     print("   Role:     Director of Undergraduate Studies (COORDINATOR)")
     print("   Features: Curriculum Workspace, degree pathway editor, prerequisite trees, cohort analytics")
     print()
-    print("3. FACULTY ACADEMIC ADVISORS")
+    print("4. FACULTY ACADEMIC ADVISORS")
     print("   Username: advisor_alice")
     print("   Role:     Senior Faculty Advisor (ADVISOR)")
     print("   Features: Triage Queue (Alex's submitted plan), override modal, risk profile indicators")
@@ -1025,30 +1046,30 @@ def seed_database():
     print("   Role:     Data Science & Transfer Advisor (ADVISOR)")
     print("   Features: Priya's transfer student advising, career competency reviews")
     print()
-    print("4. STUDENT PERSONAS & DIVERSE SCENARIOS")
+    print("5. STUDENT PERSONAS & DIVERSE SCENARIOS (1–10 GPA SCALE)")
     print("   a) Elena Rostova (Honors Senior - Cloud Track)")
     print("      Username: student_elena")
-    print("      Stats:    102 / 120 Credits Completed | 3.91 GPA | LOW Risk")
+    print("      Stats:    60 Completed Credits | 9.85 / 10.00 CGPA | LOW Risk")
     print("      Plan:     'Elena's Honors Graduation Plan' (Status: APPROVED)")
     print()
     print("   b) Alex Rivera (Proactive Junior - Review Queue Scenario)")
     print("      Username: student_alex")
-    print("      Stats:    55 / 120 Credits Completed | 3.72 GPA | On Track")
+    print("      Stats:    40 Completed Credits (+7 IP) | 9.20 / 10.00 CGPA | On Track")
     print("      Plan:     'Alex's 4-Year Computer Science Pathway' (Status: SUBMITTED - in triage queue)")
     print()
     print("   c) Marcus Vance (Sophomore - At Risk / Academic Warning)")
     print("      Username: student_marcus")
-    print("      Stats:    26 / 120 Credits | 2.38 GPA | HIGH Risk")
+    print("      Stats:    14 Completed Credits | 5.75 / 10.00 CGPA | CRITICAL Risk")
     print("      Issue:    D+ in MATH101, Withdrew from CS102, active prerequisite bottleneck")
     print()
     print("   d) Priya Sharma (Data Science Junior - Transfer Credit Student)")
     print("      Username: student_priya")
-    print("      Stats:    36 Credits + 22 Transfer Credits Verified (Pacific Coast Univ) | 3.82 GPA")
+    print("      Stats:    10 Institutional + 7 Transfer Credits | 9.80 / 10.00 CGPA")
     print("      Program:  B.S. in Data Science & Artificial Intelligence (DS-BS)")
     print()
     print("   e) Jordan Taylor (Senior - Advisor Prerequisite Override)")
     print("      Username: student_jordan")
-    print("      Stats:    88 / 120 Credits | 3.65 GPA | Cybersecurity Focus")
+    print("      Stats:    37 Completed Credits | 9.15 / 10.00 CGPA | Cybersecurity Focus")
     print("      Special:  Official recorded Advisor Override for CS430 (NSA Fellowship waiver)")
     print("-" * 80)
 

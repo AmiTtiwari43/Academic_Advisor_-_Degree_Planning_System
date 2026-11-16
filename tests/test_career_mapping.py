@@ -230,7 +230,7 @@ def career_setup(db):
         pinned_curriculum=curr_ver,
         enrollment_term=term1,
         status=StudentRecordStatus.ACTIVE,
-        cached_cgpa=Decimal("3.50"),
+        cached_cgpa=Decimal("8.50"),
         cached_total_credits=Decimal("8.00"),
     )
     student_rec_b = StudentRecord.objects.create(
@@ -240,7 +240,7 @@ def career_setup(db):
         pinned_curriculum=curr_ver,
         enrollment_term=term1,
         status=StudentRecordStatus.ACTIVE,
-        cached_cgpa=Decimal("3.00"),
+        cached_cgpa=Decimal("7.50"),
         cached_total_credits=Decimal("0.00"),
     )
 

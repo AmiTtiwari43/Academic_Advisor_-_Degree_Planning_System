@@ -392,7 +392,7 @@ def graph_curriculum_setup(db):
         academic_year="2026-2027",
         status=CurriculumStatus.DRAFT,
         total_credits_required=Decimal("120.00"),
-        min_cgpa_required=Decimal("2.000"),
+        min_cgpa_required=Decimal("5.000"),
     )
     c1 = Course.objects.create(institution=institution_alpha, code="SE-101", title="Intro to SE", credits=Decimal("4.00"))
     c2 = Course.objects.create(institution=institution_alpha, code="SE-201", title="Software Design", credits=Decimal("4.00"))

@@ -21,7 +21,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const [targetCourse, setTargetCourse] = useState<string>(availableCourses[0] || 'CS-101');
   const [minGrade, setMinGrade] = useState<string>('C');
   const [minCredits, setMinCredits] = useState<number>(30);
-  const [minCgpa, setMinCgpa] = useState<number>(2.5);
+  const [minCgpa, setMinCgpa] = useState<number>(6.0);
   const [ruleDescription, setRuleDescription] = useState<string>('Standard Course Prerequisite');
 
   // Multi-condition state for all_of
@@ -33,7 +33,7 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
   const [testCompletedCode, setTestCompletedCode] = useState<string>('CS-101');
   const [testGrade, setTestGrade] = useState<string>('B');
   const [testCredits, setTestCredits] = useState<number>(32);
-  const [testCgpa, setTestCgpa] = useState<number>(3.1);
+  const [testCgpa, setTestCgpa] = useState<number>(7.5);
   const [isTestInProgress, setIsTestInProgress] = useState<boolean>(false);
 
   // Simulation Result
@@ -371,11 +371,13 @@ export const RuleBuilderModal: React.FC<RuleBuilderModalProps> = ({
                 {operator === 'cgpa_min' && (
                   <>
                     <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 600, color: '#334155', marginBottom: '0.4rem' }}>
-                      Minimum CGPA Threshold (0.00 - 4.00)
+                      Minimum CGPA Threshold (0.00 – 10.00 Scale)
                     </label>
                     <input
                       type="number"
                       step="0.1"
+                      min="0.0"
+                      max="10.0"
                       value={minCgpa}
                       onChange={(e) => setMinCgpa(Number(e.target.value))}
                       style={{

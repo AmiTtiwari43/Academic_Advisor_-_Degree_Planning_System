@@ -149,7 +149,7 @@ export const CurriculumWorkspacePage: React.FC = () => {
       const newV = await curriculumApi.createProgrammeVersion(selectedProgrammeId, {
         academic_year: '2026-2027',
         total_credits_required: 120.0,
-        min_cgpa_required: 2.0,
+        min_cgpa_required: 5.0,
       });
       setFeedbackMsg({
         type: 'success',
@@ -503,7 +503,7 @@ export const CurriculumWorkspacePage: React.FC = () => {
               Curriculum Requirement Structure
             </h3>
             <span style={{ fontSize: '0.85rem', color: '#64748B' }}>
-              Total Required: <strong>{versionDetail.total_credits_required} Credits</strong> | Min CGPA: <strong>{versionDetail.min_cgpa_required}</strong>
+              Total Required: <strong>{versionDetail.total_credits_required} Credits</strong> | Min CGPA: <strong>{versionDetail.min_cgpa_required} (10.0 Scale)</strong>
             </span>
           </div>
 

@@ -197,7 +197,7 @@ def seed_demo():
             "programme": prog,
             "pinned_curriculum": curr_ver,
             "enrollment_term": terms["FA2026"],
-            "cached_cgpa": Decimal("3.80"),
+            "cached_cgpa": Decimal("9.20"),
             "cached_total_credits": Decimal("15.00"),
         }
     )

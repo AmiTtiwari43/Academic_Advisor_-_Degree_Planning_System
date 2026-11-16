@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, Navigate } from 'react-router-dom';
-import { LogOut, Menu, ShieldCheck, Sparkles } from 'lucide-react';
+import { LogOut, Menu, Sparkles } from 'lucide-react';
 import styles from './AppLayout.module.css';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { IconButton } from '../components/IconButton/IconButton';
-import { Badge } from '../components/Badge/Badge';
 import { NotificationBell } from '../components/Notifications';
 import { AssistantDrawer } from '../components/Assistant';
-import { useQuery } from '@tanstack/react-query';
-import { apiClient } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 
 export const AppLayout: React.FC = () => {
@@ -17,14 +14,6 @@ export const AppLayout: React.FC = () => {
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
   const { user, activeMembership, activeRole, logout, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
-
-  // Health check query proves backend connectivity (only when authenticated)
-  const { data: healthData, isSuccess } = useQuery({
-    queryKey: ['system-health'],
-    queryFn: () => apiClient.checkHealth(),
-    enabled: !!isAuthenticated,
-    refetchInterval: 60000,
-  });
 
   const handleLogout = async () => {
     await logout();
@@ -106,20 +95,6 @@ export const AppLayout: React.FC = () => {
           </div>
 
           <div className={styles.rightSection}>
-            {isSuccess && healthData ? (
-              <Badge
-                variant="success"
-                size="sm"
-                icon={<ShieldCheck size={12} />}
-              >
-                Engine Connected
-              </Badge>
-            ) : (
-              <Badge variant="neutral" size="sm">
-                Connecting...
-              </Badge>
-            )}
-
             <button
               type="button"
               className={styles.assistantButton}

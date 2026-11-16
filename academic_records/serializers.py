@@ -1,3 +1,5 @@
+from typing import Any
+
 from rest_framework import serializers
 
 from academic_records.models import (
@@ -7,6 +9,8 @@ from academic_records.models import (
     TranscriptEntry,
     TransferCredit,
 )
+from academic_records.services.context_builder import compute_semester_gpas
+from rule_engine.core.context import DEFAULT_GRADE_SCALE
 
 
 class AcademicTermSerializer(serializers.ModelSerializer):
@@ -32,6 +36,12 @@ class TranscriptEntrySerializer(serializers.ModelSerializer):
     course_code = serializers.CharField(source="course.code", read_only=True)
     course_title = serializers.CharField(source="course.title", read_only=True)
     term_code = serializers.CharField(source="term.code", read_only=True)
+    grade_points = serializers.SerializerMethodField()
+
+    def get_grade_points(self, obj) -> float | None:
+        if not obj.grade:
+            return None
+        return DEFAULT_GRADE_SCALE.get(obj.grade.strip().upper())
 
     class Meta:
         model = TranscriptEntry
@@ -45,6 +55,7 @@ class TranscriptEntrySerializer(serializers.ModelSerializer):
             "term",
             "term_code",
             "grade",
+            "grade_points",
             "credits_attempted",
             "credits_earned",
             "status",
@@ -154,10 +165,15 @@ class StudentRecordDetailSerializer(StudentRecordSerializer):
     transcript_entries = TranscriptEntrySerializer(many=True, read_only=True)
     transfer_credits = TransferCreditSerializer(many=True, read_only=True)
     exemptions = ExemptionSerializer(many=True, read_only=True)
+    semester_summaries = serializers.SerializerMethodField()
+
+    def get_semester_summaries(self, obj) -> list[dict[str, Any]]:
+        return compute_semester_gpas(obj)
 
     class Meta(StudentRecordSerializer.Meta):
         fields = StudentRecordSerializer.Meta.fields + [
             "transcript_entries",
             "transfer_credits",
             "exemptions",
+            "semester_summaries",
         ]

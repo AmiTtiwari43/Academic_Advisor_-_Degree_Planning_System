@@ -193,11 +193,21 @@ export const LandingPage: React.FC = () => {
                 <button
                   type="button"
                   className={styles.quickLoginBtn}
-                  onClick={() => handleQuickLogin('student_elena')}
+                  onClick={() => handleQuickLogin('hod_alan')}
                   disabled={isSubmitting}
                 >
-                  <span className={styles.quickLoginName}>Elena Rostova</span>
-                  <span className={styles.quickLoginRole}>Honors Senior</span>
+                  <span className={styles.quickLoginName}>Dr. Alan Sterling</span>
+                  <span className={styles.quickLoginRole}>Head of Department (HOD)</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.quickLoginBtn}
+                  onClick={() => handleQuickLogin('admin_super')}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.quickLoginName}>Arthur Pendelton</span>
+                  <span className={styles.quickLoginRole}>System Administrator</span>
                 </button>
               </div>
             </div>

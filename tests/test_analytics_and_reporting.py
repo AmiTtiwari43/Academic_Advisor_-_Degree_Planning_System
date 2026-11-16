@@ -130,7 +130,7 @@ def analytics_setup(db):
         programme=prog_cs,
         pinned_curriculum=curriculum_cs,
         enrollment_term=term_fall2026,
-        cached_cgpa=Decimal("3.80"),
+        cached_cgpa=Decimal("9.20"),
         cached_total_credits=Decimal("110.00"),  # Near completion (110 / 120 = 91.6%)
         status=StudentRecordStatus.ACTIVE,
     )
@@ -140,7 +140,7 @@ def analytics_setup(db):
         programme=prog_cs,
         pinned_curriculum=curriculum_cs,
         enrollment_term=term_fall2026,
-        cached_cgpa=Decimal("2.90"),
+        cached_cgpa=Decimal("7.50"),
         cached_total_credits=Decimal("45.00"),  # Bracket 26-50% (45 / 120 = 37.5%)
         status=StudentRecordStatus.ACTIVE,
     )
@@ -150,7 +150,7 @@ def analytics_setup(db):
         programme=prog_cs,
         pinned_curriculum=curriculum_cs,
         enrollment_term=term_fall2026,
-        cached_cgpa=Decimal("2.10"),
+        cached_cgpa=Decimal("5.50"),
         cached_total_credits=Decimal("15.00"),  # Bracket 0-25% (15 / 120 = 12.5%)
         status=StudentRecordStatus.ACTIVE,
     )
@@ -316,7 +316,7 @@ def test_programme_progress_report_aggregations(analytics_setup):
     # Average credits = (110 + 45 + 15) / 3 = 170 / 3 = 56.666... -> 56.7
     assert cs_item["avg_earned_credits"] == 56.7
     # Average GPA = (3.80 + 2.90 + 2.10) / 3 = 8.80 / 3 = 2.93
-    assert cs_item["avg_cgpa"] == 2.93
+    assert cs_item["avg_cgpa"] == 7.40
     # Brackets:
     # sr1 (110 cr): 76-100% and near completion
     # sr2 (45 cr): 26-50%

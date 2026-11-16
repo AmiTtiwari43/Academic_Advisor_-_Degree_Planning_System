@@ -73,7 +73,7 @@ def audit_environment():
         academic_year="2026-2027",
         status=CurriculumStatus.DRAFT,
         total_credits_required=Decimal("20.00"),
-        min_cgpa_required=Decimal("2.00"),
+        min_cgpa_required=Decimal("5.00"),
     )
 
     # Courses
@@ -104,7 +104,7 @@ def audit_environment():
         group_type=RequirementGroupType.MANDATORY,
         min_credits=Decimal("8.00"),
         min_courses=2,
-        min_cgpa=Decimal("2.50"),
+        min_cgpa=Decimal("6.00"),
         display_order=2,
     )
     RequirementGroupCourse.objects.create(requirement_group=math_group, course=math101, is_mandatory=True)
@@ -210,7 +210,7 @@ class TestDegreeAuditScenarios:
                 student_record=rec,
                 course=crs,
                 term=term,
-                grade="A",
+                grade="A+",
                 credits_attempted=Decimal("4.00"),
                 credits_earned=Decimal("4.00"),
                 status=TranscriptEntryStatus.COMPLETED,
@@ -223,7 +223,7 @@ class TestDegreeAuditScenarios:
         assert report.is_cgpa_satisfied is True
         assert report.is_degree_satisfied is True
         assert report.total_credits_earned == Decimal("20.00")
-        assert report.overall_cgpa == Decimal("4.00")
+        assert report.overall_cgpa == Decimal("10.00")
         for g in report.groups:
             assert g.is_satisfied is True
 
@@ -306,7 +306,7 @@ class TestDegreeAuditScenarios:
 
         report = run_degree_audit(rec)
 
-        assert report.overall_cgpa == Decimal("1.00")
+        assert report.overall_cgpa == Decimal("3.00")
         assert report.is_cgpa_satisfied is False
         assert report.is_degree_satisfied is False
 
@@ -331,13 +331,13 @@ class TestDegreeAuditScenarios:
             attempt_number=1,
             verification_status=VerificationStatus.VERIFIED,
         )
-        # Attempt 2: A
+        # Attempt 2: A+
         TranscriptEntry.objects.create(
             institution=env["inst"],
             student_record=rec,
             course=c["cs101"],
             term=env["term_s27"],
-            grade="A",
+            grade="A+",
             credits_attempted=Decimal("4.00"),
             credits_earned=Decimal("4.00"),
             status=TranscriptEntryStatus.COMPLETED,
@@ -349,7 +349,7 @@ class TestDegreeAuditScenarios:
 
         # Total earned credits should be 4.00 (not 8.00)
         assert report.total_credits_earned == Decimal("4.00")
-        assert report.overall_cgpa == Decimal("4.00")
+        assert report.overall_cgpa == Decimal("10.00")
 
     def test_scenario_06_repeated_course_latest_grade_policy(self, audit_environment):
         """Scenario 6: Repeated course with LATEST_GRADE policy: attempt 1=A (term 1), attempt 2=C (term 2) -> selects C (2.00)."""
@@ -387,7 +387,7 @@ class TestDegreeAuditScenarios:
         report = run_degree_audit(rec)
 
         assert report.total_credits_earned == Decimal("4.00")
-        assert report.overall_cgpa == Decimal("2.00")
+        assert report.overall_cgpa == Decimal("5.00")
 
     def test_scenario_07_in_progress_never_counted_as_earned(self, audit_environment):
         """Scenario 7: IN_PROGRESS entry provides in_progress_credits but NEVER earned_credits."""

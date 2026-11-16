@@ -72,6 +72,11 @@ export const TranscriptTable: React.FC<TranscriptTableProps> = ({
                     <td>{entry.course_title}</td>
                     <td className={styles.gradeCell}>
                       <strong>{entry.grade || '—'}</strong>
+                      {entry.grade_points !== undefined && entry.grade_points !== null && (
+                        <span style={{ fontSize: '0.72rem', color: '#64748B', display: 'block' }}>
+                          {Number(entry.grade_points).toFixed(1)} / 10.0
+                        </span>
+                      )}
                     </td>
                     <td>{entry.credits_attempted}</td>
                     <td>

@@ -93,7 +93,7 @@ class CurriculumVersion(TenantModel):
         max_digits=6, decimal_places=2, default=Decimal("120.00")
     )
     min_cgpa_required = models.DecimalField(
-        max_digits=4, decimal_places=3, default=Decimal("2.000")
+        max_digits=5, decimal_places=3, default=Decimal("5.000")
     )
     published_at = models.DateTimeField(null=True, blank=True)
     published_by = models.ForeignKey(
@@ -251,7 +251,7 @@ class RequirementGroup(TenantModel):
     )
     min_credits = models.DecimalField(max_digits=6, decimal_places=2, default=Decimal("0.00"))
     min_courses = models.PositiveIntegerField(default=0)
-    min_cgpa = models.DecimalField(max_digits=4, decimal_places=3, null=True, blank=True)
+    min_cgpa = models.DecimalField(max_digits=5, decimal_places=3, null=True, blank=True)
     credit_category = models.ForeignKey(
         CreditCategory,
         null=True,

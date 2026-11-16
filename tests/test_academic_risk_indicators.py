@@ -218,7 +218,7 @@ def risk_fixture(db):
         academic_year="2025-2026",
         status=CurriculumStatus.DRAFT,
         total_credits_required=Decimal("120.00"),
-        min_cgpa_required=Decimal("2.000"),
+        min_cgpa_required=Decimal("5.000"),
     )
 
     # Requirement Groups

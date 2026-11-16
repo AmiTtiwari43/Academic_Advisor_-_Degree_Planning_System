@@ -160,3 +160,84 @@ def build_rule_context(
         curriculum_version_id=str(student_record.pinned_curriculum_id),
         repeated_course_policy=engine_policy,
     )
+
+
+def compute_semester_gpas(student_record: StudentRecord) -> list[dict[str, Any]]:
+    """
+    Computes semester-by-semester SGPA (Semester Grade Point Average) and cumulative CGPA
+    strictly on the standardized 10-point GPA scale.
+    """
+    entries = list(
+        student_record.transcript_entries.select_related("course", "term")
+        .filter(
+            verification_status__in=[
+                VerificationStatus.VERIFIED,
+                VerificationStatus.OFFICIAL_SEALED,
+            ]
+        )
+        .order_by("term__year", "term__start_date", "course__code")
+    )
+
+    terms_order: list[AcademicTerm] = []
+    term_entries_map: dict[str, list[Any]] = {}
+
+    for entry in entries:
+        t = entry.term
+        if t.code not in term_entries_map:
+            terms_order.append(t)
+            term_entries_map[t.code] = []
+        term_entries_map[t.code].append(entry)
+
+    semester_summaries: list[dict[str, Any]] = []
+    cum_quality_points = Decimal("0.00")
+    cum_gpa_credits = Decimal("0.00")
+    cum_earned_credits = Decimal("0.00")
+
+    for t in terms_order:
+        term_entries = term_entries_map[t.code]
+        term_attempted = Decimal("0.00")
+        term_earned = Decimal("0.00")
+        term_quality_points = Decimal("0.00")
+        term_gpa_credits = Decimal("0.00")
+
+        for e in term_entries:
+            term_attempted += e.credits_attempted
+            term_earned += e.credits_earned
+            cum_earned_credits += e.credits_earned
+
+            grade_val = DEFAULT_GRADE_SCALE.get(e.grade.strip().upper())
+            if grade_val is not None and e.credits_attempted > Decimal("0.00"):
+                qp = Decimal(str(grade_val)) * e.credits_attempted
+                term_quality_points += qp
+                term_gpa_credits += e.credits_attempted
+                cum_quality_points += qp
+                cum_gpa_credits += e.credits_attempted
+
+        sgpa = (
+            round(term_quality_points / term_gpa_credits, 2)
+            if term_gpa_credits > Decimal("0.00")
+            else Decimal("0.00")
+        )
+        cgpa_at_term = (
+            round(cum_quality_points / cum_gpa_credits, 2)
+            if cum_gpa_credits > Decimal("0.00")
+            else Decimal("0.00")
+        )
+
+        semester_summaries.append(
+            {
+                "term_id": str(t.id),
+                "term_code": t.code,
+                "term_name": t.name,
+                "year": t.year,
+                "season": t.season,
+                "credits_attempted": float(term_attempted),
+                "credits_earned": float(term_earned),
+                "sgpa": float(sgpa),
+                "cumulative_cgpa": float(cgpa_at_term),
+                "entries_count": len(term_entries),
+            }
+        )
+
+    return semester_summaries
+
