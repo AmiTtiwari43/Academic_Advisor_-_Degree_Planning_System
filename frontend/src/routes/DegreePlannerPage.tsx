@@ -48,16 +48,26 @@ export const DegreePlannerPage: React.FC = () => {
     ])
       .then(([records, terms, courses]) => {
         if (!isMounted) return;
-        setStudentRecords(records);
+        const recordsList = Array.isArray(records)
+          ? records
+          : (records as unknown as { results?: StudentRecord[] })?.results || [];
+        const termsList = Array.isArray(terms)
+          ? terms
+          : (terms as unknown as { results?: AcademicTerm[] })?.results || [];
+        const coursesList = Array.isArray(courses)
+          ? courses
+          : (courses as unknown as { results?: Course[] })?.results || [];
+
+        setStudentRecords(recordsList);
         // Sort terms chronologically
-        const sortedTerms = [...terms].sort(
+        const sortedTerms = [...termsList].sort(
           (a, b) => new Date(a.start_date).getTime() - new Date(b.start_date).getTime()
         );
         setAcademicTerms(sortedTerms);
-        setCatalogCourses(courses);
+        setCatalogCourses(coursesList);
 
-        if (records.length > 0) {
-          setSelectedRecordId(records[0].id);
+        if (recordsList.length > 0) {
+          setSelectedRecordId(recordsList[0].id);
         } else {
           setLoading(false);
         }
@@ -85,15 +95,24 @@ export const DegreePlannerPage: React.FC = () => {
       planningApi
         .fetchPlans(recordId)
         .then((data) => {
-          setPlans(data);
-          if (data.length > 0) {
+          const list = Array.isArray(data)
+            ? data
+            : (data as unknown as { results?: Plan[] })?.results || [];
+          setPlans(list);
+          if (list.length > 0) {
             const match = preferredPlanId
-              ? data.find((p) => p.id === preferredPlanId) || data[0]
-              : data.find((p) => p.is_primary) || data[0];
-            setActivePlan(match);
+              ? list.find((p) => p.id === preferredPlanId) || list[0]
+              : list.find((p) => p.is_primary) || list[0];
+            return planningApi.fetchPlan(match.id);
           } else {
             setActivePlan(null);
             setSimulation(null);
+            return null;
+          }
+        })
+        .then((fullPlan) => {
+          if (fullPlan) {
+            setActivePlan(fullPlan);
           }
         })
         .catch((err) => {
@@ -294,7 +313,7 @@ export const DegreePlannerPage: React.FC = () => {
   };
 
   const plannedCourseCodes = new Set(
-    activePlan?.items.map((it) => it.course_code) || []
+    (activePlan?.items || []).map((it) => it.course_code)
   );
 
   return (
@@ -332,7 +351,14 @@ export const DegreePlannerPage: React.FC = () => {
               value={activePlan?.id ?? ''}
               onChange={(e) => {
                 const p = plans.find((pl) => pl.id === e.target.value);
-                if (p) setActivePlan(p);
+                if (p) {
+                  setLoading(true);
+                  planningApi
+                    .fetchPlan(p.id)
+                    .then(setActivePlan)
+                    .catch((err) => setError(err.message || 'Failed to fetch plan detail.'))
+                    .finally(() => setLoading(false));
+                }
               }}
               aria-label="Select active plan"
               data-testid="plan-select"
@@ -478,7 +504,7 @@ export const DegreePlannerPage: React.FC = () => {
             <div className={styles.plannerGridSection}>
               <SemesterColumnGrid
                 terms={academicTerms}
-                items={activePlan.items}
+                items={activePlan.items || []}
                 simulationReport={simulation}
                 onRemoveCourse={handleRemoveCourse}
                 onMoveCourse={handleMoveCourse}

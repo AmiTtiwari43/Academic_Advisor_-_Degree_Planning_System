@@ -28,9 +28,14 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
   if (params) {
     const searchParams = new URLSearchParams();
     Object.entries(params).forEach(([key, value]) => {
-      searchParams.append(key, String(value));
+      if (value !== undefined && value !== null && value !== '') {
+        searchParams.append(key, String(value));
+      }
     });
-    url += `?${searchParams.toString()}`;
+    const qs = searchParams.toString();
+    if (qs) {
+      url += `?${qs}`;
+    }
   }
 
   const headers: Record<string, string> = {
@@ -71,7 +76,21 @@ async function request<T>(endpoint: string, options: RequestOptions = {}): Promi
     return {} as T;
   }
 
-  return response.json() as Promise<T>;
+  const data = await response.json();
+  if (
+    data &&
+    typeof data === 'object' &&
+    !Array.isArray(data) &&
+    'results' in data &&
+    Array.isArray((data as Record<string, unknown>).results) &&
+    'count' in data &&
+    typeof (data as Record<string, unknown>).count === 'number' &&
+    ('next' in data || 'previous' in data)
+  ) {
+    return (data as { results: unknown }).results as T;
+  }
+
+  return data as T;
 }
 
 export const apiClient = {

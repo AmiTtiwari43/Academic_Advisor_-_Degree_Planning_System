@@ -106,3 +106,4 @@ Every phase enforces the quality gate via `make check`:
 - [Security Threat Model](docs/threat-model.md)
 - [Security Checklist & Permission Matrix](docs/security-checklist.md)
 - [Implementation Status](docs/implementation-status.md)
+- [Manual Feature Verification Guide](docs/MANUAL_FEATURE_VERIFICATION_GUIDE.md)

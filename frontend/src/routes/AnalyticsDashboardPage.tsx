@@ -176,14 +176,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
       header: 'Avg CGPA',
       sortable: true,
       align: 'right',
-      render: (item) => item.avg_cgpa.toFixed(2),
+      render: (item) => (item.avg_cgpa ?? 0).toFixed(2),
     },
     {
       key: 'avg_earned_credits',
       header: 'Avg Earned Credits',
       sortable: true,
       align: 'right',
-      render: (item) => item.avg_earned_credits.toFixed(1),
+      render: (item) => (item.avg_earned_credits ?? 0).toFixed(1),
     },
     { key: 'bracket_0_25', header: '0–25%', align: 'center' },
     { key: 'bracket_26_50', header: '26–50%', align: 'center' },
@@ -262,7 +262,7 @@ export const AnalyticsDashboardPage: React.FC = () => {
       header: 'Avg Turnaround (Hours)',
       sortable: true,
       align: 'right',
-      render: (item) => `${item.avg_turnaround_hours.toFixed(1)} hrs`,
+      render: (item) => `${(item.avg_turnaround_hours ?? 0).toFixed(1)} hrs`,
     },
   ];
 
@@ -382,7 +382,8 @@ export const AnalyticsDashboardPage: React.FC = () => {
                 <Clock size={18} className={styles.kpiIcon} />
               </div>
               <div className={styles.kpiValue}>
-                {overview.avg_turnaround_hours.toFixed(1)} <span style={{ fontSize: '1rem' }}>hrs</span>
+                {((overview.avg_turnaround_hours ?? overview.avg_approval_turnaround_hours ?? 0)).toFixed(1)}{' '}
+                <span style={{ fontSize: '1rem' }}>hrs</span>
               </div>
               <div className={styles.kpiSubtext}>From submission to advisor decision</div>
             </div>
@@ -556,19 +557,19 @@ export const AnalyticsDashboardPage: React.FC = () => {
                     </div>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate}>
-                        {turnaroundReport.avg_turnaround_hours.toFixed(1)}h
+                        {(turnaroundReport.avg_turnaround_hours ?? 0).toFixed(1)}h
                       </div>
                       <div className={styles.conversionLabel}>Average Turnaround</div>
                     </div>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate}>
-                        {turnaroundReport.min_turnaround_hours.toFixed(1)}h
+                        {(turnaroundReport.min_turnaround_hours ?? 0).toFixed(1)}h
                       </div>
                       <div className={styles.conversionLabel}>Fastest Decision</div>
                     </div>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate}>
-                        {turnaroundReport.max_turnaround_hours.toFixed(1)}h
+                        {(turnaroundReport.max_turnaround_hours ?? 0).toFixed(1)}h
                       </div>
                       <div className={styles.conversionLabel}>Longest Turnaround</div>
                     </div>
@@ -590,25 +591,25 @@ export const AnalyticsDashboardPage: React.FC = () => {
                   <div className={styles.conversionGrid}>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate}>
-                        {funnelReport.conversion_rates.submission_rate_pct.toFixed(1)}%
+                        {(funnelReport.conversion_rates?.submission_rate_pct ?? 0).toFixed(1)}%
                       </div>
                       <div className={styles.conversionLabel}>Submission Rate (Draft → Submitted)</div>
                     </div>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate} style={{ color: '#10b981' }}>
-                        {funnelReport.conversion_rates.approval_rate_pct.toFixed(1)}%
+                        {(funnelReport.conversion_rates?.approval_rate_pct ?? 0).toFixed(1)}%
                       </div>
                       <div className={styles.conversionLabel}>Approval Rate</div>
                     </div>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate} style={{ color: '#f59e0b' }}>
-                        {funnelReport.conversion_rates.return_rate_pct.toFixed(1)}%
+                        {(funnelReport.conversion_rates?.return_rate_pct ?? 0).toFixed(1)}%
                       </div>
                       <div className={styles.conversionLabel}>Return for Revision Rate</div>
                     </div>
                     <div className={styles.conversionCard}>
                       <div className={styles.conversionRate} style={{ color: '#ef4444' }}>
-                        {funnelReport.conversion_rates.rejection_rate_pct.toFixed(1)}%
+                        {(funnelReport.conversion_rates?.rejection_rate_pct ?? 0).toFixed(1)}%
                       </div>
                       <div className={styles.conversionLabel}>Rejection Rate</div>
                     </div>

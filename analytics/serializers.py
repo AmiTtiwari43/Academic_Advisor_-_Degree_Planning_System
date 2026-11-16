@@ -132,4 +132,5 @@ class AnalyticsOverviewSerializer(serializers.Serializer):
     plans_pending_review = serializers.IntegerField()
     critical_or_high_risk_students = serializers.IntegerField()
     avg_approval_turnaround_hours = serializers.FloatField()
+    avg_turnaround_hours = serializers.FloatField(source="avg_approval_turnaround_hours", required=False)
     top_bottlenecks = PrerequisiteBlockerItemSerializer(many=True)

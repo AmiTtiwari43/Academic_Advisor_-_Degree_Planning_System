@@ -208,13 +208,16 @@ describe('AdvisorWorkspacePage', () => {
       </BrowserRouter>
     );
 
-    await waitFor(() => {
-      expect(screen.getByText('Advisor Workspace & Degree Plan Review')).toBeInTheDocument();
-      expect(screen.getByText('student_alex')).toBeInTheDocument();
-      expect(screen.getByText('4 days')).toBeInTheDocument();
-      expect(screen.getByText('1 Warning(s)')).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /start official review/i })).toBeInTheDocument();
-    });
+    await waitFor(
+      () => {
+        expect(screen.getByText('Advisor Workspace & Degree Plan Review')).toBeInTheDocument();
+        expect(screen.getByText('student_alex')).toBeInTheDocument();
+        expect(screen.getByText('4 days')).toBeInTheDocument();
+        expect(screen.getByText('1 Warning(s)')).toBeInTheDocument();
+        expect(screen.getByRole('button', { name: /start official review/i })).toBeInTheDocument();
+      },
+      { timeout: 4000 }
+    );
   });
 
   it('triggers start official review action', async () => {

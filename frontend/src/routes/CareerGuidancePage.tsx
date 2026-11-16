@@ -82,9 +82,12 @@ export const CareerGuidancePage: React.FC = () => {
     setIsObjectivesLoading(true);
     try {
       const data = await careerApi.getObjectives({ is_active: true });
-      setObjectives(data);
-      if (data.length > 0 && !selectedObjectiveId) {
-        setSelectedObjectiveId(data[0].id);
+      const list = Array.isArray(data)
+        ? data
+        : (data as unknown as { results?: CareerObjective[] })?.results || [];
+      setObjectives(list);
+      if (list.length > 0 && !selectedObjectiveId) {
+        setSelectedObjectiveId(list[0].id);
       }
     } catch {
       // Non-fatal, handle error in views
@@ -118,7 +121,10 @@ export const CareerGuidancePage: React.FC = () => {
         objective_id: selectedObjectiveId,
         limit: 15,
       });
-      setRecommendations(res);
+      const list = Array.isArray(res)
+        ? res
+        : (res as unknown as { results?: CourseRecommendation[] })?.results || [];
+      setRecommendations(list);
     } catch {
       setRecsError('Failed to load course recommendations.');
     } finally {
@@ -134,8 +140,14 @@ export const CareerGuidancePage: React.FC = () => {
         careerApi.getSkills(),
         careerApi.getCourseSkills(),
       ]);
-      setSkills(skillsData);
-      setCourseMappings(mappingsData);
+      const skillsList = Array.isArray(skillsData)
+        ? skillsData
+        : (skillsData as unknown as { results?: Skill[] })?.results || [];
+      const mappingsList = Array.isArray(mappingsData)
+        ? mappingsData
+        : (mappingsData as unknown as { results?: CourseSkillMapping[] })?.results || [];
+      setSkills(skillsList);
+      setCourseMappings(mappingsList);
     } catch {
       // Non-fatal
     } finally {

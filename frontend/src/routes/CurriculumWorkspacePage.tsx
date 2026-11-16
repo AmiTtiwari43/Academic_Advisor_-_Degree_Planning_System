@@ -39,12 +39,18 @@ export const CurriculumWorkspacePage: React.FC = () => {
         curriculumApi.getProgrammes(),
         curriculumApi.getCourses(),
       ]);
-      setProgrammes(progs);
-      setAllCourses(courses);
+      const progsList = Array.isArray(progs)
+        ? progs
+        : (progs as unknown as { results?: typeof progs })?.results || [];
+      const coursesList = Array.isArray(courses)
+        ? courses
+        : (courses as unknown as { results?: typeof courses })?.results || [];
+      setProgrammes(progsList);
+      setAllCourses(coursesList);
 
-      if (progs.length > 0 && !selectedProgrammeId) {
-        setSelectedProgrammeId(progs[0].id);
-        const versions = progs[0].curriculum_versions || [];
+      if (progsList.length > 0 && !selectedProgrammeId) {
+        setSelectedProgrammeId(progsList[0].id);
+        const versions = progsList[0].curriculum_versions || [];
         if (versions.length > 0) {
           setSelectedVersionId(versions[0].id);
         }

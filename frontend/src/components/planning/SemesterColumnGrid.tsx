@@ -19,13 +19,15 @@ export interface SemesterColumnGridProps {
 
 export const SemesterColumnGrid: React.FC<SemesterColumnGridProps> = ({
   terms,
-  items,
+  items = [],
   simulationReport,
   onRemoveCourse,
   onMoveCourse,
   onDropCourse,
   isReadOnly = false,
 }) => {
+  const safeItems = Array.isArray(items) ? items : [];
+
   return (
     <div className={styles.gridContainer} data-testid="semester-column-grid">
       <div className={styles.gridActions}>
@@ -37,7 +39,7 @@ export const SemesterColumnGrid: React.FC<SemesterColumnGridProps> = ({
       <div className={styles.columnsWrapper}>
         {terms.map((term, idx) => {
           const termIndex = idx + 1;
-          const termItems = items.filter(
+          const termItems = safeItems.filter(
             (it) => it.planned_term === term.id || it.term_index === termIndex
           );
 

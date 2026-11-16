@@ -36,9 +36,12 @@ export const DegreeAuditPage: React.FC = () => {
       .getStudentRecords()
       .then((records) => {
         if (!isMounted) return;
-        setStudentRecords(records);
-        if (records.length > 0) {
-          setSelectedRecordId(records[0].id);
+        const list = Array.isArray(records)
+          ? records
+          : (records as unknown as { results?: StudentRecord[] })?.results || [];
+        setStudentRecords(list);
+        if (list.length > 0) {
+          setSelectedRecordId(list[0].id);
         } else {
           setLoading(false);
         }

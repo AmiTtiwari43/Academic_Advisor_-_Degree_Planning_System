@@ -10,7 +10,8 @@ export interface AnalyticsOverview {
   total_active_students: number;
   total_plans: number;
   plans_pending_review: number;
-  avg_turnaround_hours: number;
+  avg_turnaround_hours?: number;
+  avg_approval_turnaround_hours?: number;
   critical_or_high_risk_students: number;
   top_bottlenecks: TopBottleneck[];
 }

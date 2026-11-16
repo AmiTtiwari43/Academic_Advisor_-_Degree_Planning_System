@@ -72,6 +72,10 @@ export const NotificationBell: React.FC = () => {
     enabled: isOpen,
   });
 
+  const items: NotificationItem[] = Array.isArray(notifications)
+    ? notifications
+    : (notifications as unknown as { results?: NotificationItem[] })?.results || [];
+
   // Mark single as read mutation
   const markReadMutation = useMutation({
     mutationFn: (id: string) => notificationsApi.markAsRead(id),
@@ -192,8 +196,8 @@ export const NotificationBell: React.FC = () => {
           <div className={styles.list}>
             {isLoading ? (
               <div className={styles.loadingState}>Loading notifications...</div>
-            ) : notifications && notifications.length > 0 ? (
-              notifications.map((item: NotificationItem) => (
+            ) : items.length > 0 ? (
+              items.map((item: NotificationItem) => (
                 <div
                   key={item.id}
                   className={`${styles.item} ${item.read_status === 'UNREAD' ? styles.itemUnread : styles.itemRead}`}
