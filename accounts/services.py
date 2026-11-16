@@ -31,8 +31,14 @@ def authenticate_and_login(request, username: str, password: str) -> User:
     """
     Authenticates user credentials and verifies active membership.
     On success, starts a session; on failure, raises ValidationError.
+    Supports both username and institutional email identifier.
     """
     user = authenticate(request, username=username, password=password)
+    if not user and "@" in username:
+        matched_user = User.objects.filter(email__iexact=username).first()
+        if matched_user:
+            user = authenticate(request, username=matched_user.username, password=password)
+
     if not user or not user.is_active:
         raise ValidationError("Invalid credentials.")
 

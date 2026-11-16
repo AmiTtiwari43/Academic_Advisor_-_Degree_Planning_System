@@ -1,20 +1,56 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { BookOpen, Calendar, CheckCircle2, Shield, Users } from 'lucide-react';
+import { BookOpen, Calendar, CheckCircle2, Shield, Users, AlertCircle } from 'lucide-react';
 import styles from './LandingPage.module.css';
 import { Button } from '../components/Button/Button';
 import { Input } from '../components/Input/Input';
 import { Badge } from '../components/Badge/Badge';
+import { useAuth } from '../context/AuthContext';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
-  const [email, setEmail] = useState('advisor@institution.edu');
-  const [password, setPassword] = useState('••••••••••••');
+  const { login, isAuthenticated } = useAuth();
+  const [identifier, setIdentifier] = useState('student_alex');
+  const [password, setPassword] = useState('Password123!');
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSignIn = (e: React.FormEvent) => {
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate('/dashboard');
+    }
+  }, [isAuthenticated, navigate]);
+
+  const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Navigates directly to the authenticated shell demo
-    navigate('/dashboard');
+    if (!identifier.trim() || !password) {
+      setError('Please provide username/email and password.');
+      return;
+    }
+
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await login({ username: identifier.trim(), password });
+      navigate('/dashboard');
+    } catch {
+      setError('Invalid credentials. Please verify your username and password.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleQuickLogin = async (username: string) => {
+    setError(null);
+    setIsSubmitting(true);
+    try {
+      await login({ username, password: 'Password123!' });
+      navigate('/dashboard');
+    } catch {
+      setError(`Failed to sign in as ${username}. Ensure demo dataset is seeded.`);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -79,13 +115,22 @@ export const LandingPage: React.FC = () => {
               <p className={styles.authSub}>Access your institution's academic workspace</p>
             </div>
 
+            {error && (
+              <div className={styles.errorBanner} role="alert">
+                <AlertCircle size={14} />
+                <span>{error}</span>
+              </div>
+            )}
+
             <form onSubmit={handleSignIn} className={styles.authForm}>
               <Input
-                label="Institutional Email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                label="Institutional Username or Email"
+                type="text"
+                value={identifier}
+                onChange={(e) => setIdentifier(e.target.value)}
+                placeholder="e.g. student_alex or alex@agu.edu"
                 required
+                disabled={isSubmitting}
               />
               <Input
                 label="Password"
@@ -93,17 +138,69 @@ export const LandingPage: React.FC = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isSubmitting}
               />
 
               <div className={styles.authNote}>
                 <CheckCircle2 size={14} className={styles.noteIcon} />
-                <span>Phase 01 prototype: Demo session enabled.</span>
+                <span>Default Password for all seeded accounts: <strong>Password123!</strong></span>
               </div>
 
-              <Button type="submit" variant="primary" size="md" className={styles.submitButton}>
-                Enter Academic Workspace
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                className={styles.submitButton}
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? 'Authenticating...' : 'Sign In to Workspace'}
               </Button>
             </form>
+
+            <div className={styles.quickLoginSection}>
+              <div className={styles.quickLoginTitle}>Quick Demo Sign-In</div>
+              <div className={styles.quickLoginGrid}>
+                <button
+                  type="button"
+                  className={styles.quickLoginBtn}
+                  onClick={() => handleQuickLogin('student_alex')}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.quickLoginName}>Alex Rivera</span>
+                  <span className={styles.quickLoginRole}>Student (Junior CS)</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.quickLoginBtn}
+                  onClick={() => handleQuickLogin('advisor_alice')}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.quickLoginName}>Dr. Alice Chen</span>
+                  <span className={styles.quickLoginRole}>Faculty Advisor</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.quickLoginBtn}
+                  onClick={() => handleQuickLogin('coordinator_cora')}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.quickLoginName}>Dr. Cora Vance</span>
+                  <span className={styles.quickLoginRole}>Coordinator</span>
+                </button>
+
+                <button
+                  type="button"
+                  className={styles.quickLoginBtn}
+                  onClick={() => handleQuickLogin('student_elena')}
+                  disabled={isSubmitting}
+                >
+                  <span className={styles.quickLoginName}>Elena Rostova</span>
+                  <span className={styles.quickLoginRole}>Honors Senior</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>

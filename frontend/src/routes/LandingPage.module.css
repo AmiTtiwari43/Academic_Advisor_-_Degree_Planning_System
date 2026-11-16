@@ -131,6 +131,72 @@
   gap: 18px;
 }
 
+.errorBanner {
+  background-color: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: var(--font-size-xs);
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quickLoginSection {
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--color-slate-200);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.quickLoginTitle {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-slate-500);
+}
+
+.quickLoginGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.quickLoginBtn {
+  background-color: var(--color-surface-pure);
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.quickLoginBtn:hover:not(:disabled) {
+  border-color: var(--color-prestige-gold-500);
+  background-color: var(--color-prestige-gold-50);
+  box-shadow: 0 2px 6px rgba(11, 19, 36, 0.06);
+}
+
+.quickLoginName {
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  color: var(--color-foundation-navy-900);
+}
+
+.quickLoginRole {
+  font-size: 10px;
+  color: var(--color-slate-500);
+}
+
 .authNote {
   display: flex;
   align-items: center;

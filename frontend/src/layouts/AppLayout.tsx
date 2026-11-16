@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Outlet, useNavigate, Navigate } from 'react-router-dom';
 import { LogOut, Menu, ShieldCheck, Sparkles } from 'lucide-react';
 import styles from './AppLayout.module.css';
 import { Sidebar } from '../components/Sidebar/Sidebar';
@@ -15,13 +15,14 @@ export const AppLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
-  const { user, activeMembership, activeRole, logout } = useAuth();
+  const { user, activeMembership, activeRole, logout, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
-  // Health check query proves backend connectivity
+  // Health check query proves backend connectivity (only when authenticated)
   const { data: healthData, isSuccess } = useQuery({
     queryKey: ['system-health'],
     queryFn: () => apiClient.checkHealth(),
+    enabled: !!isAuthenticated,
     refetchInterval: 60000,
   });
 
@@ -29,6 +30,41 @@ export const AppLayout: React.FC = () => {
     await logout();
     navigate('/login');
   };
+
+  // Guard: If authentication state is loading, wait before mounting children
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        height: '100vh',
+        width: '100vw',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: '#F8F9FC',
+        color: '#0B1324',
+        fontFamily: 'Inter, sans-serif'
+      }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            border: '3px solid #E2E8F0',
+            borderTopColor: '#0E7577',
+            borderRadius: '50%',
+            animation: 'spin 0.8s linear infinite'
+          }} />
+          <span style={{ fontSize: '14px', fontWeight: 500, color: '#475569' }}>
+            Verifying institutional session...
+          </span>
+        </div>
+      </div>
+    );
+  }
+
+  // Guard: If not authenticated, redirect to login page immediately
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   const displayName =
     user?.preferred_name ||
