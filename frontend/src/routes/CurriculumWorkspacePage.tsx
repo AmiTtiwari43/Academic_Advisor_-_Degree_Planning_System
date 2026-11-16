@@ -9,6 +9,7 @@ import {
 import { RuleBuilderModal } from '../components/curriculum/RuleBuilderModal';
 import { PublishPreviewModal } from '../components/curriculum/PublishPreviewModal';
 import { VersionDiffModal } from '../components/curriculum/VersionDiffModal';
+import styles from './CurriculumWorkspacePage.module.css';
 
 export const CurriculumWorkspacePage: React.FC = () => {
   const [programmes, setProgrammes] = useState<Programme[]>([]);
@@ -198,14 +199,15 @@ export const CurriculumWorkspacePage: React.FC = () => {
   );
 
   return (
-    <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '1.5rem' }}>
+    <div className={styles.pageContainer}>
       {/* Page Title & Breadcrumb */}
-      <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+      <div className={styles.pageHeader}>
         <div>
-          <h1 style={{ margin: '0 0 0.25rem', fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', letterSpacing: '-0.02em' }}>
+          <span className={styles.preTitle}>Academic Catalogue &amp; Specifications</span>
+          <h1 className={styles.title}>
             Curriculum &amp; Requirement Workspace
           </h1>
-          <p style={{ margin: 0, color: '#64748B', fontSize: '0.9rem' }}>
+          <p className={styles.subtitle}>
             Author, validate, preview, and publish immutable curriculum versions with deterministic rules.
           </p>
         </div>
@@ -263,40 +265,18 @@ export const CurriculumWorkspacePage: React.FC = () => {
       </div>
 
       {/* Programme & Version Header Bar */}
-      <div
-        style={{
-          backgroundColor: '#FFFFFF',
-          borderRadius: '10px',
-          border: '1px solid #E2E8F0',
-          padding: '1.25rem 1.5rem',
-          marginBottom: '1.5rem',
-          boxShadow: '0 1px 3px rgba(0,0,0,0.05)',
-          display: 'flex',
-          flexWrap: 'wrap',
-          gap: '1.5rem',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-        }}
-      >
+      <div className={styles.controlCard}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem', flexWrap: 'wrap' }}>
           {/* Programme Dropdown */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+          <div className={styles.controlGroup}>
+            <label className={styles.controlLabel}>
               Degree Programme
             </label>
             <select
               value={selectedProgrammeId}
               onChange={(e) => handleProgrammeChange(e.target.value)}
-              style={{
-                padding: '0.55rem 0.85rem',
-                borderRadius: '6px',
-                border: '1px solid #CBD5E1',
-                fontSize: '0.9rem',
-                fontWeight: 600,
-                color: '#0F172A',
-                backgroundColor: '#F8FAFC',
-                minWidth: '260px',
-              }}
+              className={styles.selectInput}
+              style={{ minWidth: '260px' }}
             >
               {programmes.map((p) => (
                 <option key={p.id} value={p.id}>
@@ -307,8 +287,8 @@ export const CurriculumWorkspacePage: React.FC = () => {
           </div>
 
           {/* Version Selector */}
-          <div>
-            <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 600, color: '#64748B', textTransform: 'uppercase', marginBottom: '0.25rem' }}>
+          <div className={styles.controlGroup}>
+            <label className={styles.controlLabel}>
               Curriculum Version
             </label>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
@@ -316,16 +296,8 @@ export const CurriculumWorkspacePage: React.FC = () => {
                 value={selectedVersionId}
                 onChange={(e) => setSelectedVersionId(e.target.value)}
                 disabled={programmeVersions.length === 0}
-                style={{
-                  padding: '0.55rem 0.85rem',
-                  borderRadius: '6px',
-                  border: '1px solid #CBD5E1',
-                  fontSize: '0.9rem',
-                  fontWeight: 600,
-                  color: '#0F172A',
-                  backgroundColor: '#F8FAFC',
-                  minWidth: '180px',
-                }}
+                className={styles.selectInput}
+                style={{ minWidth: '180px' }}
               >
                 {programmeVersions.map((v) => (
                   <option key={v.id} value={v.id}>
@@ -502,49 +474,22 @@ export const CurriculumWorkspacePage: React.FC = () => {
       )}
 
       {/* Main Workspace Navigation Tabs */}
-      <div style={{ display: 'flex', borderBottom: '1px solid #E2E8F0', marginBottom: '1.5rem' }}>
+      <div className={styles.tabsBar}>
         <button
           onClick={() => setActiveTab('groups')}
-          style={{
-            padding: '0.75rem 1.25rem',
-            border: 'none',
-            borderBottom: activeTab === 'groups' ? '2px solid #2563EB' : '2px solid transparent',
-            background: 'none',
-            fontWeight: activeTab === 'groups' ? 600 : 500,
-            color: activeTab === 'groups' ? '#2563EB' : '#64748B',
-            cursor: 'pointer',
-            fontSize: '0.95rem',
-          }}
+          className={`${styles.tabBtn} ${activeTab === 'groups' ? styles.tabBtnActive : ''}`}
         >
           Requirement Groups Hierarchy
         </button>
         <button
           onClick={() => setActiveTab('courses')}
-          style={{
-            padding: '0.75rem 1.25rem',
-            border: 'none',
-            borderBottom: activeTab === 'courses' ? '2px solid #2563EB' : '2px solid transparent',
-            background: 'none',
-            fontWeight: activeTab === 'courses' ? 600 : 500,
-            color: activeTab === 'courses' ? '#2563EB' : '#64748B',
-            cursor: 'pointer',
-            fontSize: '0.95rem',
-          }}
+          className={`${styles.tabBtn} ${activeTab === 'courses' ? styles.tabBtnActive : ''}`}
         >
           Course Catalogue
         </button>
         <button
           onClick={() => setActiveTab('rules')}
-          style={{
-            padding: '0.75rem 1.25rem',
-            border: 'none',
-            borderBottom: activeTab === 'rules' ? '2px solid #2563EB' : '2px solid transparent',
-            background: 'none',
-            fontWeight: activeTab === 'rules' ? 600 : 500,
-            color: activeTab === 'rules' ? '#2563EB' : '#64748B',
-            cursor: 'pointer',
-            fontSize: '0.95rem',
-          }}
+          className={`${styles.tabBtn} ${activeTab === 'rules' ? styles.tabBtnActive : ''}`}
         >
           Prerequisite Rules &amp; Test Simulator
         </button>

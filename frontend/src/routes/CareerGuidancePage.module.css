@@ -1,314 +1,357 @@
 .pageContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6, 1.5rem);
-  padding: var(--space-6, 1.5rem);
+  gap: 24px;
+  padding: 24px;
   max-width: 1440px;
   margin: 0 auto;
   width: 100%;
 }
 
 .advisoryBanner {
-  background: #fefce8;
-  border: 1px solid #fef08a;
-  border-left: 4px solid #ca8a04;
-  border-radius: var(--radius-md, 0.5rem);
-  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  background: linear-gradient(90deg, #FDFBF7 0%, #FFFFFF 100%);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-left: 4px solid var(--color-prestige-gold-600);
+  border-radius: var(--radius-md);
+  padding: 16px 20px;
   display: flex;
   align-items: flex-start;
-  gap: var(--space-3, 0.75rem);
-  color: #713f12;
-  font-size: 0.875rem;
+  gap: 12px;
+  color: #78350F;
+  font-size: var(--font-size-sm);
   line-height: 1.5;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
 }
 
 .advisoryIcon {
-  color: #ca8a04;
+  color: var(--color-prestige-gold-700);
   flex-shrink: 0;
-  margin-top: 0.125rem;
+  margin-top: 2px;
 }
 
 .selectorBar {
-  background: var(--color-bg-surface, #ffffff);
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
-  border-radius: var(--radius-lg, 0.75rem);
-  padding: var(--space-4, 1rem) var(--space-5, 1.25rem);
+  background: var(--color-surface-pure);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  padding: 18px 24px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-4, 1rem);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 16px;
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
 }
 
 .selectorGroup {
   display: flex;
   align-items: center;
-  gap: var(--space-3, 0.75rem);
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .selectorLabel {
-  font-size: 0.875rem;
+  font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-text-main, #0f172a);
+  color: var(--color-foundation-navy-900);
 }
 
 .selectInput {
-  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-  border: 1px solid var(--color-border-subtle, #cbd5e1);
-  border-radius: var(--radius-sm, 0.375rem);
-  font-size: 0.875rem;
+  padding: 8px 14px;
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
   background: #ffffff;
-  color: var(--color-text-main, #0f172a);
-  min-width: 260px;
+  color: var(--color-foundation-navy-900);
+  min-width: 280px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
 }
 
 .selectInput:focus {
   outline: none;
-  border-color: var(--color-primary, #2563eb);
+  border-color: var(--color-accent-teal-600);
+  box-shadow: 0 0 0 3px rgba(14, 117, 119, 0.15);
 }
 
 .workspaceCard {
-  background: var(--color-bg-surface, #ffffff);
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
-  border-radius: var(--radius-lg, 0.75rem);
+  background: var(--color-surface-pure);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
 }
 
 .workspaceContent {
-  padding: var(--space-5, 1.25rem);
+  padding: 24px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5, 1.25rem);
+  gap: 24px;
 }
 
 /* KPI Summary Cards */
 .kpiGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--space-4, 1rem);
+  gap: 18px;
 }
 
 .kpiCard {
   background: #ffffff;
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
-  border-radius: var(--radius-md, 0.5rem);
-  padding: var(--space-4, 1rem);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  padding: 18px 20px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 0.5rem);
+  gap: 8px;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-fast);
+}
+
+.kpiCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-teal-600) 0%, transparent 100%);
+}
+
+.kpiCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-slate-300);
+  box-shadow: 0 6px 16px -2px rgba(11, 19, 36, 0.06);
 }
 
 .kpiHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted, #64748b);
-  font-weight: 500;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-slate-500);
+  font-weight: 700;
 }
 
 .kpiValue {
-  font-size: 1.875rem;
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-2xl);
   font-weight: 700;
-  color: var(--color-text-main, #0f172a);
+  color: var(--color-foundation-navy-900);
   line-height: 1.1;
+  letter-spacing: -0.02em;
 }
 
 .kpiSubtext {
-  font-size: 0.75rem;
-  color: var(--color-text-muted, #64748b);
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
 }
 
 /* Readiness Progress Bar */
 .readinessBarContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 0.5rem);
-  margin-top: var(--space-1, 0.25rem);
+  gap: 8px;
+  margin-top: 4px;
 }
 
 .readinessBarTrack {
   height: 10px;
-  background: #e2e8f0;
-  border-radius: 5px;
+  background: var(--color-slate-100);
+  border-radius: var(--radius-pill);
   overflow: hidden;
+  border: 1px solid rgba(15, 23, 42, 0.05);
 }
 
 .readinessBarFill {
   height: 100%;
-  border-radius: 5px;
-  background: linear-gradient(90deg, #3b82f6 0%, #10b981 100%);
-  transition: width 0.4s ease;
+  border-radius: var(--radius-pill);
+  background: linear-gradient(90deg, var(--color-accent-teal-600) 0%, var(--color-accent-teal-400) 100%);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Skills Sections */
 .skillsSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3, 0.75rem);
+  gap: 16px;
 }
 
 .sectionHeader {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  border-bottom: 1px solid var(--color-border-subtle, #f1f5f9);
-  padding-bottom: var(--space-2, 0.5rem);
+  border-bottom: 1px solid var(--color-slate-200);
+  padding-bottom: 10px;
 }
 
 .sectionTitle {
-  font-size: 1.0625rem;
-  font-weight: 600;
-  color: var(--color-text-main, #0f172a);
+  font-family: var(--font-family-serif);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
   display: flex;
   align-items: center;
-  gap: var(--space-2, 0.5rem);
+  gap: 8px;
+  letter-spacing: -0.01em;
 }
 
 .skillsGrid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-  gap: var(--space-3, 0.75rem);
+  gap: 14px;
 }
 
 .skillCard {
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
-  border-radius: var(--radius-md, 0.5rem);
-  padding: var(--space-3, 0.75rem) var(--space-4, 1rem);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2, 0.5rem);
-  background: #f8fafc;
+  gap: 8px;
+  background: #F8FAFD;
+  transition: all var(--transition-fast);
+}
+
+.skillCard:hover {
+  transform: translateY(-2px);
+  border-color: var(--color-slate-300);
+  box-shadow: 0 4px 12px -2px rgba(11, 19, 36, 0.06);
 }
 
 .skillCardSatisfied {
-  border-left: 4px solid #10b981;
+  border-left: 4px solid #10B981;
 }
 
 .skillCardGap {
-  border-left: 4px solid #f59e0b;
+  border-left: 4px solid var(--color-prestige-gold-500);
 }
 
 .skillCardMissing {
-  border-left: 4px solid #ef4444;
+  border-left: 4px solid #EF4444;
 }
 
 .skillTopRow {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-2, 0.5rem);
+  gap: 8px;
 }
 
 .skillName {
-  font-weight: 600;
-  color: var(--color-text-main, #0f172a);
+  font-weight: 650;
+  color: var(--color-foundation-navy-900);
   font-size: 0.9375rem;
+  letter-spacing: -0.01em;
 }
 
 .skillMeta {
   display: flex;
   align-items: center;
-  gap: var(--space-2, 0.5rem);
-  font-size: 0.8125rem;
-  color: var(--color-text-muted, #64748b);
+  gap: 8px;
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
   flex-wrap: wrap;
 }
 
 .sourceCourses {
   font-size: 0.75rem;
-  color: #047857;
-  background: #ecfdf5;
-  padding: 0.2rem 0.5rem;
-  border-radius: 4px;
+  color: #065F46;
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  padding: 3px 8px;
+  border-radius: var(--radius-xs);
   display: inline-flex;
   align-items: center;
-  gap: 0.25rem;
-  margin-top: 0.25rem;
+  gap: 4px;
+  margin-top: 4px;
+  font-weight: 500;
 }
 
 /* Recommendations Cards */
 .recommendationList {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4, 1rem);
+  gap: 16px;
 }
 
 .recommendationCard {
-  border: 1px solid var(--color-border-subtle, #e2e8f0);
-  border-radius: var(--radius-md, 0.5rem);
-  padding: var(--space-4, 1.25rem);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-md);
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-3, 0.75rem);
+  gap: 12px;
   background: #ffffff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+  transition: all var(--transition-fast);
 }
 
 .recommendationCard:hover {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: var(--color-slate-300);
+  box-shadow: 0 6px 18px -2px rgba(11, 19, 36, 0.07);
+  transform: translateY(-2px);
 }
 
 .recHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: var(--space-3, 0.75rem);
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .recCourseInfo {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
+  gap: 4px;
 }
 
 .recCourseTitle {
+  font-family: var(--font-family-serif);
   font-size: 1.125rem;
   font-weight: 700;
-  color: var(--color-text-main, #0f172a);
+  color: var(--color-foundation-navy-900);
 }
 
 .recBadges {
   display: flex;
   align-items: center;
-  gap: var(--space-2, 0.5rem);
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .recExplanation {
-  font-size: 0.875rem;
-  color: var(--color-text-main, #334155);
-  line-height: 1.5;
-  background: #f8fafc;
-  padding: var(--space-3, 0.75rem);
-  border-radius: var(--radius-sm, 0.375rem);
-  border-left: 3px solid var(--color-primary, #3b82f6);
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-700);
+  line-height: 1.55;
+  background: #F8FAFD;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border-left: 3px solid var(--color-accent-teal-600);
 }
 
 .skillsCoveredRow {
   display: flex;
   align-items: center;
-  gap: var(--space-2, 0.5rem);
+  gap: 8px;
   flex-wrap: wrap;
-  font-size: 0.8125rem;
-  color: var(--color-text-muted, #64748b);
+  font-size: var(--font-size-xs);
+  color: var(--color-slate-500);
 }
 
 .skillPill {
-  background: #eff6ff;
-  color: #1e40af;
-  border: 1px solid #bfdbfe;
-  padding: 0.15rem 0.5rem;
-  border-radius: 9999px;
+  background: #EFF6FF;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
   font-size: 0.75rem;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 /* Taxonomy Management */
@@ -317,28 +360,29 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-3, 0.75rem);
-  margin-bottom: var(--space-3, 0.75rem);
+  gap: 12px;
+  margin-bottom: 12px;
 }
 
 .filterControls {
   display: flex;
   align-items: center;
-  gap: var(--space-2, 0.5rem);
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .searchInput {
-  padding: var(--space-2, 0.5rem) var(--space-3, 0.75rem);
-  border: 1px solid var(--color-border-subtle, #cbd5e1);
-  border-radius: var(--radius-sm, 0.375rem);
-  font-size: 0.875rem;
-  min-width: 220px;
+  padding: 8px 14px;
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  min-width: 240px;
+  background: var(--color-surface-pure);
 }
 
 @media (max-width: 768px) {
   .pageContainer {
-    padding: var(--space-3, 0.75rem);
+    padding: 16px;
   }
 
   .selectorBar {

@@ -3,102 +3,123 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-4);
-  padding: var(--space-4) var(--space-5);
+  gap: 16px;
+  padding: 18px 24px;
   background: var(--color-surface-pure);
-  border: var(--border-default);
+  border: 1px solid var(--color-slate-200);
   border-radius: var(--radius-lg);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
 }
 
 .planContext {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .planTitle {
+  font-family: var(--font-family-serif);
   font-size: var(--font-size-base);
   font-weight: 700;
   color: var(--color-foundation-navy-900);
+  letter-spacing: -0.01em;
 }
 
 .metaBadge {
-  font-size: var(--font-size-xs);
-  color: var(--color-slate-500);
+  font-size: var(--font-size-2xs);
+  color: var(--color-slate-600);
   background: var(--color-slate-100);
   padding: 2px 8px;
-  border-radius: var(--radius-sm);
-  font-family: monospace;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-family-mono);
+  font-weight: 600;
+  border: 1px solid var(--color-slate-200);
 }
 
 .actionsGroup {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .btnAction {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-1);
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-sm);
+  gap: 6px;
+  padding: 8px 16px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   border: 1px solid transparent;
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .btnAction:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none !important;
 }
 
 .btnStartReview {
-  background: var(--color-foundation-navy-900);
+  background: linear-gradient(180deg, var(--color-foundation-navy-800) 0%, var(--color-foundation-navy-900) 100%);
   color: #ffffff;
+  border-color: var(--color-foundation-navy-950);
 }
 
 .btnStartReview:hover:not(:disabled) {
-  background: var(--color-slate-800);
+  background: var(--color-foundation-navy-700);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(11, 19, 36, 0.2);
 }
 
 .btnApprove {
-  background: var(--color-accent-teal-700);
+  background: linear-gradient(180deg, var(--color-accent-teal-500) 0%, var(--color-accent-teal-600) 100%);
   color: #ffffff;
+  border-color: var(--color-accent-teal-700);
 }
 
 .btnApprove:hover:not(:disabled) {
-  background: var(--color-accent-teal-600);
+  background: linear-gradient(180deg, var(--color-accent-teal-600) 0%, var(--color-accent-teal-700) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(12, 94, 96, 0.25);
 }
 
 .btnReturn {
-  background: #f59e0b;
+  background: linear-gradient(180deg, #F59E0B 0%, #D97706 100%);
   color: #ffffff;
+  border-color: #B45309;
 }
 
 .btnReturn:hover:not(:disabled) {
-  background: #d97706;
+  background: #D97706;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(217, 119, 6, 0.25);
 }
 
 .btnReject {
-  background: var(--color-accent-crimson-600);
+  background: linear-gradient(180deg, #EF4444 0%, #DC2626 100%);
   color: #ffffff;
+  border-color: #B91C1C;
 }
 
 .btnReject:hover:not(:disabled) {
-  background: #b91c1c;
+  background: #B91C1C;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(220, 38, 38, 0.25);
 }
 
 .btnOverride {
-  background: #8b5cf6;
+  background: linear-gradient(180deg, var(--color-prestige-gold-600) 0%, var(--color-prestige-gold-700) 100%);
   color: #ffffff;
+  border-color: var(--color-prestige-gold-800);
 }
 
 .btnOverride:hover:not(:disabled) {
-  background: #7c3aed;
+  background: linear-gradient(180deg, var(--color-prestige-gold-500) 0%, var(--color-prestige-gold-600) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(184, 134, 11, 0.3);
 }

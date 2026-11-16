@@ -9,33 +9,34 @@
   align-items: center;
   justify-content: center;
   background: transparent;
-  border: none;
+  border: 1px solid transparent;
   cursor: pointer;
   color: var(--color-slate-600);
-  padding: 6px;
-  border-radius: var(--radius-md);
-  transition: all 150ms ease-in-out;
+  padding: 7px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
 }
 
 .bellButton:hover,
 .bellButtonActive {
   background-color: var(--color-surface-hover);
-  color: var(--color-primary-600);
+  color: var(--color-foundation-navy-900);
+  border-color: var(--color-slate-200);
 }
 
 .badgeCount {
   position: absolute;
-  top: 1px;
-  right: 1px;
-  background-color: var(--color-status-danger);
+  top: 2px;
+  right: 2px;
+  background-color: #DC2626;
   color: #ffffff;
   font-size: 10px;
   font-weight: 700;
   line-height: 1;
   padding: 2px 5px;
-  border-radius: 9999px;
-  border: 2px solid var(--color-surface);
-  box-shadow: var(--shadow-sm);
+  border-radius: var(--radius-pill);
+  border: 2px solid var(--color-surface-pure);
+  box-shadow: 0 1px 3px rgba(220, 38, 38, 0.3);
   pointer-events: none;
 }
 
@@ -45,15 +46,15 @@
   right: 0;
   width: 380px;
   max-width: calc(100vw - 24px);
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: var(--color-surface-pure);
+  border: 1px solid var(--color-slate-200);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 12px 32px -4px rgba(11, 19, 36, 0.16), 0 2px 6px rgba(11, 19, 36, 0.06);
   z-index: 1000;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  animation: slideDown 150ms ease-out;
+  animation: slideDown 160ms cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @keyframes slideDown {
@@ -68,22 +69,24 @@
 }
 
 .header {
-  padding: 12px 16px;
-  border-bottom: 1px solid var(--color-border);
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--color-slate-200);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: var(--color-surface);
+  background: linear-gradient(180deg, #FFFFFF 0%, #F8FAFD 100%);
 }
 
 .title {
+  font-family: var(--font-family-serif);
   font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--color-slate-900);
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
   margin: 0;
   display: flex;
   align-items: center;
   gap: 8px;
+  letter-spacing: -0.01em;
 }
 
 .actions {
@@ -96,17 +99,17 @@
   background: none;
   border: none;
   font-size: var(--font-size-xs);
-  font-weight: 500;
-  color: var(--color-primary-600);
+  font-weight: 600;
+  color: var(--color-accent-teal-700);
   cursor: pointer;
-  padding: 4px 6px;
-  border-radius: var(--radius-sm);
-  transition: background-color 150ms ease;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
 }
 
 .markAllBtn:hover:not(:disabled) {
-  background-color: var(--color-primary-50);
-  text-decoration: underline;
+  background-color: var(--color-surface-hover);
+  color: var(--color-accent-teal-800);
 }
 
 .markAllBtn:disabled {
@@ -116,10 +119,10 @@
 
 .filterTabs {
   display: flex;
-  padding: 6px 16px;
-  background-color: var(--color-surface-muted);
-  border-bottom: 1px solid var(--color-border);
-  gap: 8px;
+  padding: 6px 14px;
+  background-color: #F8FAFD;
+  border-bottom: 1px solid var(--color-slate-200);
+  gap: 6px;
 }
 
 .tabBtn {
@@ -127,22 +130,23 @@
   border: none;
   font-size: var(--font-size-xs);
   font-weight: 500;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
+  padding: 4px 10px;
+  border-radius: var(--radius-xs);
   color: var(--color-slate-600);
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all var(--transition-fast);
 }
 
 .tabBtn:hover {
-  color: var(--color-slate-900);
+  color: var(--color-foundation-navy-900);
 }
 
 .tabBtnActive {
-  background-color: var(--color-surface);
-  color: var(--color-primary-700);
-  box-shadow: var(--shadow-sm);
+  background-color: var(--color-surface-pure);
+  color: var(--color-accent-teal-700);
+  box-shadow: 0 1px 2px rgba(11, 19, 36, 0.05);
   font-weight: 600;
+  border: 1px solid var(--color-slate-200);
 }
 
 .list {
@@ -155,9 +159,9 @@
 .item {
   display: flex;
   flex-direction: column;
-  padding: 12px 16px;
+  padding: 12px 18px;
   border-bottom: 1px solid var(--color-slate-100);
-  transition: background-color 120ms ease;
+  transition: background-color var(--transition-fast);
   position: relative;
 }
 
@@ -166,19 +170,19 @@
 }
 
 .itemUnread {
-  background-color: var(--color-primary-50);
+  background-color: #F0FDF4;
 }
 
 .itemUnread:hover {
-  background-color: #ebf5ff;
+  background-color: #DCFCE7;
 }
 
 .itemRead {
-  background-color: var(--color-surface);
+  background-color: var(--color-surface-pure);
 }
 
 .itemRead:hover {
-  background-color: var(--color-surface-hover);
+  background-color: #F8FAFD;
 }
 
 .itemTop {
@@ -196,29 +200,30 @@
 
 .itemTime {
   font-size: 11px;
-  color: var(--color-slate-500);
+  color: var(--color-slate-400);
 }
 
 .unreadDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: var(--color-primary-600);
+  background-color: #16A34A;
   display: inline-block;
+  box-shadow: 0 0 6px rgba(22, 163, 74, 0.4);
 }
 
 .itemSubject {
-  font-size: var(--font-size-sm);
-  font-weight: 600;
-  color: var(--color-slate-900);
+  font-size: var(--font-size-xs);
+  font-weight: 650;
+  color: var(--color-foundation-navy-900);
   margin-bottom: 2px;
-  line-height: 1.3;
+  line-height: 1.35;
 }
 
 .itemPreview {
   font-size: var(--font-size-xs);
   color: var(--color-slate-600);
-  line-height: 1.4;
+  line-height: 1.45;
   margin: 0;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -236,21 +241,24 @@
   background: none;
   border: none;
   font-size: 11px;
-  color: var(--color-primary-600);
+  font-weight: 600;
+  color: var(--color-accent-teal-700);
   cursor: pointer;
-  padding: 2px 4px;
+  padding: 2px 6px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-xs);
+  transition: all var(--transition-fast);
 }
 
 .markReadBtn:hover {
-  text-decoration: underline;
+  background-color: var(--color-surface-hover);
+  color: var(--color-accent-teal-800);
 }
 
 .emptyState {
-  padding: 32px 16px;
+  padding: 36px 16px;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -266,7 +274,7 @@
 .emptyTitle {
   font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-slate-700);
+  color: var(--color-foundation-navy-900);
   margin: 0;
 }
 

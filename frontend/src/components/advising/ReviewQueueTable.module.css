@@ -1,12 +1,12 @@
 .container {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 16px;
   background: var(--color-surface-pure);
-  border: var(--border-default);
+  border: 1px solid var(--color-slate-200);
   border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  padding: 24px;
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
 }
 
 .filterBar {
@@ -14,49 +14,58 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-3);
-  padding-bottom: var(--space-4);
-  border-bottom: var(--border-subtle);
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-slate-200);
 }
 
 .filterGroup {
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
   flex-wrap: wrap;
 }
 
 .pillButton {
-  padding: var(--space-1) var(--space-3);
+  padding: 5px 14px;
   font-size: var(--font-size-xs);
   font-weight: 600;
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-pill);
   border: 1px solid var(--color-slate-200);
   background: var(--color-surface-pure);
   color: var(--color-slate-600);
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: all var(--transition-fast);
 }
 
 .pillButton:hover {
-  background: var(--color-slate-100);
+  background: var(--color-surface-hover);
   color: var(--color-foundation-navy-900);
+  border-color: var(--color-slate-300);
 }
 
 .pillButtonActive {
   background: var(--color-accent-teal-700);
   color: #ffffff;
   border-color: var(--color-accent-teal-700);
+  box-shadow: 0 1px 2px rgba(12, 94, 96, 0.2);
 }
 
 .searchInput {
-  padding: var(--space-2) var(--space-3);
+  padding: 8px 14px;
   font-size: var(--font-size-sm);
-  border: var(--border-default);
-  border-radius: var(--radius-md);
-  min-width: 240px;
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-sm);
+  min-width: 260px;
   background: var(--color-surface-pure);
   color: var(--color-foundation-navy-900);
+  transition: all var(--transition-fast);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--color-accent-teal-600);
+  box-shadow: 0 0 0 3px rgba(14, 117, 119, 0.15);
 }
 
 .tableWrapper {
@@ -71,35 +80,39 @@
 }
 
 .table th {
-  padding: var(--space-3);
-  background: var(--color-slate-50);
-  color: var(--color-slate-700);
-  font-weight: 600;
+  padding: 12px 14px;
+  background: #F8FAFD;
+  color: var(--color-foundation-navy-800);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
   border-bottom: 2px solid var(--color-slate-200);
   white-space: nowrap;
 }
 
 .table td {
-  padding: var(--space-3);
+  padding: 14px;
   border-bottom: 1px solid var(--color-slate-100);
   vertical-align: middle;
 }
 
 .row:hover {
-  background-color: var(--color-slate-50);
+  background-color: #F8FAFD;
 }
 
 .selectedRow {
-  background-color: rgba(13, 148, 136, 0.08) !important;
+  background-color: #F0FDFA !important;
 }
 
 .studentInfo {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .studentName {
-  font-weight: 600;
+  font-weight: 650;
   color: var(--color-foundation-navy-900);
 }
 
@@ -111,41 +124,46 @@
 .waitBadge {
   display: inline-flex;
   align-items: center;
-  padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
-  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 650;
+  letter-spacing: 0.02em;
 }
 
 .waitNormal {
   background: var(--color-slate-100);
   color: var(--color-slate-700);
+  border: 1px solid var(--color-slate-200);
 }
 
 .waitUrgent {
-  background: rgba(239, 68, 68, 0.12);
-  color: var(--color-accent-crimson-600);
+  background: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
 }
 
 .actionBtn {
-  padding: var(--space-1) var(--space-3);
+  padding: 6px 14px;
   font-size: var(--font-size-xs);
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-xs);
   border: 1px solid var(--color-accent-teal-600);
   background: #ffffff;
   color: var(--color-accent-teal-700);
   cursor: pointer;
-  transition: all 0.15s ease-in-out;
+  transition: all var(--transition-fast);
 }
 
 .actionBtn:hover {
   background: var(--color-accent-teal-600);
   color: #ffffff;
+  box-shadow: 0 2px 4px rgba(12, 94, 96, 0.2);
 }
 
 .emptyState {
-  padding: var(--space-6);
+  padding: 36px 16px;
   text-align: center;
   color: var(--color-slate-500);
+  font-style: italic;
 }

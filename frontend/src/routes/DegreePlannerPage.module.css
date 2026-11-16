@@ -1,10 +1,10 @@
 .pageContainer {
-  padding: var(--space-6);
-  max-width: 1700px;
+  padding: 24px;
+  max-width: 1720px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: 24px;
   box-sizing: border-box;
 }
 
@@ -13,17 +13,28 @@
   align-items: flex-start;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-4);
-  padding-bottom: var(--space-4);
-  border-bottom: var(--border-subtle);
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-slate-200);
+  position: relative;
+}
+
+.pageHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-prestige-gold-500) 0%, transparent 100%);
 }
 
 .preTitle {
-  font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-size: var(--font-size-2xs);
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--color-accent-teal-700);
+  letter-spacing: 0.1em;
+  color: var(--color-prestige-gold-700);
 }
 
 .title {
@@ -31,7 +42,8 @@
   font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--color-foundation-navy-900);
-  margin: var(--space-1) 0 var(--space-2) 0;
+  margin: 4px 0 6px 0;
+  letter-spacing: -0.02em;
 }
 
 .subtitle {
@@ -43,63 +55,84 @@
 .headerControls {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 12px;
   flex-wrap: wrap;
 }
 
 .selectInput {
-  padding: var(--space-2) var(--space-3);
+  padding: 8px 14px;
   font-size: var(--font-size-sm);
-  border-radius: var(--radius-md);
-  border: var(--border-default);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-slate-300);
   background: var(--color-surface-pure);
   color: var(--color-foundation-navy-900);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.selectInput:focus {
+  border-color: var(--color-accent-teal-600);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 117, 119, 0.15);
 }
 
 .btnPrimary {
-  background: var(--color-accent-teal-600);
+  background: linear-gradient(180deg, var(--color-accent-teal-500) 0%, var(--color-accent-teal-600) 100%);
   color: #ffffff;
   border: 1px solid var(--color-accent-teal-700);
-  padding: var(--space-2) var(--space-4);
+  padding: 8px 18px;
   font-size: var(--font-size-sm);
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background 0.15s ease;
+  transition: all var(--transition-fast);
+  box-shadow: 0 1px 2px rgba(12, 94, 96, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .btnPrimary:hover {
-  background: var(--color-accent-teal-700);
+  background: linear-gradient(180deg, var(--color-accent-teal-600) 0%, var(--color-accent-teal-700) 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(12, 94, 96, 0.25);
 }
 
 .planStatusBadge {
-  padding: 4px 10px;
-  border-radius: 9999px;
-  font-size: var(--font-size-xs);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-2xs);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.06em;
+  border: 1px solid transparent;
 }
 
 .statusDraft {
-  background: var(--color-foundation-navy-100);
-  color: var(--color-foundation-navy-800);
+  background: #F1F5F9;
+  color: #334155;
+  border-color: #CBD5E1;
 }
 
 .statusSubmitted {
-  background: var(--color-status-info-bg);
-  color: var(--color-status-info-text);
-  border: 1px solid var(--color-status-info-border);
+  background: #EFF6FF;
+  color: #1E40AF;
+  border-color: #93C5FD;
+}
+
+.statusApproved {
+  background: #ECFDF5;
+  color: #065F46;
+  border-color: #86EFAC;
 }
 
 .workspaceLayout {
   display: grid;
-  grid-template-columns: 1fr 340px;
-  gap: var(--space-6);
+  grid-template-columns: 1fr 360px;
+  gap: 24px;
   align-items: start;
 }
 
-@media (max-width: 1024px) {
+@media (max-width: 1100px) {
   .workspaceLayout {
     grid-template-columns: 1fr;
   }
@@ -108,54 +141,64 @@
 .plannerGridSection {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: 16px;
   overflow: hidden;
 }
 
 .conflictAlert {
-  background: var(--color-status-danger-bg);
-  border: 1px solid var(--color-status-danger-border);
-  color: var(--color-status-danger-text);
-  padding: var(--space-3) var(--space-4);
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  color: #991B1B;
+  padding: 14px 18px;
   border-radius: var(--radius-md);
   font-size: var(--font-size-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
+  box-shadow: 0 1px 3px rgba(153, 27, 27, 0.05);
 }
 
 .submitDialogBackdrop {
   position: fixed;
   inset: 0;
-  background: rgba(10, 20, 36, 0.6);
-  backdrop-filter: blur(4px);
+  background: rgba(6, 11, 20, 0.65);
+  backdrop-filter: blur(8px);
   display: flex;
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: var(--space-4);
+  padding: 16px;
 }
 
 .submitDialogContent {
   background: var(--color-surface-pure);
-  border: var(--border-subtle);
+  border: 1px solid rgba(15, 23, 42, 0.1);
   border-radius: var(--radius-lg);
-  box-shadow: 0 20px 25px -5px rgba(10, 20, 36, 0.2);
+  box-shadow: 0 24px 48px -12px rgba(11, 19, 36, 0.22);
   width: 100%;
-  max-width: 500px;
+  max-width: 520px;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  padding: var(--space-6);
-  gap: var(--space-4);
+  padding: 28px;
+  gap: 18px;
 }
 
 .textareaInput {
   width: 100%;
-  padding: var(--space-3);
+  padding: 12px;
   font-size: var(--font-size-sm);
-  border: var(--border-default);
-  border-radius: var(--radius-md);
+  border: 1px solid var(--color-slate-300);
+  border-radius: var(--radius-sm);
   box-sizing: border-box;
-  min-height: 100px;
+  min-height: 110px;
+  background-color: var(--color-surface-pure);
+  color: var(--color-slate-900);
+  outline: none;
+  transition: all var(--transition-fast);
+}
+
+.textareaInput:focus {
+  border-color: var(--color-accent-teal-600);
+  box-shadow: 0 0 0 3px rgba(14, 117, 119, 0.15);
 }

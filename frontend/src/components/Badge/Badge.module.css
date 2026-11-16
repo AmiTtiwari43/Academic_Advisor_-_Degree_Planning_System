@@ -2,70 +2,80 @@
   display: inline-flex;
   align-items: center;
   font-family: var(--font-family-sans);
-  font-weight: 500;
-  border-radius: 9999px;
+  font-weight: 550;
+  border-radius: var(--radius-pill);
   border: 1px solid transparent;
   white-space: nowrap;
   user-select: none;
+  letter-spacing: 0.02em;
+  transition: all var(--transition-fast);
 }
 
 /* Sizes */
 .sm {
   padding: 2px 8px;
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-2xs);
   gap: 4px;
 }
 
 .md {
-  padding: 4px 10px;
+  padding: 3px 10px;
   font-size: var(--font-size-xs);
   gap: 6px;
 }
 
-/* Semantic Variants */
+/* Semantic Variants with bespoke archival tint */
 .neutral {
-  background-color: var(--color-surface-muted);
+  background-color: var(--color-slate-100);
   color: var(--color-slate-700);
   border-color: var(--color-slate-300);
 }
 
 .success {
-  background-color: var(--color-status-success-bg);
-  color: var(--color-status-success-text);
-  border-color: var(--color-status-success-border);
+  background-color: #ECFDF5;
+  color: #065F46;
+  border-color: #A7F3D0;
+  box-shadow: 0 1px 2px rgba(6, 95, 70, 0.05);
 }
 
 .warning {
-  background-color: var(--color-status-warning-bg);
-  color: var(--color-status-warning-text);
-  border-color: var(--color-status-warning-border);
+  background-color: #FFFBEB;
+  color: #92400E;
+  border-color: #FDE68A;
+  box-shadow: 0 1px 2px rgba(146, 64, 14, 0.05);
 }
 
 .danger {
-  background-color: var(--color-status-danger-bg);
-  color: var(--color-status-danger-text);
-  border-color: var(--color-status-danger-border);
+  background-color: #FEF2F2;
+  color: #991B1B;
+  border-color: #FECACA;
+  box-shadow: 0 1px 2px rgba(153, 27, 27, 0.05);
 }
 
 .info {
-  background-color: var(--color-status-info-bg);
-  color: var(--color-status-info-text);
-  border-color: var(--color-status-info-border);
+  background-color: #EFF6FF;
+  color: #1E40AF;
+  border-color: #BFDBFE;
+  box-shadow: 0 1px 2px rgba(30, 64, 175, 0.05);
 }
 
 .teal {
-  background-color: var(--color-accent-teal-100);
-  color: var(--color-accent-teal-700);
-  border-color: #a5e0e0;
+  background-color: #F0FDFA;
+  color: #0F766E;
+  border-color: #99F6E4;
+  box-shadow: 0 1px 2px rgba(15, 118, 110, 0.05);
+}
+
+.gold {
+  background-color: var(--color-prestige-gold-50);
+  color: var(--color-prestige-gold-800);
+  border-color: var(--color-prestige-gold-200);
+  box-shadow: 0 1px 2px rgba(120, 83, 9, 0.08);
 }
 
 .icon {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-}
-
-.label {
-  display: inline-flex;
-  align-items: center;
+  flex-shrink: 0;
 }

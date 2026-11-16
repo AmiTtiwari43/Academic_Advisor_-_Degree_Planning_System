@@ -1,13 +1,25 @@
 .panelContainer {
   background: var(--color-surface-pure);
-  border: var(--border-subtle);
+  border: 1px solid var(--color-slate-200);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
-  padding: var(--space-4) var(--space-5);
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  margin-bottom: var(--space-4);
+  gap: 18px;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.panelContainer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-teal-600) 0%, var(--color-prestige-gold-500) 100%);
 }
 
 .topRow {
@@ -15,49 +27,54 @@
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
-  gap: var(--space-3);
+  gap: 16px;
 }
 
 .timelineSection {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 16px;
   flex-wrap: wrap;
 }
 
 .gradBadge {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  padding: var(--space-2) var(--space-3);
-  background: var(--color-foundation-navy-100);
-  color: var(--color-foundation-navy-900);
-  border-radius: var(--radius-md);
+  gap: 8px;
+  padding: 8px 14px;
+  background: linear-gradient(135deg, var(--color-foundation-navy-900) 0%, #0F1D38 100%);
+  color: #FFFFFF;
+  border-radius: var(--radius-sm);
   font-family: var(--font-family-serif);
-  font-weight: 600;
+  font-weight: 700;
   font-size: var(--font-size-base);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .gradIcon {
   font-size: 1.1rem;
+  color: var(--color-prestige-gold-400);
 }
 
 .metricsRow {
   display: flex;
   align-items: center;
-  gap: var(--space-4);
+  gap: 20px;
 }
 
 .metricItem {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .metricLabel {
-  font-size: var(--font-size-xs);
+  font-size: 11px;
   color: var(--color-slate-500);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.08em;
+  font-weight: 700;
 }
 
 .metricValue {
@@ -70,108 +87,119 @@
 .actionsSection {
   display: flex;
   align-items: center;
-  gap: var(--space-3);
+  gap: 10px;
   flex-wrap: wrap;
 }
 
 .actionBtn {
-  padding: var(--space-2) var(--space-4);
-  font-size: var(--font-size-sm);
+  padding: 8px 16px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  transition: all 0.15s ease;
+  gap: 8px;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
 }
 
 .btnSecondary {
   background: var(--color-surface-pure);
-  border: var(--border-default);
+  border: 1px solid var(--color-slate-300);
   color: var(--color-slate-700);
 }
 
 .btnSecondary:hover:not(:disabled) {
   background: var(--color-surface-hover);
-  border-color: var(--color-slate-500);
+  border-color: var(--color-slate-400);
+  color: var(--color-foundation-navy-900);
+  transform: translateY(-1px);
 }
 
 .btnPrimary {
-  background: var(--color-accent-teal-600);
+  background: linear-gradient(180deg, var(--color-accent-teal-500) 0%, var(--color-accent-teal-600) 100%);
   border: 1px solid var(--color-accent-teal-700);
   color: #ffffff;
+  box-shadow: 0 1px 2px rgba(12, 94, 96, 0.2);
 }
 
 .btnPrimary:hover:not(:disabled) {
-  background: var(--color-accent-teal-700);
+  background: linear-gradient(180deg, var(--color-accent-teal-600) 0%, var(--color-accent-teal-700) 100%);
+  transform: translateY(-1px);
 }
 
 .btnSubmit {
-  background: var(--color-foundation-navy-800);
-  border: 1px solid var(--color-foundation-navy-900);
+  background: linear-gradient(180deg, var(--color-foundation-navy-800) 0%, var(--color-foundation-navy-900) 100%);
+  border: 1px solid var(--color-foundation-navy-950);
   color: #ffffff;
 }
 
 .btnSubmit:hover:not(:disabled) {
-  background: var(--color-foundation-navy-900);
+  background: var(--color-foundation-navy-700);
+  transform: translateY(-1px);
 }
 
 .actionBtn:disabled {
-  opacity: 0.5;
+  opacity: 0.55;
   cursor: not-allowed;
+  box-shadow: none !important;
 }
 
 .issuesContainer {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 12px;
 }
 
 .hardBanner {
-  background: var(--color-status-danger-bg);
-  border: 1px solid var(--color-status-danger-border);
-  color: var(--color-status-danger-text);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  background: #FEF2F2;
+  border: 1px solid #FECACA;
+  border-left: 4px solid #DC2626;
+  color: #991B1B;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
 }
 
 .warningBanner {
-  background: var(--color-status-warning-bg);
-  border: 1px solid var(--color-status-warning-border);
-  color: var(--color-status-warning-text);
-  border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  background: #FFFBEB;
+  border: 1px solid #FDE68A;
+  border-left: 4px solid #D97706;
+  color: #92400E;
+  border-radius: var(--radius-sm);
+  padding: 14px 18px;
 }
 
 .bannerTitle {
   font-weight: 700;
   font-size: var(--font-size-sm);
-  margin-bottom: var(--space-1);
+  margin-bottom: 4px;
   display: flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
 }
 
 .constraintList {
-  margin: var(--space-1) 0 0 0;
-  padding-left: var(--space-4);
+  margin: 6px 0 0 0;
+  padding-left: 18px;
   font-size: var(--font-size-xs);
+  line-height: 1.5;
 }
 
 .constraintItem {
-  margin-bottom: var(--space-1);
+  margin-bottom: 2px;
 }
 
 .validBanner {
-  background: var(--color-status-success-bg);
-  border: 1px solid var(--color-status-success-border);
-  color: var(--color-status-success-text);
-  border-radius: var(--radius-md);
-  padding: var(--space-2) var(--space-3);
+  background: #ECFDF5;
+  border: 1px solid #A7F3D0;
+  border-left: 4px solid #16A34A;
+  color: #065F46;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
   font-size: var(--font-size-xs);
   font-weight: 600;
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
+  gap: 8px;
 }

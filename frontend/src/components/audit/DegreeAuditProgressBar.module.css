@@ -2,11 +2,23 @@
   background-color: var(--color-surface-pure);
   border: 1px solid var(--color-slate-200);
   border-radius: var(--radius-lg);
-  padding: 20px 24px;
+  padding: 24px 28px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  gap: 18px;
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
+  position: relative;
+  overflow: hidden;
+}
+
+.progressContainer::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-teal-600) 0%, var(--color-prestige-gold-500) 100%);
 }
 
 .topRow {
@@ -32,10 +44,10 @@
 }
 
 .label {
-  font-size: var(--font-size-xs);
-  font-weight: 600;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
   color: var(--color-slate-500);
 }
 
@@ -51,40 +63,42 @@
   font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--color-foundation-navy-900);
+  letter-spacing: -0.02em;
 }
 
 .subValue {
   font-size: var(--font-size-sm);
   color: var(--color-slate-500);
+  font-weight: 500;
 }
 
 .inProgressBadge {
-  background-color: var(--color-status-info-bg);
-  color: var(--color-status-info-text);
-  border: 1px solid var(--color-status-info-border);
+  background-color: #EFF6FF;
+  color: #1E40AF;
+  border: 1px solid #BFDBFE;
   padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-2xs);
   font-weight: 600;
 }
 
 .cgpaBadgeSuccess {
-  background-color: var(--color-status-success-bg);
-  color: var(--color-status-success-text);
-  border: 1px solid var(--color-status-success-border);
+  background-color: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
   padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-2xs);
   font-weight: 600;
 }
 
 .cgpaBadgeDanger {
-  background-color: var(--color-status-danger-bg);
-  color: var(--color-status-danger-text);
-  border: 1px solid var(--color-status-danger-border);
+  background-color: #FEF2F2;
+  color: #991B1B;
+  border: 1px solid #FECACA;
   padding: 2px 8px;
-  border-radius: var(--radius-full);
-  font-size: var(--font-size-xs);
+  border-radius: var(--radius-pill);
+  font-size: var(--font-size-2xs);
   font-weight: 600;
 }
 
@@ -94,68 +108,72 @@
 
 .statusSatisfied {
   display: inline-block;
-  background-color: var(--color-status-success-bg);
-  color: var(--color-status-success-text);
-  border: 1px solid var(--color-status-success-border);
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
+  background-color: #ECFDF5;
+  color: #065F46;
+  border: 1px solid #A7F3D0;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .statusPending {
   display: inline-block;
-  background-color: var(--color-status-warning-bg);
-  color: var(--color-status-warning-text);
-  border: 1px solid var(--color-status-warning-border);
-  padding: 6px 12px;
-  border-radius: var(--radius-md);
+  background-color: #FFFBEB;
+  color: #92400E;
+  border: 1px solid #FDE68A;
+  padding: 6px 14px;
+  border-radius: var(--radius-sm);
   font-size: var(--font-size-xs);
   font-weight: 700;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
 }
 
 .barWrapper {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 10px;
 }
 
 .progressBar {
   position: relative;
   width: 100%;
   height: 12px;
-  background-color: var(--color-slate-200);
-  border-radius: var(--radius-full);
+  background-color: var(--color-slate-100);
+  border-radius: var(--radius-pill);
   overflow: hidden;
   display: flex;
+  border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .earnedSegment {
-  background-color: var(--color-accent-teal-600);
+  background: linear-gradient(90deg, var(--color-accent-teal-600) 0%, var(--color-accent-teal-500) 100%);
   height: 100%;
-  transition: width 0.3s ease-in-out;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .inProgressSegment {
-  background-color: var(--color-accent-teal-400, #38b2ac);
+  background-color: var(--color-accent-teal-400);
   background-image: repeating-linear-gradient(
     45deg,
     transparent,
     transparent 6px,
-    rgba(255, 255, 255, 0.3) 6px,
-    rgba(255, 255, 255, 0.3) 12px
+    rgba(255, 255, 255, 0.35) 6px,
+    rgba(255, 255, 255, 0.35) 12px
   );
   height: 100%;
-  transition: width 0.3s ease-in-out;
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .legend {
   display: flex;
-  gap: 16px;
+  gap: 20px;
   font-size: var(--font-size-xs);
-  color: var(--color-slate-500);
+  color: var(--color-slate-600);
+  font-weight: 500;
 }
 
 .legendItem {
@@ -165,22 +183,22 @@
 }
 
 .legendDotEarned {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background-color: var(--color-accent-teal-600);
 }
 
 .legendDotInProgress {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background-color: var(--color-accent-teal-400, #38b2ac);
+  background-color: var(--color-accent-teal-400);
 }
 
 .legendDotRemaining {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
   background-color: var(--color-slate-300);
 }

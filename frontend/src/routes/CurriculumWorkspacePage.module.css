@@ -1,0 +1,177 @@
+.pageContainer {
+  padding: 24px;
+  max-width: 1720px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  box-sizing: border-box;
+}
+
+.pageHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--color-slate-200);
+  position: relative;
+}
+
+.pageHeader::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  width: 80px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-accent-teal-600) 0%, transparent 100%);
+}
+
+.preTitle {
+  font-size: var(--font-size-2xs);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-accent-teal-700);
+}
+
+.title {
+  font-family: var(--font-family-serif);
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-foundation-navy-900);
+  margin: 4px 0 6px 0;
+  letter-spacing: -0.02em;
+}
+
+.subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-slate-500);
+  margin: 0;
+}
+
+.controlCard {
+  background: var(--color-surface-pure);
+  border: 1px solid var(--color-slate-200);
+  border-radius: var(--radius-lg);
+  padding: 20px 24px;
+  box-shadow: 0 1px 3px rgba(11, 19, 36, 0.03);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.controlGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.controlLabel {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-slate-500);
+}
+
+.selectInput {
+  padding: 8px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-slate-300);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-foundation-navy-900);
+  background-color: var(--color-surface-pure);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.selectInput:focus {
+  border-color: var(--color-accent-teal-600);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(14, 117, 119, 0.15);
+}
+
+.actionButtonRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btnAction {
+  padding: 8px 16px;
+  font-size: var(--font-size-xs);
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  border: 1px solid transparent;
+}
+
+.btnPrimary {
+  background: linear-gradient(180deg, var(--color-accent-teal-500) 0%, var(--color-accent-teal-600) 100%);
+  color: #FFFFFF;
+  border-color: var(--color-accent-teal-700);
+  box-shadow: 0 1px 2px rgba(12, 94, 96, 0.2);
+}
+
+.btnPrimary:hover {
+  background: linear-gradient(180deg, var(--color-accent-teal-600) 0%, var(--color-accent-teal-700) 100%);
+  transform: translateY(-1px);
+}
+
+.btnSecondary {
+  background: var(--color-surface-pure);
+  color: var(--color-slate-800);
+  border-color: var(--color-slate-300);
+}
+
+.btnSecondary:hover {
+  background: var(--color-surface-hover);
+  border-color: var(--color-slate-400);
+}
+
+.tabsBar {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--color-slate-200);
+  margin-top: 8px;
+}
+
+.tabBtn {
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-slate-600);
+  cursor: pointer;
+  position: relative;
+  transition: color var(--transition-fast);
+}
+
+.tabBtn:hover {
+  color: var(--color-foundation-navy-900);
+}
+
+.tabBtnActive {
+  color: var(--color-accent-teal-700);
+}
+
+.tabBtnActive::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: var(--color-accent-teal-700);
+}
