@@ -63,14 +63,14 @@ describe('AssistantDrawer', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
-  it('renders drawer header, regulatory disclaimer, and rate limit when open', async () => {
+  it('renders drawer header, status indicator, and academic advisory notice when open', async () => {
     renderWithClient(<AssistantDrawer isOpen={true} onClose={vi.fn()} />);
 
     expect(screen.getByRole('dialog')).toBeInTheDocument();
     expect(screen.getByText('Academic AI Advisor')).toBeInTheDocument();
-    expect(screen.getByText('20 req/min')).toBeInTheDocument();
+    expect(screen.getByText('Online')).toBeInTheDocument();
     expect(
-      screen.getByText(/AI responses are strictly grounded in your institution's published curriculum/i)
+      screen.getByText(/AI responses are strictly grounded in your institution's published curriculum|Academic guidance is for degree planning purposes only/i)
     ).toBeInTheDocument();
   });
 
@@ -117,11 +117,10 @@ describe('AssistantDrawer', () => {
       expect(screen.getByText(/All prerequisites are/i)).toBeInTheDocument();
     });
 
-    // Verify citations
-    expect(screen.getByText('RULE_ENGINE')).toBeInTheDocument();
-    expect(screen.getByText('Prerequisite Interpreter [CS201]')).toBeInTheDocument();
-    expect(screen.getByText('CURRICULUM_CATALOG')).toBeInTheDocument();
-    expect(screen.getByText(/Grounded in 3 catalog courses/i)).toBeInTheDocument();
+    // Verify response is displayed cleanly without technical debug citations
+    expect(screen.queryByText('Authoritative Sources & Engine Citations')).not.toBeInTheDocument();
+    expect(screen.queryByText('RULE_ENGINE')).not.toBeInTheDocument();
+    expect(screen.queryByText(/Grounded in 3 catalog courses/i)).not.toBeInTheDocument();
   });
 
   it('clicking a suggestion chip triggers the query immediately', async () => {

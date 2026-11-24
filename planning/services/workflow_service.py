@@ -76,11 +76,11 @@ def check_advisor_can_review(
     if Role.STUDENT in roles and len(roles) == 1:
         raise PermissionDenied("Students are not permitted to approve or review plans.")
 
-    # Admins and coordinators have institution-wide authority
-    if Role.ADMIN in roles or Role.COORDINATOR in roles:
+    # Moderators (Admins and coordinators) have institution-wide authority
+    if actor.is_superuser or any(r in roles for r in [Role.ADMIN, Role.COORDINATOR, Role.HOD, Role.MODERATOR]):
         return
 
-    if Role.ADVISOR in roles:
+    if any(r in roles for r in [Role.ADVISOR, Role.MENTOR]):
         student_user = plan.student_record.student
         is_assigned = AdvisorAssignment.objects.filter(
             institution=inst,
@@ -363,8 +363,8 @@ def get_advisor_review_queue(
         .prefetch_related("versions", "override_events")
     )
 
-    if Role.ADMIN not in roles and Role.COORDINATOR not in roles:
-        if Role.ADVISOR not in roles:
+    if not user.is_superuser and not any(r in roles for r in [Role.ADMIN, Role.COORDINATOR, Role.HOD, Role.MODERATOR]):
+        if not any(r in roles for r in [Role.ADVISOR, Role.MENTOR]):
             return []
         assigned_student_ids = AdvisorAssignment.objects.filter(
             institution=institution,
@@ -400,6 +400,18 @@ def get_advisor_review_queue(
         hard_count = len(sim_data.get("hard_constraints", []))
         warning_count = len(sim_data.get("warnings", []))
 
+        profile = getattr(student, "profile", None)
+        reg_no = (
+            profile.get_or_generate_registration_number()
+            if profile
+            else f"STU-2026-{student.id:04d}"
+        )
+        full_name = (
+            student.get_full_name()
+            or (profile.preferred_name if profile else "")
+            or student.username
+        )
+
         queue.append({
             "plan_id": str(p.id),
             "plan_name": p.name,
@@ -407,6 +419,8 @@ def get_advisor_review_queue(
             "row_version": p.row_version,
             "student_id": str(p.student_record.id),
             "student_username": student.username,
+            "student_name": full_name,
+            "student_registration_number": reg_no,
             "student_email": student.email,
             "programme_code": p.student_record.programme.code,
             "programme_name": p.student_record.programme.name,

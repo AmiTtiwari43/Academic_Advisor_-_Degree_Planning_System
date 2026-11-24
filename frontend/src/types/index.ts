@@ -17,7 +17,9 @@ export type Role =
   | 'ADVISOR'
   | 'COORDINATOR'
   | 'HOD'
-  | 'ADMIN';
+  | 'ADMIN'
+  | 'MENTOR'
+  | 'MODERATOR';
 
 export interface InstitutionSummary {
   id: string;
@@ -43,14 +45,31 @@ export interface UserMe {
   last_name: string;
   preferred_name: string;
   phone_number: string;
+  registration_number?: string;
   memberships: InstitutionMembershipSummary[];
   is_staff: boolean;
   is_superuser: boolean;
 }
 
 export interface UserProfileData {
-  phone_number: string;
+  username?: string;
+  registration_number?: string;
+  first_name?: string;
+  last_name?: string;
   preferred_name: string;
+  email?: string;
+  phone_number: string;
+  role?: string;
+  institution_name?: string;
+  academic_summary?: {
+    programme?: string;
+    programme_code?: string;
+    cgpa?: string;
+    credits_earned?: number;
+    status?: string;
+    enrollment_term?: string;
+    advisor?: string;
+  };
 }
 
 export interface DemoAcademicSummary {

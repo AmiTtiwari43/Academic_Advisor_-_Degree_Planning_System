@@ -108,7 +108,9 @@ def run_degree_audit(
     )
     in_progress_pool = {
         entry.course.code: {
+            "course_id": str(entry.course.id),
             "course_code": entry.course.code,
+            "course_title": entry.course.title,
             "title": entry.course.title,
             "credits": entry.credits_attempted,
         }
@@ -146,9 +148,12 @@ def run_degree_audit(
                 # Waived by exemption
                 group_allocated_map[g_id].append(
                     {
+                        "course_id": str(gc.course.id),
                         "course_code": code,
+                        "course_title": gc.course.title,
                         "title": gc.course.title,
                         "credits": gc.course.credits,
+                        "earned_credits": gc.course.credits,
                         "grade": "EXEMPT",
                         "is_mandatory": True,
                         "status": "EXEMPTED",
@@ -160,9 +165,12 @@ def run_degree_audit(
                 group_earned_credits_map[g_id] += item["credits"]
                 group_allocated_map[g_id].append(
                     {
+                        "course_id": str(gc.course.id),
                         "course_code": code,
+                        "course_title": gc.course.title,
                         "title": gc.course.title,
                         "credits": item["credits"],
+                        "earned_credits": item["credits"],
                         "grade": item["grade"],
                         "is_mandatory": True,
                         "status": "COMPLETED",
@@ -172,7 +180,9 @@ def run_degree_audit(
                 # Missing mandatory course
                 group_mandatory_map[g_id].append(
                     {
+                        "course_id": str(gc.course.id),
                         "course_code": code,
+                        "course_title": gc.course.title,
                         "title": gc.course.title,
                         "credits": gc.course.credits,
                     }
@@ -195,9 +205,12 @@ def run_degree_audit(
                 group_earned_credits_map[g_id] += item["credits"]
                 group_allocated_map[g_id].append(
                     {
+                        "course_id": str(gc.course.id),
                         "course_code": code,
+                        "course_title": gc.course.title,
                         "title": gc.course.title,
                         "credits": item["credits"],
+                        "earned_credits": item["credits"],
                         "grade": item["grade"],
                         "is_mandatory": False,
                         "status": "COMPLETED",

@@ -122,9 +122,9 @@ export const RequirementGroupAccordion: React.FC<RequirementGroupAccordionProps>
                   </thead>
                   <tbody>
                     {group.allocated_courses.map((c, idx) => (
-                      <tr key={`${c.course_id}-${idx}`}>
+                      <tr key={c.course_id ? `${c.course_id}-${idx}` : `${c.course_code || 'course'}-${idx}`}>
                         <td className={styles.codeCell}>{c.course_code}</td>
-                        <td className={styles.titleCell}>{c.course_title}</td>
+                        <td className={styles.titleCell}>{c.course_title || (c as unknown as { title?: string }).title}</td>
                         <td className={styles.creditsCell}>{c.earned_credits}</td>
                         <td className={styles.gradeCell}>
                           <span className={styles.gradeBadge}>{c.grade || 'CR'}</span>
@@ -153,11 +153,15 @@ export const RequirementGroupAccordion: React.FC<RequirementGroupAccordionProps>
                 </span>
               </div>
               <div className={styles.remainingList}>
-                {group.remaining_mandatory_courses.map((rem) => (
-                  <div key={rem.course_id} className={styles.remainingCard} data-testid={`remaining-course-${rem.course_code}`}>
+                {group.remaining_mandatory_courses.map((rem, idx) => (
+                  <div
+                    key={rem.course_id || rem.course_code || `rem-${idx}`}
+                    className={styles.remainingCard}
+                    data-testid={`remaining-course-${rem.course_code}`}
+                  >
                     <div className={styles.remainingDetails}>
                       <span className={styles.remainingCode}>{rem.course_code}</span>
-                      <span className={styles.remainingTitle}>{rem.course_title}</span>
+                      <span className={styles.remainingTitle}>{rem.course_title || (rem as unknown as { title?: string }).title}</span>
                       <span className={styles.remainingCredits}>({rem.credits} cr)</span>
                     </div>
                     <button
@@ -165,7 +169,7 @@ export const RequirementGroupAccordion: React.FC<RequirementGroupAccordionProps>
                       className={styles.checkEligibilityBtn}
                       onClick={(e) => {
                         e.stopPropagation();
-                        onCheckEligibility(rem.course_id, rem.course_code, rem.course_title);
+                        onCheckEligibility(rem.course_id || rem.course_code, rem.course_code, rem.course_title || (rem as unknown as { title?: string }).title || rem.course_code);
                       }}
                       data-testid={`check-eligibility-btn-${rem.course_code}`}
                     >
@@ -184,10 +188,13 @@ export const RequirementGroupAccordion: React.FC<RequirementGroupAccordionProps>
                 <h4 className={styles.sectionSubtitleInfo}>Currently Enrolled (In Progress)</h4>
               </div>
               <div className={styles.inProgressList}>
-                {group.in_progress_courses.map((ip) => (
-                  <div key={ip.course_id} className={styles.inProgressCard}>
+                {group.in_progress_courses.map((ip, idx) => (
+                  <div
+                    key={ip.course_id || ip.course_code || `ip-${idx}`}
+                    className={styles.inProgressCard}
+                  >
                     <span className={styles.inProgressCode}>{ip.course_code}</span>
-                    <span className={styles.inProgressTitle}>{ip.course_title}</span>
+                    <span className={styles.inProgressTitle}>{ip.course_title || (ip as unknown as { title?: string }).title}</span>
                     <span className={styles.inProgressCredits}>({ip.credits} cr)</span>
                     <span className={styles.inProgressTag}>In Progress — Not Yet Earned</span>
                   </div>

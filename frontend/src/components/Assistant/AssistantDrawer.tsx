@@ -7,7 +7,6 @@ import {
   ShieldAlert,
   BookOpen,
   ArrowRight,
-  Info,
 } from 'lucide-react';
 import { assistantApi, AssistantCitation, AssistantResponse } from '../../api/assistant';
 import { Badge } from '../Badge/Badge';
@@ -20,6 +19,81 @@ interface Message {
   citations?: AssistantCitation[];
   groundedSummary?: string;
 }
+
+function renderFormattedMessage(text: string): React.ReactNode {
+  const lines = text.split('\n');
+  return (
+    <div className={styles.formattedText}>
+      {lines.map((line, idx) => {
+        const trimmed = line.trim();
+
+        // Level 3/4 headers
+        if (trimmed.startsWith('### ')) {
+          return (
+            <h4 key={idx} className={styles.msgH4}>
+              {trimmed.replace(/^###\s+/, '')}
+            </h4>
+          );
+        }
+        if (trimmed.startsWith('#### ')) {
+          return (
+            <h5 key={idx} className={styles.msgH5}>
+              {trimmed.replace(/^####\s+/, '')}
+            </h5>
+          );
+        }
+
+        // Inline formatting for **bold** and `code`
+        const parts = line.split(/(\*\*.*?\*\*|`.*?`)/g);
+        const formattedLine = parts.map((part, pIdx) => {
+          if (part.startsWith('**') && part.endsWith('**')) {
+            return <strong key={pIdx}>{part.slice(2, -2)}</strong>;
+          }
+          if (part.startsWith('`') && part.endsWith('`')) {
+            return (
+              <code key={pIdx} className={styles.inlineCode}>
+                {part.slice(1, -1)}
+              </code>
+            );
+          }
+          return part;
+        });
+
+        // Bullet items
+        if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+          return (
+            <div key={idx} className={styles.bulletItem}>
+              <span className={styles.bulletDot}>•</span>
+              <span className={styles.bulletContent}>{formattedLine}</span>
+            </div>
+          );
+        }
+
+        // Numbered list items
+        if (/^\d+\.\s/.test(trimmed)) {
+          return (
+            <div key={idx} className={styles.numberedItem}>
+              {formattedLine}
+            </div>
+          );
+        }
+
+        // Empty line
+        if (!trimmed) {
+          return <div key={idx} className={styles.emptyLine} />;
+        }
+
+        // Standard paragraph line
+        return (
+          <p key={idx} className={styles.textLine}>
+            {formattedLine}
+          </p>
+        );
+      })}
+    </div>
+  );
+}
+
 
 interface AssistantDrawerProps {
   isOpen: boolean;
@@ -153,12 +227,12 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
               <h2 id="assistant-drawer-title" className={styles.drawerTitle}>
                 Academic AI Advisor
               </h2>
-              <span className={styles.headerSubtext}>Curriculum Rules Engine Grounded</span>
+              <span className={styles.headerSubtext}>Academic Degree Planning Advisor</span>
             </div>
           </div>
           <div className={styles.headerActions}>
             <Badge variant="teal" size="sm">
-              20 req/min
+              Online
             </Badge>
             <button
               type="button"
@@ -176,7 +250,7 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
           <ShieldAlert size={16} className={styles.disclaimerIcon} />
           <span>
             {capabilities?.disclaimer ||
-              "AI responses are strictly grounded in your institution's published curriculum and official degree audit records. The assistant cannot make exceptions, approve degree plans, or modify records."}
+              'Academic guidance is for degree planning purposes only. Official approvals and substitutions require your faculty advisor.'}
           </span>
         </div>
 
@@ -190,7 +264,7 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
               <h3 className={styles.welcomeTitle}>Degree Planning & Curriculum Assistant</h3>
               <p className={styles.welcomeDesc}>
                 Ask questions about course prerequisite chains, graduation progress, or remaining
-                degree requirements. All evaluations are verified by the institutional rules engine.
+                degree requirements.
               </p>
               <div className={styles.suggestionsTitle}>Suggested Inquiries</div>
               <div className={styles.suggestionChips}>
@@ -219,32 +293,7 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
                   <div className={styles.userBubble}>{msg.text}</div>
                 ) : (
                   <div className={styles.assistantBubble}>
-                    <div>{msg.text}</div>
-
-                    {/* Citations Block */}
-                    {msg.citations && msg.citations.length > 0 && (
-                      <div className={styles.citationsBlock}>
-                        <div className={styles.citationsHeading}>
-                          <Info size={12} />
-                          <span>Authoritative Sources & Engine Citations</span>
-                        </div>
-                        <div className={styles.citationsList}>
-                          {msg.citations.map((c, i) => (
-                            <div key={i} className={styles.citationChip}>
-                              <div className={styles.citationSource}>
-                                <span className={styles.citationTag}>{c.source_type}</span>
-                                <span>{c.reference}</span>
-                              </div>
-                              <div className={styles.citationDetails}>{c.details}</div>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {msg.groundedSummary && (
-                      <div className={styles.groundedMeta}>✓ {msg.groundedSummary}</div>
-                    )}
+                    {renderFormattedMessage(msg.text)}
                   </div>
                 )}
               </div>
@@ -255,7 +304,7 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
             <div className={`${styles.messageRow} ${styles.assistantMessageRow}`}>
               <div className={styles.loadingBubble}>
                 <div className={styles.spinner} />
-                <span>Evaluating curriculum rules and degree audit status...</span>
+                <span>Reviewing degree requirements...</span>
               </div>
             </div>
           )}
@@ -295,7 +344,7 @@ export const AssistantDrawer: React.FC<AssistantDrawerProps> = ({
             </div>
             <div className={styles.inputFooterText}>
               <span>Enter to send · Shift+Enter for newline</span>
-              <span>Zero client-side rule overrides</span>
+              <span>Institutional Degree Planning</span>
             </div>
           </form>
         </div>

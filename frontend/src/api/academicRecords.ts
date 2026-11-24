@@ -76,6 +76,8 @@ export interface StudentRecord {
   student_username: string;
   student_first_name: string;
   student_last_name: string;
+  student_preferred_name?: string;
+  student_registration_number?: string;
   student_email: string;
   programme: string;
   programme_code: string;

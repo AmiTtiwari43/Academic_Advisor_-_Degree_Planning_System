@@ -8,6 +8,8 @@ export interface ReviewQueueItem {
   row_version: number;
   student_id: string;
   student_username: string;
+  student_name?: string;
+  student_registration_number?: string;
   student_email: string;
   programme_code: string;
   programme_name: string;

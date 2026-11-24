@@ -5,6 +5,12 @@ from accounts.models import AdvisorAssignment, InstitutionMembership, Role
 from institutions.models import Institution
 
 
+# Unified RBAC Role Groupings: Moderator, Mentor, Student
+MODERATOR_ROLES = [Role.COORDINATOR, Role.HOD, Role.ADMIN, Role.MODERATOR]
+MENTOR_ROLES = [Role.ADVISOR, Role.MENTOR]
+STUDENT_ROLES = [Role.STUDENT]
+
+
 def get_user_roles_for_institution(user: User, institution: Institution) -> list[str]:
     """
     Returns active roles for a user within a specific institution.
@@ -39,27 +45,27 @@ def can_view_student_record(
     if not roles:
         return False
 
-    # Coordinators, HODs, and Admins can view any student in their institution
-    if any(r in roles for r in [Role.COORDINATOR, Role.HOD, Role.ADMIN]):
+    # Moderators (Coordinators, HODs, Admins) can view any student in their institution
+    if any(r in roles for r in MODERATOR_ROLES):
         return True
 
     # Student viewing own record
     if actor_user.id == student_user.id:
-        return Role.STUDENT in roles
+        return any(r in roles for r in STUDENT_ROLES)
 
-    # Faculty advisor viewing assigned advisee
-    if Role.ADVISOR in roles:
+    # Faculty advisor / Mentor viewing assigned advisee
+    if any(r in roles for r in MENTOR_ROLES):
         advisor_membership = InstitutionMembership.objects.filter(
             user=actor_user,
             institution=institution,
-            role=Role.ADVISOR,
+            role__in=MENTOR_ROLES,
             is_active=True,
         ).first()
 
         student_membership = InstitutionMembership.objects.filter(
             user=student_user,
             institution=institution,
-            role=Role.STUDENT,
+            role__in=STUDENT_ROLES,
             is_active=True,
         ).first()
 
@@ -83,7 +89,7 @@ def can_manage_curriculum(actor_user: User, institution: Institution) -> bool:
     if actor_user.is_superuser:
         return True
     roles = get_user_roles_for_institution(actor_user, institution)
-    return any(r in roles for r in [Role.COORDINATOR, Role.HOD, Role.ADMIN])
+    return any(r in roles for r in MODERATOR_ROLES)
 
 
 def can_assign_advisor(actor_user: User, institution: Institution) -> bool:
@@ -95,7 +101,7 @@ def can_assign_advisor(actor_user: User, institution: Institution) -> bool:
     if actor_user.is_superuser:
         return True
     roles = get_user_roles_for_institution(actor_user, institution)
-    return any(r in roles for r in [Role.COORDINATOR, Role.HOD, Role.ADMIN])
+    return any(r in roles for r in MODERATOR_ROLES)
 
 
 def can_manage_institution(actor_user: User, institution: Institution) -> bool:
@@ -107,7 +113,7 @@ def can_manage_institution(actor_user: User, institution: Institution) -> bool:
     if actor_user.is_superuser:
         return True
     roles = get_user_roles_for_institution(actor_user, institution)
-    return Role.ADMIN in roles
+    return any(r in roles for r in [Role.ADMIN, Role.MODERATOR])
 
 
 def is_system_admin(actor_user: User) -> bool:
@@ -120,7 +126,7 @@ def is_system_admin(actor_user: User) -> bool:
         return True
     return InstitutionMembership.objects.filter(
         user=actor_user,
-        role=Role.ADMIN,
+        role__in=[Role.ADMIN, Role.MODERATOR],
         is_active=True,
     ).exists()
 

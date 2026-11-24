@@ -17,12 +17,14 @@ from accounts.views import (
     UserMeView,
     UserProfileView,
 )
-from common.views import health_check
+from common.views import GlobalSearchView, health_check
 from institutions.views import DepartmentListView, InstitutionListView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/health/", health_check, name="health-check"),
+    path("api/search/", GlobalSearchView.as_view(), name="global-search"),
+    path("api/v1/search/", GlobalSearchView.as_view(), name="global-search-v1"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/docs/", SpectacularSwaggerView.as_view(url_name="schema"), name="swagger-ui"),
     # Authentication & Profile

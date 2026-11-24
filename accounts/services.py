@@ -1,5 +1,6 @@
 from typing import Optional
 
+from django.db import transaction
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
@@ -98,20 +99,38 @@ def confirm_password_reset(uidb64: str, token: str, new_password: str) -> None:
     invalidate_user_sessions(user)
 
 
+@transaction.atomic
 def update_user_profile(
     user: User,
     phone_number: Optional[str] = None,
     preferred_name: Optional[str] = None,
+    first_name: Optional[str] = None,
+    last_name: Optional[str] = None,
+    email: Optional[str] = None,
 ) -> UserProfile:
     """
-    Updates profile fields for a user. Ignores any privileged attributes.
+    Updates profile fields for a user atomically. Ignores any privileged attributes.
     """
     profile, _ = UserProfile.objects.get_or_create(user=user)
     if phone_number is not None:
-        profile.phone_number = phone_number
+        profile.phone_number = phone_number.strip()
     if preferred_name is not None:
-        profile.preferred_name = preferred_name
+        profile.preferred_name = preferred_name.strip()
     profile.save()
+
+    user_updated_fields = []
+    if first_name is not None:
+        user.first_name = first_name.strip()
+        user_updated_fields.append("first_name")
+    if last_name is not None:
+        user.last_name = last_name.strip()
+        user_updated_fields.append("last_name")
+    if email is not None and email.strip():
+        user.email = email.strip()
+        user_updated_fields.append("email")
+    if user_updated_fields:
+        user.save(update_fields=user_updated_fields)
+
     return profile
 
 

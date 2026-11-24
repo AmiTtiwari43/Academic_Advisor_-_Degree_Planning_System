@@ -12,18 +12,19 @@ import {
   ChevronRight,
   ShieldCheck,
   BarChart3,
+  User,
   X,
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
-import { Role } from '../../types';
+import { UnifiedRole } from '../../utils/rbac';
 import styles from './Sidebar.module.css';
 import { IconButton } from '../IconButton/IconButton';
 
 export interface NavItem {
   to: string;
-  label: string;
+  label: string | ((role: UnifiedRole) => string);
   icon: React.ReactNode;
-  allowedRoles?: Role[];
+  allowedUnifiedRoles: UnifiedRole[];
 }
 
 export interface SidebarProps {
@@ -34,43 +35,59 @@ export interface SidebarProps {
 }
 
 const ALL_NAV_ITEMS: NavItem[] = [
-  { to: '/dashboard', label: 'Overview', icon: <LayoutDashboard size={20} /> },
-  { to: '/curriculum', label: 'Curriculum Catalog', icon: <BookOpen size={20} /> },
   {
-    to: '/plan',
-    label: 'Degree Planner',
-    icon: <Calendar size={20} />,
-    allowedRoles: ['STUDENT', 'ADVISOR', 'COORDINATOR'],
-  },
-  {
-    to: '/audit',
-    label: 'Degree Audit',
-    icon: <FileCheck size={20} />,
-    allowedRoles: ['STUDENT', 'ADVISOR', 'COORDINATOR', 'HOD'],
+    to: '/dashboard',
+    label: (role) => `${role === 'MODERATOR' ? 'Moderator' : role === 'MENTOR' ? 'Mentor' : 'Student'} Dashboard`,
+    icon: <LayoutDashboard size={20} />,
+    allowedUnifiedRoles: ['STUDENT', 'MENTOR', 'MODERATOR'],
   },
   {
     to: '/advising',
-    label: 'Advisor Workspace',
+    label: (role) => role === 'MODERATOR' ? 'Advising Oversight' : 'Mentor Workspace',
     icon: <Users size={20} />,
-    allowedRoles: ['ADVISOR', 'COORDINATOR', 'HOD', 'ADMIN'],
+    allowedUnifiedRoles: ['MENTOR', 'MODERATOR'],
+  },
+  {
+    to: '/curriculum',
+    label: 'Curriculum Catalog',
+    icon: <BookOpen size={20} />,
+    allowedUnifiedRoles: ['MODERATOR'],
   },
   {
     to: '/analytics',
     label: 'Institutional Analytics',
     icon: <BarChart3 size={20} />,
-    allowedRoles: ['ADVISOR', 'COORDINATOR', 'HOD', 'ADMIN'],
+    allowedUnifiedRoles: ['MODERATOR'],
+  },
+  {
+    to: '/plan',
+    label: 'Degree Planner',
+    icon: <Calendar size={20} />,
+    allowedUnifiedRoles: ['STUDENT', 'MENTOR', 'MODERATOR'],
+  },
+  {
+    to: '/audit',
+    label: 'Degree Audit',
+    icon: <FileCheck size={20} />,
+    allowedUnifiedRoles: ['STUDENT', 'MENTOR', 'MODERATOR'],
   },
   {
     to: '/careers',
     label: 'Career Guidance',
     icon: <Compass size={20} />,
-    allowedRoles: ['STUDENT', 'ADVISOR', 'COORDINATOR'],
+    allowedUnifiedRoles: ['STUDENT', 'MENTOR', 'MODERATOR'],
   },
   {
     to: '/admin',
     label: 'Institution Admin',
     icon: <ShieldCheck size={20} />,
-    allowedRoles: ['ADMIN'],
+    allowedUnifiedRoles: ['MODERATOR'],
+  },
+  {
+    to: '/profile',
+    label: 'My Profile',
+    icon: <User size={20} />,
+    allowedUnifiedRoles: ['STUDENT', 'MENTOR', 'MODERATOR'],
   },
 ];
 
@@ -80,12 +97,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isMobileOpen,
   onMobileClose,
 }) => {
-  const { activeRole } = useAuth();
+  const { unifiedRole } = useAuth();
+  const role: UnifiedRole = unifiedRole || 'STUDENT';
 
   const visibleNavItems = ALL_NAV_ITEMS.filter((item) => {
-    if (!item.allowedRoles) return true;
-    if (!activeRole) return true; // show default if role not yet loaded
-    return item.allowedRoles.includes(activeRole);
+    return item.allowedUnifiedRoles.includes(role);
   });
 
   return (
@@ -135,23 +151,26 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {/* Navigation List */}
         <nav className={styles.nav}>
           <ul className={styles.navList}>
-            {visibleNavItems.map((item) => (
-              <li key={item.to} className={styles.navItem}>
-                <NavLink
-                  to={item.to}
-                  className={({ isActive }) =>
-                    [styles.navLink, isActive ? styles.activeLink : '']
-                      .filter(Boolean)
-                      .join(' ')
-                  }
-                  title={isCollapsed ? item.label : undefined}
-                  onClick={onMobileClose}
-                >
-                  <span className={styles.icon}>{item.icon}</span>
-                  {!isCollapsed && <span className={styles.label}>{item.label}</span>}
-                </NavLink>
-              </li>
-            ))}
+            {visibleNavItems.map((item) => {
+              const labelText = typeof item.label === 'function' ? item.label(role) : item.label;
+              return (
+                <li key={item.to} className={styles.navItem}>
+                  <NavLink
+                    to={item.to}
+                    className={({ isActive }) =>
+                      [styles.navLink, isActive ? styles.activeLink : '']
+                        .filter(Boolean)
+                        .join(' ')
+                    }
+                    title={isCollapsed ? labelText : undefined}
+                    onClick={onMobileClose}
+                  >
+                    <span className={styles.icon}>{item.icon}</span>
+                    {!isCollapsed && <span className={styles.label}>{labelText}</span>}
+                  </NavLink>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 

@@ -129,7 +129,11 @@ def get_authorized_context(
         if adv_assign and adv_assign.advisor and adv_assign.advisor.user:
             adv_u = adv_assign.advisor.user
             name_parts = [p for p in [adv_u.first_name, adv_u.last_name] if p]
-            adv_display = f"Dr. {' '.join(name_parts)}" if name_parts else f"Advisor {adv_u.username}"
+            raw_name = " ".join(name_parts).strip()
+            if raw_name.lower().startswith("dr.") or raw_name.lower().startswith("dr "):
+                adv_display = raw_name
+            else:
+                adv_display = f"Dr. {raw_name}" if raw_name else f"Advisor {adv_u.username}"
             context_data["assigned_advisor"] = {
                 "name": adv_display,
                 "email": adv_u.email,

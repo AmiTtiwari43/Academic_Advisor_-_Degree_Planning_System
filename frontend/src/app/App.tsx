@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from './ErrorBoundary';
 import { AuthProvider } from '../context/AuthContext';
+import { RoleRoute } from '../components/Auth/RoleRoute';
 import { PublicLayout } from '../layouts/PublicLayout';
 import { AppLayout } from '../layouts/AppLayout';
 import { LandingPage } from '../routes/LandingPage';
@@ -17,6 +18,7 @@ import { DegreeAuditPage } from '../routes/DegreeAuditPage';
 import { AdvisorWorkspacePage } from '../routes/AdvisorWorkspacePage';
 import { AnalyticsDashboardPage } from '../routes/AnalyticsDashboardPage';
 import { CareerGuidancePage } from '../routes/CareerGuidancePage';
+import { ProfilePage } from '../routes/ProfilePage';
 import { NotFoundPage } from '../routes/NotFoundPage';
 
 const queryClient = new QueryClient({
@@ -43,16 +45,80 @@ export const App: React.FC = () => {
                 <Route path="/reset-password" element={<ResetPasswordPage />} />
               </Route>
 
-              {/* Authenticated Application Shell */}
+              {/* Authenticated Application Shell with Strict RBAC Panels */}
               <Route element={<AppLayout />}>
-                <Route path="/dashboard" element={<DashboardPage />} />
-                <Route path="/curriculum" element={<CurriculumWorkspacePage />} />
-                <Route path="/plan" element={<DegreePlannerPage />} />
-                <Route path="/audit" element={<DegreeAuditPage />} />
-                <Route path="/advising" element={<AdvisorWorkspacePage />} />
-                <Route path="/analytics" element={<AnalyticsDashboardPage />} />
-                <Route path="/careers" element={<CareerGuidancePage />} />
-                <Route path="/admin" element={<DashboardPage />} />
+                <Route
+                  path="/dashboard"
+                  element={
+                    <RoleRoute allowedRoles={['STUDENT', 'MENTOR', 'MODERATOR']}>
+                      <DashboardPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/curriculum"
+                  element={
+                    <RoleRoute allowedRoles={['MODERATOR']}>
+                      <CurriculumWorkspacePage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/plan"
+                  element={
+                    <RoleRoute allowedRoles={['STUDENT', 'MENTOR', 'MODERATOR']}>
+                      <DegreePlannerPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/audit"
+                  element={
+                    <RoleRoute allowedRoles={['STUDENT', 'MENTOR', 'MODERATOR']}>
+                      <DegreeAuditPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/advising"
+                  element={
+                    <RoleRoute allowedRoles={['MENTOR', 'MODERATOR']}>
+                      <AdvisorWorkspacePage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/analytics"
+                  element={
+                    <RoleRoute allowedRoles={['MODERATOR']}>
+                      <AnalyticsDashboardPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/careers"
+                  element={
+                    <RoleRoute allowedRoles={['STUDENT', 'MENTOR', 'MODERATOR']}>
+                      <CareerGuidancePage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/admin"
+                  element={
+                    <RoleRoute allowedRoles={['MODERATOR']}>
+                      <DashboardPage />
+                    </RoleRoute>
+                  }
+                />
+                <Route
+                  path="/profile"
+                  element={
+                    <RoleRoute allowedRoles={['STUDENT', 'MENTOR', 'MODERATOR']}>
+                      <ProfilePage />
+                    </RoleRoute>
+                  }
+                />
               </Route>
 
               {/* Status & Error Routes */}

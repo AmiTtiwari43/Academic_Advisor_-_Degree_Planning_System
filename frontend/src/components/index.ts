@@ -16,3 +16,4 @@ export * from './Sidebar/Sidebar';
 export * from './Breadcrumbs/Breadcrumbs';
 export * from './Notifications';
 export * from './Assistant';
+export * from './Search';

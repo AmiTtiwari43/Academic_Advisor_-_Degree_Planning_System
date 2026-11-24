@@ -47,8 +47,12 @@ import {
 } from '../api/analytics';
 
 export const DashboardPage: React.FC = () => {
-  const { user, activeRole, activeMembership } = useAuth();
+  const { user, activeRole, activeMembership, unifiedRole } = useAuth();
   const navigate = useNavigate();
+
+  // Moderator Super Admin Perspective Switcher State
+  const [moderatorPerspective, setModeratorPerspective] = useState<'MODERATOR' | 'MENTOR' | 'STUDENT'>('MODERATOR');
+  const [selectedStudentId, setSelectedStudentId] = useState<string>('');
 
   // Consultation Dialog State (for Students)
   const [isConsultationOpen, setIsConsultationOpen] = useState(false);
@@ -101,6 +105,24 @@ export const DashboardPage: React.FC = () => {
     });
   };
 
+  const handleSelectStudent = async (studentId: string) => {
+    setSelectedStudentId(studentId);
+    const chosen = adviseeRecords.find((r) => r.id === studentId);
+    if (chosen) {
+      setStudentRecord(chosen);
+      try {
+        const [audit, transcript] = await Promise.all([
+          academicRecordsApi.getStudentRecordAudit(chosen.id).catch(() => null),
+          academicRecordsApi.getStudentRecordTranscript(chosen.id).catch(() => []),
+        ]);
+        setDegreeAudit(audit);
+        setTranscriptEntries(transcript);
+      } catch {
+        // ignore
+      }
+    }
+  };
+
   // Determine current effective role (default to STUDENT if null)
   const currentRole = activeRole || 'STUDENT';
 
@@ -120,7 +142,7 @@ export const DashboardPage: React.FC = () => {
           setDegreeAudit(audit);
           setTranscriptEntries(transcript);
         }
-      } else if (currentRole === 'ADVISOR') {
+      } else if (currentRole === 'ADVISOR' || currentRole === 'MENTOR') {
         const [queue, advisees] = await Promise.all([
           advisingApi.fetchQueue().catch(() => []),
           academicRecordsApi.getStudentRecords().catch(() => []),
@@ -128,26 +150,57 @@ export const DashboardPage: React.FC = () => {
         setReviewQueue(queue);
         setAdviseeRecords(advisees);
       } else if (currentRole === 'COORDINATOR') {
-        const [progs, crs] = await Promise.all([
+        const [progs, crs, queue, advisees] = await Promise.all([
           curriculumApi.getProgrammes().catch(() => []),
           curriculumApi.getCourses().catch(() => []),
+          advisingApi.fetchQueue().catch(() => []),
+          academicRecordsApi.getStudentRecords().catch(() => []),
         ]);
         setProgrammes(progs);
         setCourses(crs);
+        setReviewQueue(queue);
+        setAdviseeRecords(advisees);
       } else if (currentRole === 'HOD') {
-        const [overview, progress] = await Promise.all([
+        const [overview, progress, queue, advisees] = await Promise.all([
           analyticsApi.getOverview().catch(() => null),
           analyticsApi.getProgrammeProgress().catch(() => null),
+          advisingApi.fetchQueue().catch(() => []),
+          academicRecordsApi.getStudentRecords().catch(() => []),
         ]);
         setAnalyticsOverview(overview);
         setProgrammeProgress(progress);
-      } else if (currentRole === 'ADMIN') {
-        const [terms, overview] = await Promise.all([
+        setReviewQueue(queue);
+        setAdviseeRecords(advisees);
+      } else {
+        // ADMIN / MODERATOR
+        const [terms, overview, queue, advisees, progress, progs, crs] = await Promise.all([
           academicRecordsApi.getTerms().catch(() => []),
           analyticsApi.getOverview().catch(() => null),
+          advisingApi.fetchQueue().catch(() => []),
+          academicRecordsApi.getStudentRecords().catch(() => []),
+          analyticsApi.getProgrammeProgress().catch(() => null),
+          curriculumApi.getProgrammes().catch(() => []),
+          curriculumApi.getCourses().catch(() => []),
         ]);
         setAcademicTerms(terms);
         setAnalyticsOverview(overview);
+        setReviewQueue(queue);
+        setAdviseeRecords(advisees);
+        setProgrammeProgress(progress);
+        setProgrammes(progs);
+        setCourses(crs);
+
+        if (advisees && advisees.length > 0) {
+          const firstAdvisee = advisees[0];
+          setStudentRecord(firstAdvisee);
+          setSelectedStudentId(firstAdvisee.id);
+          const [audit, transcript] = await Promise.all([
+            academicRecordsApi.getStudentRecordAudit(firstAdvisee.id).catch(() => null),
+            academicRecordsApi.getStudentRecordTranscript(firstAdvisee.id).catch(() => []),
+          ]);
+          setDegreeAudit(audit);
+          setTranscriptEntries(transcript);
+        }
       }
     } catch {
       // Graceful fallback: UI displays clear empty/informative states
@@ -181,10 +234,111 @@ export const DashboardPage: React.FC = () => {
     );
   }
 
+  const isModeratorRole =
+    ['ADMIN', 'MODERATOR', 'COORDINATOR', 'HOD'].includes(currentRole) ||
+    unifiedRole === 'MODERATOR' ||
+    Boolean(user?.is_superuser);
+
+  const renderPerspectiveSwitcher = () => (
+    <div
+      style={{
+        display: 'flex',
+        gap: '10px',
+        marginBottom: '20px',
+        backgroundColor: '#F8FAFC',
+        padding: '8px 12px',
+        borderRadius: '12px',
+        alignItems: 'center',
+        flexWrap: 'wrap',
+        border: '1px solid #E2E8F0',
+      }}
+      data-testid="moderator-perspective-switcher"
+    >
+      <span
+        style={{
+          fontSize: '0.85rem',
+          fontWeight: 700,
+          color: '#334155',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+        }}
+      >
+        <ShieldCheck size={16} color="#7C3AED" />
+        Super Admin Mode:
+      </span>
+      <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+        <button
+          type="button"
+          onClick={() => setModeratorPerspective('MODERATOR')}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '0.82rem',
+            backgroundColor: moderatorPerspective === 'MODERATOR' ? '#7C3AED' : '#FFFFFF',
+            color: moderatorPerspective === 'MODERATOR' ? '#FFFFFF' : '#475569',
+            boxShadow:
+              moderatorPerspective === 'MODERATOR'
+                ? '0 2px 4px rgba(124, 58, 237, 0.25)'
+                : 'none',
+            border: moderatorPerspective === 'MODERATOR' ? 'none' : '1px solid #E2E8F0',
+          }}
+        >
+          👑 Moderator Executive View
+        </button>
+        <button
+          type="button"
+          onClick={() => setModeratorPerspective('MENTOR')}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '0.82rem',
+            backgroundColor: moderatorPerspective === 'MENTOR' ? '#0E7577' : '#FFFFFF',
+            color: moderatorPerspective === 'MENTOR' ? '#FFFFFF' : '#475569',
+            boxShadow:
+              moderatorPerspective === 'MENTOR'
+                ? '0 2px 4px rgba(14, 117, 119, 0.25)'
+                : 'none',
+            border: moderatorPerspective === 'MENTOR' ? 'none' : '1px solid #E2E8F0',
+          }}
+        >
+          👨‍🏫 Mentor Dashboard View
+        </button>
+        <button
+          type="button"
+          onClick={() => setModeratorPerspective('STUDENT')}
+          style={{
+            padding: '6px 14px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            fontWeight: 600,
+            fontSize: '0.82rem',
+            backgroundColor: moderatorPerspective === 'STUDENT' ? '#2563EB' : '#FFFFFF',
+            color: moderatorPerspective === 'STUDENT' ? '#FFFFFF' : '#475569',
+            boxShadow:
+              moderatorPerspective === 'STUDENT'
+                ? '0 2px 4px rgba(37, 99, 235, 0.25)'
+                : 'none',
+            border: moderatorPerspective === 'STUDENT' ? 'none' : '1px solid #E2E8F0',
+          }}
+        >
+          🎓 Student Dashboard View
+        </button>
+      </div>
+    </div>
+  );
+
   // ==========================================
   // 1. STUDENT VIEW
   // ==========================================
-  if (currentRole === 'STUDENT') {
+  const isViewingStudentPerspective =
+    currentRole === 'STUDENT' || (isModeratorRole && moderatorPerspective === 'STUDENT');
+
+  if (isViewingStudentPerspective) {
     const cgpaVal = degreeAudit ? Number(degreeAudit.overall_cgpa) : Number(studentRecord?.cached_cgpa || 0);
     const minCgpaVal = degreeAudit ? Number(degreeAudit.min_cgpa_required) : 5.0;
     const isCgpaSatisfied = cgpaVal >= minCgpaVal;
@@ -241,15 +395,86 @@ export const DashboardPage: React.FC = () => {
       },
     ];
 
+    const greetingName =
+      isModeratorRole && moderatorPerspective === 'STUDENT' && studentRecord
+        ? (studentRecord.student_preferred_name ||
+           (studentRecord.student_first_name
+             ? `${studentRecord.student_first_name} ${studentRecord.student_last_name || ''}`.trim()
+             : studentRecord.student_username) ||
+           'Student Candidate')
+        : (user?.preferred_name?.trim() ||
+           (user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user?.username) ||
+           'Student');
+
     return (
       <div className={styles.dashboardContainer}>
+        {isModeratorRole && moderatorPerspective === 'STUDENT' && (
+          <>
+            {renderPerspectiveSwitcher()}
+            <div
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: '12px 18px',
+                backgroundColor: 'rgba(37, 99, 235, 0.08)',
+                border: '1px solid rgba(37, 99, 235, 0.25)',
+                borderRadius: '10px',
+                marginBottom: '20px',
+                flexWrap: 'wrap',
+                gap: '12px',
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <Badge variant="teal" size="sm">Super Admin Clearance</Badge>
+                <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#1E40AF' }}>
+                  Inspecting Live Student Dashboard
+                </span>
+              </div>
+              {adviseeRecords.length > 0 && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <label htmlFor="moderator-student-select" style={{ fontSize: '0.85rem', color: '#475569', fontWeight: 600 }}>
+                    Active Advisee Record:
+                  </label>
+                  <select
+                    id="moderator-student-select"
+                    value={selectedStudentId || (studentRecord?.id || '')}
+                    onChange={(e) => handleSelectStudent(e.target.value)}
+                    style={{
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      border: '1px solid #CBD5E1',
+                      fontSize: '0.85rem',
+                      backgroundColor: '#FFFFFF',
+                      fontWeight: 500,
+                      maxWidth: '320px',
+                    }}
+                  >
+                    {adviseeRecords.map((r) => (
+                      <option key={r.id} value={r.id}>
+                        {r.student_preferred_name || `${r.student_first_name} ${r.student_last_name}`.trim() || r.student_username} [{r.student_registration_number || `STU-2026-${r.id}`}] ({r.programme_code})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          </>
+        )}
         <PageHeader
-          title={`Welcome back, ${user?.first_name || user?.username || 'Student'}`}
+          title={`Welcome back, ${greetingName}`}
           subtitle={`${studentRecord?.programme_name || 'Degree Candidate'} — Official Academic Overview`}
           badge={
-            <Badge variant="teal" size="sm">
-              {studentRecord?.status || 'Active Standing'}
-            </Badge>
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
+              <Badge variant="teal" size="sm">
+                {studentRecord?.status || 'Active Standing'}
+              </Badge>
+              {(studentRecord?.student_registration_number || user?.registration_number) && (
+                <Badge variant="neutral" size="sm">
+                  REG: {studentRecord?.student_registration_number || user?.registration_number}
+                </Badge>
+              )}
+            </div>
           }
           breadcrumbs={[{ label: 'Academic Workspace' }, { label: 'Student Overview' }]}
           actions={
@@ -527,9 +752,14 @@ export const DashboardPage: React.FC = () => {
   }
 
   // ==========================================
-  // 2. FACULTY ADVISOR VIEW
+  // 2. FACULTY ADVISOR & MENTOR VIEW
   // ==========================================
-  if (currentRole === 'ADVISOR') {
+  const isViewingMentorPerspective =
+    currentRole === 'ADVISOR' ||
+    currentRole === 'MENTOR' ||
+    (isModeratorRole && moderatorPerspective === 'MENTOR');
+
+  if (isViewingMentorPerspective) {
     const pendingCount = reviewQueue.filter(
       (q) => q.status === 'SUBMITTED' || q.status === 'RESUBMITTED' || q.status === 'UNDER_REVIEW'
     ).length;
@@ -584,12 +814,23 @@ export const DashboardPage: React.FC = () => {
     ];
 
     const adviseeColumns: Column<StudentRecord>[] = [
+      {
+        key: 'student_registration_number' as keyof StudentRecord,
+        header: 'Registration No',
+        width: '150px',
+        sortable: true,
+        render: (item) => (
+          <Badge variant="teal" size="sm">
+            {item.student_registration_number || `STU-2026-${item.id}`}
+          </Badge>
+        ),
+      },
       { key: 'student_username', header: 'Student ID', width: '130px', sortable: true },
       {
         key: 'student_first_name',
         header: 'Student Name',
         sortable: true,
-        render: (item) => `${item.student_first_name} ${item.student_last_name}`,
+        render: (item) => item.student_preferred_name || `${item.student_first_name} ${item.student_last_name}`.trim() || item.student_username,
       },
       { key: 'programme_code', header: 'Programme', width: '120px', sortable: true },
       {
@@ -636,6 +877,31 @@ export const DashboardPage: React.FC = () => {
 
     return (
       <div className={styles.dashboardContainer}>
+        {isModeratorRole && renderPerspectiveSwitcher()}
+        {isModeratorRole && moderatorPerspective === 'MENTOR' && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '12px 18px',
+              backgroundColor: 'rgba(14, 117, 119, 0.08)',
+              border: '1px solid rgba(14, 117, 119, 0.25)',
+              borderRadius: '10px',
+              marginBottom: '20px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Badge variant="teal" size="sm">Super Admin Clearance</Badge>
+              <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#0E7577' }}>
+                Inspecting Live Mentor / Faculty Workspace &amp; Review Backlog
+              </span>
+            </div>
+            <span style={{ fontSize: '0.85rem', color: '#475569' }}>
+              Showing {adviseeRecords.length} institutional advisees &amp; {reviewQueue.length} pending reviews
+            </span>
+          </div>
+        )}
         <PageHeader
           title="Advisor Academic Operations"
           subtitle="Triage submitted degree plans, evaluate prerequisite waivers, and track advisee progress."
@@ -773,6 +1039,31 @@ export const DashboardPage: React.FC = () => {
 
     return (
       <div className={styles.dashboardContainer}>
+        {isModeratorRole && renderPerspectiveSwitcher()}
+        {isModeratorRole && moderatorPerspective === 'MENTOR' && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '12px 18px',
+              backgroundColor: 'rgba(14, 117, 119, 0.08)',
+              border: '1px solid rgba(14, 117, 119, 0.25)',
+              borderRadius: '10px',
+              marginBottom: '20px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Badge variant="teal" size="sm">Super Admin Clearance</Badge>
+              <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#0E7577' }}>
+                Inspecting Live Mentor / Faculty Workspace &amp; Review Backlog
+              </span>
+            </div>
+            <span style={{ fontSize: '0.85rem', color: '#475569' }}>
+              Showing {adviseeRecords.length} institutional advisees &amp; {reviewQueue.length} pending reviews
+            </span>
+          </div>
+        )}
         <PageHeader
           title="Programme Coordinator Operations"
           subtitle="Author curriculum versions, configure prerequisite logic rules, and govern academic catalogs."
@@ -963,6 +1254,31 @@ export const DashboardPage: React.FC = () => {
 
     return (
       <div className={styles.dashboardContainer}>
+        {isModeratorRole && renderPerspectiveSwitcher()}
+        {isModeratorRole && moderatorPerspective === 'MENTOR' && (
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '12px 18px',
+              backgroundColor: 'rgba(14, 117, 119, 0.08)',
+              border: '1px solid rgba(14, 117, 119, 0.25)',
+              borderRadius: '10px',
+              marginBottom: '20px',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <Badge variant="teal" size="sm">Super Admin Clearance</Badge>
+              <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#0E7577' }}>
+                Inspecting Live Mentor / Faculty Workspace &amp; Review Backlog
+              </span>
+            </div>
+            <span style={{ fontSize: '0.85rem', color: '#475569' }}>
+              Showing {adviseeRecords.length} institutional advisees &amp; {reviewQueue.length} pending reviews
+            </span>
+          </div>
+        )}
         <PageHeader
           title="Department Executive Overview"
           subtitle="Departmental academic performance, cohort graduation trajectories, and prerequisite bottlenecks."
@@ -1104,6 +1420,31 @@ export const DashboardPage: React.FC = () => {
 
   return (
     <div className={styles.dashboardContainer}>
+      {isModeratorRole && renderPerspectiveSwitcher()}
+      {isModeratorRole && moderatorPerspective === 'MODERATOR' && (
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '12px 18px',
+            backgroundColor: 'rgba(124, 58, 237, 0.08)',
+            border: '1px solid rgba(124, 58, 237, 0.25)',
+            borderRadius: '10px',
+            marginBottom: '20px',
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Badge variant="teal" size="sm">Super Admin Control Center</Badge>
+            <span style={{ fontSize: '0.92rem', fontWeight: 600, color: '#7C3AED' }}>
+              Institutional Moderator &amp; System Administration Workspace
+            </span>
+          </div>
+          <span style={{ fontSize: '0.85rem', color: '#475569' }}>
+            Full Clearance: Curriculum, Advising Oversight, Analytics &amp; Multi-Tenant Controls
+          </span>
+        </div>
+      )}
       <PageHeader
         title="Institutional System Administration"
         subtitle="Multi-tenant institutional configuration, academic term calendars, security governance, and operational controls."

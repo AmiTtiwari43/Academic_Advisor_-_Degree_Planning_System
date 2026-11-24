@@ -265,9 +265,15 @@ class SkillGapAnalysisView(APIView):
                 student=user, institution_id__in=user_insts
             ).first()
             if not record:
+                # If current user is a staff member (Mentor, Moderator, Coordinator, Admin),
+                # default to the first student record in their institution
+                record = StudentRecord.objects.filter(
+                    institution_id__in=user_insts
+                ).first()
+            if not record:
                 return Response(
                     {"detail": "No student record associated with current user."},
-                    status=status.HTTP_400_BAD_REQUEST,
+                    status=status.HTTP_404_NOT_FOUND,
                 )
 
         if not can_view_student_record(user, record.student, record.institution):
@@ -279,6 +285,10 @@ class SkillGapAnalysisView(APIView):
             objective = CareerObjective.objects.filter(
                 id=objective_id, institution=record.institution
             ).first()
+            if not objective:
+                objective = CareerObjective.objects.filter(
+                    id=objective_id, institution_id__in=user_insts
+                ).first()
             if not objective:
                 return Response(
                     {"detail": "Career objective not found."},
@@ -350,10 +360,13 @@ class CourseRecommendationsView(APIView):
                 student=user, institution_id__in=user_insts
             ).first()
             if not record:
-                return Response(
-                    {"detail": "No student record associated with current user."},
-                    status=status.HTTP_400_BAD_REQUEST,
-                )
+                # If current user is a staff member (Mentor, Moderator, Coordinator, Admin),
+                # default to the first student record in their institution
+                record = StudentRecord.objects.filter(
+                    institution_id__in=user_insts
+                ).first()
+            if not record:
+                return Response([], status=status.HTTP_200_OK)
 
         if not can_view_student_record(user, record.student, record.institution):
             raise PermissionDenied("You do not have permission to view recommendations for this student.")
@@ -364,6 +377,10 @@ class CourseRecommendationsView(APIView):
             objective = CareerObjective.objects.filter(
                 id=objective_id, institution=record.institution
             ).first()
+            if not objective:
+                objective = CareerObjective.objects.filter(
+                    id=objective_id, institution_id__in=user_insts
+                ).first()
             if not objective:
                 return Response(
                     {"detail": "Career objective not found."},

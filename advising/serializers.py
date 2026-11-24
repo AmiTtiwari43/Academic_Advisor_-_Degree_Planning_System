@@ -42,8 +42,21 @@ class RiskEvaluationResultSerializer(serializers.Serializer):
 
 class StudentRiskProfileModelSerializer(serializers.ModelSerializer):
     student_username = serializers.CharField(source="student_record.student.username", read_only=True)
+    student_name = serializers.SerializerMethodField()
+    student_registration_number = serializers.SerializerMethodField()
     programme_code = serializers.CharField(source="student_record.programme.code", read_only=True)
     programme_name = serializers.CharField(source="student_record.programme.name", read_only=True)
+
+    def get_student_name(self, obj: StudentRiskProfile) -> str:
+        s = obj.student_record.student
+        profile = getattr(s, "profile", None)
+        return s.get_full_name() or (profile.preferred_name if profile else "") or s.username
+
+    def get_student_registration_number(self, obj: StudentRiskProfile) -> str:
+        profile = getattr(obj.student_record.student, "profile", None)
+        if profile:
+            return profile.get_or_generate_registration_number()
+        return f"STU-2026-{obj.student_record.student_id:04d}"
 
     class Meta:
         model = StudentRiskProfile
@@ -52,6 +65,8 @@ class StudentRiskProfileModelSerializer(serializers.ModelSerializer):
             "institution",
             "student_record",
             "student_username",
+            "student_name",
+            "student_registration_number",
             "programme_code",
             "programme_name",
             "overall_risk_level",

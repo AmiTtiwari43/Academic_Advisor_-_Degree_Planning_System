@@ -1,18 +1,21 @@
 import React, { useState } from 'react';
 import { Outlet, useNavigate, Navigate } from 'react-router-dom';
-import { LogOut, Menu, Sparkles } from 'lucide-react';
+import { LogOut, Menu, Sparkles, ChevronDown } from 'lucide-react';
 import styles from './AppLayout.module.css';
 import { Sidebar } from '../components/Sidebar/Sidebar';
 import { IconButton } from '../components/IconButton/IconButton';
 import { NotificationBell } from '../components/Notifications';
 import { AssistantDrawer } from '../components/Assistant';
+import { UserProfileModal } from '../components/profile';
+import { UniversalSearchBar } from '../components/Search';
 import { useAuth } from '../context/AuthContext';
 
 export const AppLayout: React.FC = () => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
   const [isAssistantOpen, setIsAssistantOpen] = useState(false);
-  const { user, activeMembership, activeRole, logout, isAuthenticated, isLoading } = useAuth();
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const { user, activeMembership, roleDisplayName, unifiedRole, logout, isAuthenticated, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -56,11 +59,19 @@ export const AppLayout: React.FC = () => {
   }
 
   const displayName =
-    user?.preferred_name ||
-    (user?.first_name ? `${user.first_name} ${user.last_name}` : user?.username) ||
+    user?.preferred_name?.trim() ||
+    (user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user?.username) ||
     'Authenticated User';
 
-  const userInitials = user?.first_name
+  const userInitials = user?.preferred_name?.trim()
+    ? user.preferred_name
+        .trim()
+        .split(/\s+/)
+        .map((p) => p[0])
+        .join('')
+        .slice(0, 2)
+        .toUpperCase()
+    : user?.first_name
     ? `${user.first_name[0]}${user.last_name ? user.last_name[0] : ''}`.toUpperCase()
     : (user?.username ? user.username.slice(0, 2).toUpperCase() : 'AU');
 
@@ -94,6 +105,10 @@ export const AppLayout: React.FC = () => {
             </div>
           </div>
 
+          <div className={styles.centerSection}>
+            <UniversalSearchBar />
+          </div>
+
           <div className={styles.rightSection}>
             <button
               type="button"
@@ -107,15 +122,35 @@ export const AppLayout: React.FC = () => {
 
             <NotificationBell />
 
-            <div className={styles.userProfile}>
+            <button
+              type="button"
+              className={styles.userProfileButton}
+              onClick={() => setIsProfileOpen(true)}
+              aria-label="View and edit your user profile"
+              title="Click to view and edit profile"
+            >
               <div className={styles.userAvatar}>{userInitials}</div>
               <div className={styles.userInfo}>
-                <span className={styles.userName}>{displayName}</span>
-                <span className={styles.userRole}>
-                  {activeRole ? activeRole.replace('_', ' ') : 'Academic Portal'}
+                <div className={styles.userNameRow}>
+                  <span className={styles.userName}>{displayName}</span>
+                  <ChevronDown size={14} className={styles.profileChevron} />
+                </div>
+                <span
+                  className={styles.userRole}
+                  style={{
+                    color:
+                      unifiedRole === 'MODERATOR'
+                        ? '#7C3AED'
+                        : unifiedRole === 'MENTOR'
+                        ? '#0E7577'
+                        : '#2563EB',
+                    fontWeight: 600,
+                  }}
+                >
+                  {roleDisplayName}
                 </span>
               </div>
-            </div>
+            </button>
 
             <IconButton
               icon={<LogOut size={18} />}
@@ -136,6 +171,12 @@ export const AppLayout: React.FC = () => {
       <AssistantDrawer
         isOpen={isAssistantOpen}
         onClose={() => setIsAssistantOpen(false)}
+      />
+
+      {/* User Profile Modal */}
+      <UserProfileModal
+        isOpen={isProfileOpen}
+        onClose={() => setIsProfileOpen(false)}
       />
     </div>
   );

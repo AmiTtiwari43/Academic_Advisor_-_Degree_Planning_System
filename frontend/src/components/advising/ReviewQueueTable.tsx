@@ -56,7 +56,11 @@ export const ReviewQueueTable: React.FC<ReviewQueueTableProps> = ({
   const filteredQueue = queue.filter((item) => {
     if (!searchQuery.trim()) return true;
     const q = searchQuery.toLowerCase();
+    const regNo = (item.student_registration_number || `STU-2026-${item.student_id}`).toLowerCase();
+    const sName = (item.student_name || '').toLowerCase();
     return (
+      regNo.includes(q) ||
+      sName.includes(q) ||
       item.student_username.toLowerCase().includes(q) ||
       item.student_email.toLowerCase().includes(q) ||
       item.programme_name.toLowerCase().includes(q) ||
@@ -84,7 +88,7 @@ export const ReviewQueueTable: React.FC<ReviewQueueTableProps> = ({
 
         <input
           type="text"
-          placeholder="Filter by student, programme, plan..."
+          placeholder="Filter by Registration No, student name, programme, plan..."
           className={styles.searchInput}
           value={searchQuery}
           onChange={(e) => onSearchQueryChange(e.target.value)}
@@ -95,7 +99,7 @@ export const ReviewQueueTable: React.FC<ReviewQueueTableProps> = ({
         <table className={styles.table}>
           <thead>
             <tr>
-              <th>Advisee</th>
+              <th>Advisee (Reg No)</th>
               <th>Programme</th>
               <th>Plan & Version</th>
               <th>Status</th>
@@ -129,8 +133,24 @@ export const ReviewQueueTable: React.FC<ReviewQueueTableProps> = ({
                   >
                     <td>
                       <div className={styles.studentInfo}>
-                        <span className={styles.studentName}>{item.student_username}</span>
-                        <span className={styles.studentMeta}>{item.student_email}</span>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                          <span className={styles.studentName}>
+                            {item.student_name || item.student_username}
+                          </span>
+                          <span style={{
+                            padding: '1px 6px',
+                            background: 'rgba(14, 117, 119, 0.1)',
+                            color: '#0E7577',
+                            fontSize: '11px',
+                            fontWeight: 700,
+                            borderRadius: '4px',
+                          }}>
+                            {item.student_registration_number || `STU-2026-${item.student_id}`}
+                          </span>
+                        </div>
+                        <span className={styles.studentMeta}>
+                          @{item.student_username} &bull; {item.student_email}
+                        </span>
                       </div>
                     </td>
                     <td>

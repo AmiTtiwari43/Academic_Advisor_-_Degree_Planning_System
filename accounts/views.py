@@ -101,14 +101,20 @@ class UserProfileView(APIView):
         description="Update current user profile data (privileged fields ignored).",
     )
     def patch(self, request):
-        serializer = UserProfileSerializer(data=request.data, partial=True)
+        profile, _ = UserProfile.objects.get_or_create(user=request.user)
+        serializer = UserProfileSerializer(profile, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
-        profile = update_user_profile(
+        val = serializer.validated_data
+        updated_profile = update_user_profile(
             user=request.user,
-            phone_number=serializer.validated_data.get("phone_number"),
-            preferred_name=serializer.validated_data.get("preferred_name"),
+            phone_number=val.get("phone_number"),
+            preferred_name=val.get("preferred_name"),
+            first_name=val.get("first_name"),
+            last_name=val.get("last_name"),
+            email=val.get("email"),
         )
-        return Response(UserProfileSerializer(profile).data, status=status.HTTP_200_OK)
+        request.user.refresh_from_db()
+        return Response(UserProfileSerializer(updated_profile).data, status=status.HTTP_200_OK)
 
 
 class PasswordResetRequestView(APIView):

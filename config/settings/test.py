@@ -18,3 +18,11 @@ EMAIL_BACKEND = "django.core.mail.backends.locmem.EmailBackend"
 SECURE_SSL_REDIRECT = False
 SESSION_COOKIE_SECURE = False
 CSRF_COOKIE_SECURE = False
+
+# Expand throttle rates for fast automated test execution
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["assistant"] = "5000/minute"
+
+# Unit tests default to deterministic engine unless mocked
+GEMINI_API_KEY = ""
+SECONDARY_AI_API_KEY = ""
+

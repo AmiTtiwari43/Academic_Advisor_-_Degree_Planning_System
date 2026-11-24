@@ -9,11 +9,13 @@ import { DegreeAuditProgressBar } from '../components/audit/DegreeAuditProgressB
 import { RequirementGroupAccordion } from '../components/audit/RequirementGroupAccordion';
 import { CourseEligibilityModal } from '../components/audit/CourseEligibilityModal';
 import { TranscriptTable } from '../components/audit/TranscriptTable';
+import { SectionSearchBar } from '../components/Search';
 import styles from './DegreeAuditPage.module.css';
 
 export const DegreeAuditPage: React.FC = () => {
   const [studentRecords, setStudentRecords] = useState<StudentRecord[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string>('');
+  const [studentSearchQuery, setStudentSearchQuery] = useState<string>('');
   const [recordDetail, setRecordDetail] = useState<StudentRecordDetail | null>(null);
   const [auditReport, setAuditReport] = useState<DegreeAuditReport | null>(null);
   const [loading, setLoading] = useState(true);
@@ -110,9 +112,22 @@ export const DegreeAuditPage: React.FC = () => {
         <div className={styles.headerActions}>
           {studentRecords.length > 1 && (
             <div className={styles.selectorWrapper}>
-              <label htmlFor="student-selector" className={styles.selectorLabel}>
-                Advisee Record:
-              </label>
+              <SectionSearchBar
+                value={studentSearchQuery}
+                onChange={(val) => {
+                  setStudentSearchQuery(val);
+                  const matched = studentRecords.find((r) => {
+                    const q = val.toLowerCase();
+                    const regNo = (r.student_registration_number || `STU-2026-${r.id}`).toLowerCase();
+                    const sName = `${r.student_preferred_name || ''} ${r.student_first_name || ''} ${r.student_last_name || ''} ${r.student_username}`.toLowerCase();
+                    return regNo.includes(q) || sName.includes(q);
+                  });
+                  if (matched && matched.id !== selectedRecordId) {
+                    setSelectedRecordId(matched.id);
+                  }
+                }}
+                placeholder="Search advisee by Reg No, Name..."
+              />
               <select
                 id="student-selector"
                 value={selectedRecordId}
@@ -120,11 +135,19 @@ export const DegreeAuditPage: React.FC = () => {
                 className={styles.studentSelect}
                 data-testid="student-record-select"
               >
-                {studentRecords.map((r) => (
-                  <option key={r.id} value={r.id}>
-                    {r.student_username} ({r.programme_code})
-                  </option>
-                ))}
+                {studentRecords
+                  .filter((r) => {
+                    if (!studentSearchQuery.trim()) return true;
+                    const q = studentSearchQuery.toLowerCase();
+                    const regNo = (r.student_registration_number || `STU-2026-${r.id}`).toLowerCase();
+                    const sName = `${r.student_preferred_name || ''} ${r.student_first_name || ''} ${r.student_last_name || ''} ${r.student_username}`.toLowerCase();
+                    return regNo.includes(q) || sName.includes(q) || r.programme_code.toLowerCase().includes(q);
+                  })
+                  .map((r) => (
+                    <option key={r.id} value={r.id}>
+                      {r.student_username} [{r.student_registration_number || `STU-2026-${r.id}`}] ({r.programme_code})
+                    </option>
+                  ))}
               </select>
             </div>
           )}
@@ -147,11 +170,20 @@ export const DegreeAuditPage: React.FC = () => {
           <div className={styles.metaItem}>
             <span className={styles.metaLabel}>Student</span>
             <span className={styles.metaValue}>
-              {recordDetail.student_first_name
-                ? `${recordDetail.student_first_name} ${recordDetail.student_last_name}`
-                : recordDetail.student_username}
+              {recordDetail.student_preferred_name ||
+                (recordDetail.student_first_name
+                  ? `${recordDetail.student_first_name} ${recordDetail.student_last_name}`
+                  : recordDetail.student_username)}
             </span>
             <span className={styles.metaSub}>{recordDetail.student_email}</span>
+          </div>
+
+          <div className={styles.metaItem}>
+            <span className={styles.metaLabel}>Registration No</span>
+            <span className={styles.metaValue} style={{ color: '#0E7577', fontWeight: 700 }}>
+              {recordDetail.student_registration_number || `STU-2026-${recordDetail.id}`}
+            </span>
+            <span className={styles.metaSub}>Official Academic Identifier</span>
           </div>
 
           <div className={styles.metaItem}>
@@ -254,9 +286,9 @@ export const DegreeAuditPage: React.FC = () => {
                 </div>
 
                 <div className={styles.groupsList}>
-                  {auditReport.groups.map((grp) => (
+                  {auditReport.groups.map((grp, idx) => (
                     <RequirementGroupAccordion
-                      key={grp.group_id}
+                      key={grp.group_id || `grp-${idx}`}
                       group={grp}
                       onCheckEligibility={handleCheckEligibility}
                     />

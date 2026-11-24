@@ -9,6 +9,7 @@ import {
 import { RuleBuilderModal } from '../components/curriculum/RuleBuilderModal';
 import { PublishPreviewModal } from '../components/curriculum/PublishPreviewModal';
 import { VersionDiffModal } from '../components/curriculum/VersionDiffModal';
+import { SectionSearchBar } from '../components/Search';
 import styles from './CurriculumWorkspacePage.module.css';
 
 export const CurriculumWorkspacePage: React.FC = () => {
@@ -29,8 +30,10 @@ export const CurriculumWorkspacePage: React.FC = () => {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState<boolean>(false);
   const [isDiffModalOpen, setIsDiffModalOpen] = useState<boolean>(false);
 
-  // Course search filter
+  // Search filters
   const [courseSearch, setCourseSearch] = useState<string>('');
+  const [ruleSearch, setRuleSearch] = useState<string>('');
+  const [groupSearch, setGroupSearch] = useState<string>('');
 
   // Initial fetch: programmes & courses
   const loadData = async () => {
@@ -197,6 +200,29 @@ export const CurriculumWorkspacePage: React.FC = () => {
       c.code.toLowerCase().includes(courseSearch.toLowerCase()) ||
       c.title.toLowerCase().includes(courseSearch.toLowerCase())
   );
+
+  // Requirement groups filter
+  const filteredGroups = (versionDetail?.requirement_groups || []).filter((g) => {
+    if (!groupSearch.trim()) return true;
+    const q = groupSearch.toLowerCase();
+    const matchesName = g.name.toLowerCase().includes(q);
+    const matchesCourse = (g.group_courses || []).some(
+      (c) =>
+        c.course_code.toLowerCase().includes(q) ||
+        c.course_title.toLowerCase().includes(q)
+    );
+    return matchesName || matchesCourse;
+  });
+
+  // Prerequisite rules filter
+  const filteredRules = (versionDetail?.prerequisite_rules || []).filter((r) => {
+    if (!ruleSearch.trim()) return true;
+    const q = ruleSearch.toLowerCase();
+    const course = allCourses.find((c) => c.id === r.course);
+    const code = (course?.code || '').toLowerCase();
+    const title = (course?.title || '').toLowerCase();
+    return code.includes(q) || title.includes(q) || JSON.stringify(r.rule_json).toLowerCase().includes(q);
+  });
 
   return (
     <div className={styles.pageContainer}>
@@ -507,13 +533,22 @@ export const CurriculumWorkspacePage: React.FC = () => {
             </span>
           </div>
 
-          {versionDetail.requirement_groups.length === 0 ? (
+          <div style={{ marginBottom: '1.25rem' }}>
+            <SectionSearchBar
+              value={groupSearch}
+              onChange={setGroupSearch}
+              placeholder="Search requirement groups by name or course code..."
+              badgeCount={filteredGroups.length}
+            />
+          </div>
+
+          {filteredGroups.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1' }}>
-              <p style={{ margin: '0 0 0.5rem', color: '#64748B' }}>No requirement groups defined for this version yet.</p>
+              <p style={{ margin: '0 0 0.5rem', color: '#64748B' }}>No requirement groups match your search criteria.</p>
             </div>
           ) : (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-              {versionDetail.requirement_groups.map((group) => (
+              {filteredGroups.map((group) => (
                 <div
                   key={group.id}
                   style={{
@@ -577,23 +612,18 @@ export const CurriculumWorkspacePage: React.FC = () => {
       {/* Tab 2: Course Catalogue Table */}
       {activeTab === 'courses' && (
         <div style={{ backgroundColor: '#FFFFFF', borderRadius: '8px', border: '1px solid #E2E8F0', padding: '1.5rem' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
             <h3 style={{ margin: 0, fontSize: '1.1rem', color: '#0F172A', fontWeight: 600 }}>
-              Institution Course Catalogue ({filteredCourses.length} Courses)
+              Institution Course Catalogue
             </h3>
-            <input
-              type="text"
-              placeholder="Search by code or title..."
-              value={courseSearch}
-              onChange={(e) => setCourseSearch(e.target.value)}
-              style={{
-                padding: '0.45rem 0.75rem',
-                borderRadius: '6px',
-                border: '1px solid #CBD5E1',
-                fontSize: '0.85rem',
-                minWidth: '240px',
-              }}
-            />
+            <div style={{ flex: 1, maxWidth: '380px' }}>
+              <SectionSearchBar
+                value={courseSearch}
+                onChange={setCourseSearch}
+                placeholder="Search by code or title..."
+                badgeCount={filteredCourses.length}
+              />
+            </div>
           </div>
 
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
@@ -656,9 +686,18 @@ export const CurriculumWorkspacePage: React.FC = () => {
             )}
           </div>
 
-          {versionDetail.prerequisite_rules.length === 0 ? (
+          <div style={{ marginBottom: '1.25rem' }}>
+            <SectionSearchBar
+              value={ruleSearch}
+              onChange={setRuleSearch}
+              placeholder="Search prerequisite rules by course code or logic..."
+              badgeCount={filteredRules.length}
+            />
+          </div>
+
+          {filteredRules.length === 0 ? (
             <div style={{ textAlign: 'center', padding: '3rem', backgroundColor: '#F8FAFC', borderRadius: '8px', border: '1px dashed #CBD5E1' }}>
-              <p style={{ margin: '0 0 0.5rem', color: '#64748B' }}>No prerequisite rules defined for this curriculum version yet.</p>
+              <p style={{ margin: '0 0 0.5rem', color: '#64748B' }}>No prerequisite rules match your search criteria.</p>
               <button
                 onClick={() => setIsRuleModalOpen(true)}
                 style={{
@@ -686,7 +725,7 @@ export const CurriculumWorkspacePage: React.FC = () => {
                 </tr>
               </thead>
               <tbody>
-                {versionDetail.prerequisite_rules.map((r) => (
+                {filteredRules.map((r) => (
                   <tr key={r.id} style={{ borderBottom: '1px solid #F1F5F9' }}>
                     <td style={{ padding: '0.6rem 0.75rem', fontWeight: 600, color: '#0F172A' }}>
                       {r.course_code} - {r.course_title}

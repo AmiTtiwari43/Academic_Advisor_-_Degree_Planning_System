@@ -18,6 +18,7 @@ import { Badge } from '../components/Badge/Badge';
 import { Skeleton } from '../components/Skeleton/Skeleton';
 import { ErrorState } from '../components/ErrorState/ErrorState';
 import { EmptyState } from '../components/EmptyState/EmptyState';
+import { SectionSearchBar } from '../components/Search';
 import {
   analyticsApi,
   AnalyticsOverview,
@@ -50,6 +51,7 @@ const TABS: TabItem[] = [
 export const AnalyticsDashboardPage: React.FC = () => {
   const { activeRole } = useAuth();
   const [activeTab, setActiveTab] = useState<string>('progress');
+  const [analyticsSearch, setAnalyticsSearch] = useState<string>('');
 
   // Executive Overview State
   const [overview, setOverview] = useState<AnalyticsOverview | null>(null);
@@ -423,13 +425,21 @@ export const AnalyticsDashboardPage: React.FC = () => {
       <div className={styles.reportWorkspace}>
         <Tabs tabs={TABS} activeTab={activeTab} onChange={(id) => setActiveTab(id)} />
 
-        {/* Toolbar with CSV Export */}
+        {/* Toolbar with Search and CSV Export */}
         <div className={styles.reportToolbar}>
           <div className={styles.reportMeta}>
             <FileSpreadsheet size={16} />
             <span>
               Report: <strong>{TABS.find((t) => t.id === activeTab)?.label}</strong>
             </span>
+          </div>
+
+          <div style={{ flex: 1, maxWidth: '380px' }}>
+            <SectionSearchBar
+              value={analyticsSearch}
+              onChange={setAnalyticsSearch}
+              placeholder="Filter report records by code, name, advisor..."
+            />
           </div>
 
           <div className={styles.reportActions}>
@@ -513,10 +523,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
                 <div>
                   <Table
                     columns={progressColumns}
-                    data={progressReport.items}
+                    data={(progressReport.items || []).filter((it) => {
+                      if (!analyticsSearch.trim()) return true;
+                      const q = analyticsSearch.toLowerCase();
+                      return it.programme_code.toLowerCase().includes(q) || it.programme_name.toLowerCase().includes(q);
+                    })}
                     keyExtractor={(item) => item.programme_id}
                     caption="Student Degree Progress Distribution by Programme"
-                    emptyState={<EmptyState title="No programme data found" />}
+                    emptyState={<EmptyState title="No programme data found matching search criteria" />}
                   />
                 </div>
               )}
@@ -526,10 +540,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
                 <div>
                   <Table
                     columns={blockersColumns}
-                    data={blockersReport.items}
+                    data={(blockersReport.items || []).filter((it) => {
+                      if (!analyticsSearch.trim()) return true;
+                      const q = analyticsSearch.toLowerCase();
+                      return it.course_code.toLowerCase().includes(q) || it.course_name.toLowerCase().includes(q);
+                    })}
                     keyExtractor={(item) => item.course_id}
                     caption="High Impact Prerequisite Bottlenecks"
-                    emptyState={<EmptyState title="No course bottlenecks identified" />}
+                    emptyState={<EmptyState title="No course bottlenecks found matching search criteria" />}
                   />
                 </div>
               )}
@@ -539,10 +557,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
                 <div>
                   <Table
                     columns={workloadColumns}
-                    data={workloadReport.items}
+                    data={(workloadReport.items || []).filter((it) => {
+                      if (!analyticsSearch.trim()) return true;
+                      const q = analyticsSearch.toLowerCase();
+                      return it.advisor_name.toLowerCase().includes(q) || it.advisor_username.toLowerCase().includes(q);
+                    })}
                     keyExtractor={(item) => item.advisor_id}
                     caption="Advisor Workload & Advisee Risk Distribution"
-                    emptyState={<EmptyState title="No advisor workloads found" />}
+                    emptyState={<EmptyState title="No advisor workloads found matching search criteria" />}
                   />
                 </div>
               )}
@@ -577,10 +599,13 @@ export const AnalyticsDashboardPage: React.FC = () => {
 
                   <Table
                     columns={turnaroundColumns}
-                    data={turnaroundReport.reviewer_breakdown}
+                    data={(turnaroundReport.reviewer_breakdown || []).filter((it) => {
+                      if (!analyticsSearch.trim()) return true;
+                      return it.reviewer_name.toLowerCase().includes(analyticsSearch.toLowerCase());
+                    })}
                     keyExtractor={(item) => item.reviewer_id}
                     caption="Turnaround Breakdown by Advisor"
-                    emptyState={<EmptyState title="No review decisions found in this timeframe" />}
+                    emptyState={<EmptyState title="No review decisions match your search" />}
                   />
                 </div>
               )}
@@ -698,10 +723,14 @@ export const AnalyticsDashboardPage: React.FC = () => {
                 <div>
                   <Table
                     columns={demandColumns}
-                    data={demandReport.items}
+                    data={(demandReport.items || []).filter((it) => {
+                      if (!analyticsSearch.trim()) return true;
+                      const q = analyticsSearch.toLowerCase();
+                      return it.course_code.toLowerCase().includes(q) || it.course_name.toLowerCase().includes(q);
+                    })}
                     keyExtractor={(item) => `${item.course_id}-${item.term_code}`}
                     caption="Planned Elective Course Demand vs Scheduled Capacity"
-                    emptyState={<EmptyState title="No elective course projections found" />}
+                    emptyState={<EmptyState title="No elective course projections match your search" />}
                   />
                 </div>
               )}

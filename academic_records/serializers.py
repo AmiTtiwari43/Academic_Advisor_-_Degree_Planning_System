@@ -117,6 +117,8 @@ class StudentRecordSerializer(serializers.ModelSerializer):
     student_username = serializers.CharField(source="student.username", read_only=True)
     student_first_name = serializers.CharField(source="student.first_name", read_only=True)
     student_last_name = serializers.CharField(source="student.last_name", read_only=True)
+    student_preferred_name = serializers.SerializerMethodField()
+    student_registration_number = serializers.SerializerMethodField()
     student_email = serializers.CharField(source="student.email", read_only=True)
     programme_code = serializers.CharField(source="programme.code", read_only=True)
     programme_name = serializers.CharField(source="programme.name", read_only=True)
@@ -127,6 +129,16 @@ class StudentRecordSerializer(serializers.ModelSerializer):
         source="enrollment_term.code", read_only=True
     )
 
+    def get_student_preferred_name(self, obj: StudentRecord) -> str:
+        profile = getattr(obj.student, "profile", None)
+        return profile.preferred_name if profile and profile.preferred_name else ""
+
+    def get_student_registration_number(self, obj: StudentRecord) -> str:
+        profile = getattr(obj.student, "profile", None)
+        if profile:
+            return profile.get_or_generate_registration_number()
+        return f"STU-2026-{obj.student_id:04d}"
+
     class Meta:
         model = StudentRecord
         fields = [
@@ -136,6 +148,8 @@ class StudentRecordSerializer(serializers.ModelSerializer):
             "student_username",
             "student_first_name",
             "student_last_name",
+            "student_preferred_name",
+            "student_registration_number",
             "student_email",
             "programme",
             "programme_code",

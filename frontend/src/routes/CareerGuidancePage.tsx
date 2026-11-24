@@ -33,6 +33,7 @@ import {
   CourseSkillMapping,
   SkillCategory,
 } from '../api/career';
+import { academicRecordsApi, StudentRecord } from '../api/academicRecords';
 import styles from './CareerGuidancePage.module.css';
 
 const TABS: TabItem[] = [
@@ -51,6 +52,10 @@ export const CareerGuidancePage: React.FC = () => {
   const [objectives, setObjectives] = useState<CareerObjective[]>([]);
   const [selectedObjectiveId, setSelectedObjectiveId] = useState<string>('');
   const [isObjectivesLoading, setIsObjectivesLoading] = useState<boolean>(true);
+
+  // Student Records State (for advisors, coordinators, and students)
+  const [studentRecords, setStudentRecords] = useState<StudentRecord[]>([]);
+  const [selectedRecordId, setSelectedRecordId] = useState<string>('');
 
   // Skill Gap State
   const [skillGapReport, setSkillGapReport] = useState<SkillGapReport | null>(null);
@@ -77,6 +82,30 @@ export const CareerGuidancePage: React.FC = () => {
   const [newSkillDescription, setNewSkillDescription] = useState<string>('');
   const [isSubmittingSkill, setIsSubmittingSkill] = useState<boolean>(false);
 
+  // Fetch Student Records
+  useEffect(() => {
+    let isMounted = true;
+    academicRecordsApi
+      .getStudentRecords()
+      .then((records) => {
+        if (!isMounted) return;
+        const list = Array.isArray(records)
+          ? records
+          : (records as unknown as { results?: StudentRecord[] })?.results || [];
+        setStudentRecords(list);
+        if (list.length > 0) {
+          setSelectedRecordId((prev) => prev || list[0].id);
+        }
+      })
+      .catch(() => {
+        // Fallback gracefully in testing environments or when unauthorized
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
   // 1. Load Career Objectives
   const loadObjectives = useCallback(async () => {
     setIsObjectivesLoading(true);
@@ -102,14 +131,20 @@ export const CareerGuidancePage: React.FC = () => {
     setIsGapLoading(true);
     setGapError(null);
     try {
-      const res = await careerApi.getSkillGap({ objective_id: selectedObjectiveId });
+      const params: { objective_id: string; student_id?: string } = {
+        objective_id: selectedObjectiveId,
+      };
+      if (selectedRecordId) {
+        params.student_id = selectedRecordId;
+      }
+      const res = await careerApi.getSkillGap(params);
       setSkillGapReport(res);
     } catch {
       setGapError('Failed to load skill-gap analysis for selected career objective.');
     } finally {
       setIsGapLoading(false);
     }
-  }, [selectedObjectiveId]);
+  }, [selectedObjectiveId, selectedRecordId]);
 
   // 3. Load Recommendations
   const loadRecommendations = useCallback(async () => {
@@ -117,10 +152,14 @@ export const CareerGuidancePage: React.FC = () => {
     setIsRecsLoading(true);
     setRecsError(null);
     try {
-      const res = await careerApi.getRecommendations({
+      const params: { objective_id: string; limit: number; student_id?: string } = {
         objective_id: selectedObjectiveId,
         limit: 15,
-      });
+      };
+      if (selectedRecordId) {
+        params.student_id = selectedRecordId;
+      }
+      const res = await careerApi.getRecommendations(params);
       const list = Array.isArray(res)
         ? res
         : (res as unknown as { results?: CourseRecommendation[] })?.results || [];
@@ -130,7 +169,7 @@ export const CareerGuidancePage: React.FC = () => {
     } finally {
       setIsRecsLoading(false);
     }
-  }, [selectedObjectiveId]);
+  }, [selectedObjectiveId, selectedRecordId]);
 
   // 4. Load Taxonomy
   const loadTaxonomy = useCallback(async () => {
@@ -160,6 +199,9 @@ export const CareerGuidancePage: React.FC = () => {
   }, [loadObjectives]);
 
   useEffect(() => {
+    if (studentRecords.length > 0 && !selectedRecordId) {
+      return;
+    }
     if (activeTab === 'gap') {
       loadSkillGap();
     } else if (activeTab === 'recommendations') {
@@ -167,17 +209,26 @@ export const CareerGuidancePage: React.FC = () => {
     } else if (activeTab === 'taxonomy') {
       loadTaxonomy();
     }
-  }, [activeTab, selectedObjectiveId, loadSkillGap, loadRecommendations, loadTaxonomy]);
+  }, [activeTab, selectedObjectiveId, selectedRecordId, studentRecords.length, loadSkillGap, loadRecommendations, loadTaxonomy]);
 
   // Handle Set as Primary Preference
   const handleSetPrimary = async () => {
     if (!selectedObjectiveId) return;
     try {
-      await careerApi.createPreference({
+      const payload: {
+        career_objective: string;
+        priority: number;
+        notes: string;
+        student_record?: string;
+      } = {
         career_objective: selectedObjectiveId,
         priority: 1,
         notes: 'Set from Career Guidance workspace',
-      });
+      };
+      if (selectedRecordId) {
+        payload.student_record = selectedRecordId;
+      }
+      await careerApi.createPreference(payload);
       loadSkillGap();
     } catch {
       // Handled silently or via toast
@@ -287,6 +338,31 @@ export const CareerGuidancePage: React.FC = () => {
 
       {/* Target Career Objective Selector Bar */}
       <div className={styles.selectorBar}>
+        {studentRecords.length > 0 && (
+          <div className={styles.selectorGroup}>
+            <label htmlFor="student-select" className={styles.selectorLabel}>
+              Student:
+            </label>
+            <select
+              id="student-select"
+              className={styles.selectInput}
+              value={selectedRecordId}
+              onChange={(e) => setSelectedRecordId(e.target.value)}
+              data-testid="student-record-select"
+            >
+              {studentRecords.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.student_preferred_name ||
+                    (r.student_first_name
+                      ? `${r.student_first_name} ${r.student_last_name}`
+                      : r.student_username)}{' '}
+                  [{r.student_registration_number || `STU-2026-${r.id}`}] ({r.programme_code})
+                </option>
+              ))}
+            </select>
+          </div>
+        )}
+
         <div className={styles.selectorGroup}>
           <label htmlFor="objective-select" className={styles.selectorLabel}>
             Target Career Objective:

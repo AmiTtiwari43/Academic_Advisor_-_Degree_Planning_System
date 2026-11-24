@@ -1,11 +1,17 @@
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import React, { createContext, useContext, useEffect, useState, useCallback, useMemo } from 'react';
 import { authApi, LoginCredentials } from '../api/auth';
 import { InstitutionMembershipSummary, Role, UserMe } from '../types';
+import { toUnifiedRole, getRoleDisplayName, UnifiedRole } from '../utils/rbac';
 
-interface AuthContextType {
+export interface AuthContextType {
   user: UserMe | null;
   activeMembership: InstitutionMembershipSummary | null;
   activeRole: Role | null;
+  unifiedRole?: UnifiedRole;
+  roleDisplayName?: 'Moderator' | 'Mentor' | 'Student';
+  isModerator?: boolean;
+  isMentor?: boolean;
+  isStudent?: boolean;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (credentials: LoginCredentials) => Promise<void>;
@@ -81,12 +87,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return targetRoles.includes(activeMembership.role);
   };
 
+  const unifiedRole = useMemo(
+    () => toUnifiedRole(activeMembership?.role, user?.is_superuser),
+    [activeMembership?.role, user?.is_superuser]
+  );
+
+  const roleDisplayName = useMemo(
+    () => getRoleDisplayName(activeMembership?.role, user?.is_superuser),
+    [activeMembership?.role, user?.is_superuser]
+  );
+
+  const isModerator = unifiedRole === 'MODERATOR';
+  const isMentor = unifiedRole === 'MENTOR';
+  const isStudent = unifiedRole === 'STUDENT';
+
   return (
     <AuthContext.Provider
       value={{
         user,
         activeMembership,
         activeRole: activeMembership?.role || null,
+        unifiedRole,
+        roleDisplayName,
+        isModerator,
+        isMentor,
+        isStudent,
         isAuthenticated: !!user,
         isLoading,
         login,
@@ -104,7 +129,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = (): AuthContextType => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    return {
+      user: null,
+      activeMembership: null,
+      activeRole: null,
+      unifiedRole: 'STUDENT',
+      roleDisplayName: 'Student',
+      isModerator: false,
+      isMentor: false,
+      isStudent: true,
+      isAuthenticated: false,
+      isLoading: false,
+      login: async () => {},
+      logout: async () => {},
+      switchMembership: () => {},
+      hasRole: () => false,
+      refreshUser: async () => {},
+    };
   }
   return context;
 };

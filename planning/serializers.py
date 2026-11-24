@@ -265,6 +265,8 @@ class ReviewQueueItemSerializer(serializers.Serializer):
     row_version = serializers.IntegerField()
     student_id = serializers.UUIDField()
     student_username = serializers.CharField()
+    student_name = serializers.CharField(required=False, default="")
+    student_registration_number = serializers.CharField(required=False, default="")
     student_email = serializers.EmailField()
     programme_code = serializers.CharField()
     programme_name = serializers.CharField()

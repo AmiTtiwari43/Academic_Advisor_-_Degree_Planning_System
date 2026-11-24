@@ -10,7 +10,7 @@ from decimal import Decimal
 from django.contrib.auth.models import User
 from django.utils import timezone
 from institutions.models import Institution, Department
-from accounts.models import Role, InstitutionMembership, AdvisorAssignment
+from accounts.models import Role, InstitutionMembership, AdvisorAssignment, UserProfile
 from curriculum.models import (
     Course, Programme, CurriculumVersion, DegreeType, CurriculumStatus,
     RequirementGroup, RequirementGroupType, RequirementGroupCourse, PrerequisiteRule
@@ -162,7 +162,7 @@ def seed_demo():
         curr_ver.save()
 
     # 5. Users: Student, Advisor, Coordinator
-    def create_or_update_user(username, email, first, last, role_type, is_staff=False):
+    def create_or_update_user(username, email, first, last, role_type, is_staff=False, reg_no=""):
         u, _ = User.objects.get_or_create(
             username=username,
             defaults={"email": email, "first_name": first, "last_name": last}
@@ -183,11 +183,20 @@ def seed_demo():
         )
         mem.is_active = True
         mem.save()
+
+        profile, _ = UserProfile.objects.get_or_create(user=u)
+        profile.preferred_name = f"{first} {last}".strip()
+        profile.phone_number = "+1 (555) 234-5678"
+        if reg_no:
+            profile.registration_number = reg_no
+        else:
+            profile.get_or_generate_registration_number()
+        profile.save()
         return u, mem
 
-    student_user, stu_mem = create_or_update_user("student_alex", "alex@agu.edu", "Alex", "Rivera", Role.STUDENT)
-    advisor_user, adv_mem = create_or_update_user("advisor_alice", "alice@agu.edu", "Alice", "Chen", Role.ADVISOR, is_staff=True)
-    coord_user, coord_mem = create_or_update_user("coordinator_cora", "cora@agu.edu", "Cora", "Vance", Role.COORDINATOR, is_staff=True)
+    student_user, stu_mem = create_or_update_user("student_alex", "alex@agu.edu", "Alex", "Rivera", Role.STUDENT, reg_no="STU-2026-0001")
+    advisor_user, adv_mem = create_or_update_user("advisor_alice", "alice@agu.edu", "Alice", "Chen", Role.ADVISOR, is_staff=True, reg_no="FAC-2026-0001")
+    coord_user, coord_mem = create_or_update_user("coordinator_cora", "cora@agu.edu", "Cora", "Vance", Role.COORDINATOR, is_staff=True, reg_no="ADM-2026-0001")
 
     # 6. Student Record & Transcript
     stu_record, _ = StudentRecord.objects.get_or_create(
@@ -221,20 +230,25 @@ def seed_demo():
         ("CS201", "SP2027", "A", "4.00"),
     ]
     for c_code, term_code, grade, cr in transcripts:
-        TranscriptEntry.objects.get_or_create(
+        entry = TranscriptEntry.objects.filter(
             institution=inst,
             student_record=stu_record,
             course=courses[c_code],
-            defaults={
-                "term": terms[term_code],
-                "grade": grade,
-                "credits_attempted": Decimal(cr),
-                "credits_earned": Decimal(cr),
-                "status": TranscriptEntryStatus.COMPLETED,
-                "verification_status": VerificationStatus.VERIFIED,
-                "attempt_number": 1,
-            }
-        )
+            term=terms[term_code],
+        ).first()
+        if not entry:
+            TranscriptEntry.objects.create(
+                institution=inst,
+                student_record=stu_record,
+                course=courses[c_code],
+                term=terms[term_code],
+                grade=grade,
+                credits_attempted=Decimal(cr),
+                credits_earned=Decimal(cr),
+                status=TranscriptEntryStatus.COMPLETED,
+                verification_status=VerificationStatus.VERIFIED,
+                attempt_number=1,
+            )
 
     # 7. Degree Plan for student_alex (Submitted for review)
     plan, _ = Plan.objects.get_or_create(

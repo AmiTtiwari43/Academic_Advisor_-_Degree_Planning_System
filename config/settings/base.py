@@ -200,3 +200,9 @@ CSRF_COOKIE_SAMESITE = "Lax"
 CORS_ALLOWED_ORIGINS = env.list("CORS_ALLOWED_ORIGINS")
 CSRF_TRUSTED_ORIGINS = env.list("CSRF_TRUSTED_ORIGINS")
 CORS_ALLOW_CREDENTIALS = True
+
+# AI Assistant Multi-Tier Fallback Configuration
+GEMINI_API_KEY = env.str("GEMINI_API_KEY", default="")
+SECONDARY_AI_API_KEY = env.str("SECONDARY_AI_API_KEY", default=env.str("GROQ_API_KEY", default=""))
+SECONDARY_AI_PROVIDER = env.str("SECONDARY_AI_PROVIDER", default="groq")
+

@@ -15,11 +15,13 @@ import { CourseCatalogDrawer } from '../components/planning/CourseCatalogDrawer'
 import { PlanSimulationPanel } from '../components/planning/PlanSimulationPanel';
 import { PlanVersionDiffModal } from '../components/planning/PlanVersionDiffModal';
 import { WhatIfModal } from '../components/planning/WhatIfModal';
+import { SectionSearchBar } from '../components/Search';
 import styles from './DegreePlannerPage.module.css';
 
 export const DegreePlannerPage: React.FC = () => {
   const [studentRecords, setStudentRecords] = useState<StudentRecord[]>([]);
   const [selectedRecordId, setSelectedRecordId] = useState<string>('');
+  const [studentFilterQuery, setStudentFilterQuery] = useState('');
   const [plans, setPlans] = useState<Plan[]>([]);
   const [activePlan, setActivePlan] = useState<Plan | null>(null);
   const [academicTerms, setAcademicTerms] = useState<AcademicTerm[]>([]);
@@ -316,6 +318,16 @@ export const DegreePlannerPage: React.FC = () => {
     (activePlan?.items || []).map((it) => it.course_code)
   );
 
+  const filteredStudentRecords = studentRecords.filter((r) => {
+    if (!studentFilterQuery.trim()) return true;
+    const q = studentFilterQuery.toLowerCase();
+    const regNo = (r.student_registration_number || `STU-2026-${r.id}`).toLowerCase();
+    const sName = `${r.student_preferred_name || ''} ${r.student_first_name || ''} ${r.student_last_name || ''} ${r.student_username}`.toLowerCase();
+    return regNo.includes(q) || sName.includes(q) || r.programme_code.toLowerCase().includes(q);
+  });
+
+  const activeStudentRecord = studentRecords.find((r) => r.id === selectedRecordId);
+
   return (
     <div className={styles.pageContainer} data-testid="degree-planner-page">
       {/* Page Header */}
@@ -330,19 +342,38 @@ export const DegreePlannerPage: React.FC = () => {
 
         <div className={styles.headerControls}>
           {studentRecords.length > 1 && (
-            <select
-              className={styles.selectInput}
-              value={selectedRecordId}
-              onChange={(e) => setSelectedRecordId(e.target.value)}
-              aria-label="Select student record"
-              data-testid="student-record-select"
-            >
-              {studentRecords.map((r) => (
-                <option key={r.id} value={r.id}>
-                  {r.student_username} ({r.programme_code})
-                </option>
-              ))}
-            </select>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              <SectionSearchBar
+                value={studentFilterQuery}
+                onChange={(val) => {
+                  setStudentFilterQuery(val);
+                  const matched = studentRecords.find((r) => {
+                    const q = val.toLowerCase();
+                    const regNo = (r.student_registration_number || `STU-2026-${r.id}`).toLowerCase();
+                    const sName = `${r.student_preferred_name || ''} ${r.student_first_name || ''} ${r.student_last_name || ''} ${r.student_username}`.toLowerCase();
+                    return regNo.includes(q) || sName.includes(q);
+                  });
+                  if (matched && matched.id !== selectedRecordId) {
+                    setSelectedRecordId(matched.id);
+                  }
+                }}
+                placeholder="Filter advisees by Reg No, Name..."
+                badgeCount={filteredStudentRecords.length}
+              />
+              <select
+                className={styles.selectInput}
+                value={selectedRecordId}
+                onChange={(e) => setSelectedRecordId(e.target.value)}
+                aria-label="Select student record"
+                data-testid="student-record-select"
+              >
+                {filteredStudentRecords.map((r) => (
+                  <option key={r.id} value={r.id}>
+                    {r.student_username} [{r.student_registration_number || `STU-2026-${r.id}`}] ({r.programme_code})
+                  </option>
+                ))}
+              </select>
+            </div>
           )}
 
           {plans.length > 0 && (
@@ -369,6 +400,26 @@ export const DegreePlannerPage: React.FC = () => {
                 </option>
               ))}
             </select>
+          )}
+
+          {activeStudentRecord && (
+            <span
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                padding: '4px 10px',
+                borderRadius: '6px',
+                fontSize: '0.82rem',
+                fontWeight: 600,
+                letterSpacing: '0.04em',
+                background: 'rgba(99, 102, 241, 0.12)',
+                color: '#6366f1',
+                border: '1px solid rgba(99, 102, 241, 0.25)',
+              }}
+              title="Active Student Registration ID"
+            >
+              🆔 {activeStudentRecord.student_registration_number || `STU-2026-${activeStudentRecord.id}`}
+            </span>
           )}
 
           {activePlan && (
