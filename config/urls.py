@@ -3,7 +3,7 @@ URL configuration for Academic Advisor & Degree Planning System.
 """
 
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
 
 from accounts.views import (
@@ -17,7 +17,7 @@ from accounts.views import (
     UserMeView,
     UserProfileView,
 )
-from common.views import GlobalSearchView, health_check
+from common.views import GlobalSearchView, health_check, spa_assets_view, spa_index_view
 from institutions.views import DepartmentListView, InstitutionListView
 
 urlpatterns = [
@@ -89,6 +89,9 @@ urlpatterns = [
     # Curriculum-Grounded AI Assistant
     path("api/v1/", include("ai_assistant.urls")),
     path("api/", include("ai_assistant.urls")),
+    # Frontend SPA and Assets
+    path("assets/<path:path>", spa_assets_view, name="spa-assets"),
+    re_path(r"^(?!api/|admin/|static/|assets/).*$", spa_index_view, name="spa-catchall"),
 ]
 
 

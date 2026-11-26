@@ -9,7 +9,18 @@ from .base import env
 DEBUG = False
 
 # Strict host headers
-ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS")
+ALLOWED_HOSTS = env.list("DJANGO_ALLOWED_HOSTS", default=["localhost", "127.0.0.1", ".onrender.com"])
+
+# Automatically support Render's dynamically assigned external hostname
+render_external_hostname = env.str("RENDER_EXTERNAL_HOSTNAME", default="")
+if render_external_hostname:
+    if render_external_hostname not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(render_external_hostname)
+    origin = f"https://{render_external_hostname}"
+    if origin not in CSRF_TRUSTED_ORIGINS:
+        CSRF_TRUSTED_ORIGINS.append(origin)
+    if origin not in CORS_ALLOWED_ORIGINS:
+        CORS_ALLOWED_ORIGINS.append(origin)
 
 # HTTPS and Security Headers
 SECURE_SSL_REDIRECT = env.bool("SECURE_SSL_REDIRECT", default=True)

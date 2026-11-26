@@ -1,5 +1,8 @@
 from datetime import datetime, timezone
+import mimetypes
 
+from django.conf import settings
+from django.http import FileResponse, HttpResponse
 from django.db.models import Q
 from drf_spectacular.utils import extend_schema
 from rest_framework import permissions, serializers, status
@@ -271,3 +274,35 @@ class GlobalSearchView(APIView):
             })
 
         return Response(results, status=status.HTTP_200_OK)
+
+
+def spa_index_view(request):
+    """
+    Serve the built React SPA index.html for frontend routes.
+    If the frontend bundle hasn't been compiled yet, return an informational status page.
+    """
+    index_file = settings.BASE_DIR / "frontend" / "dist" / "index.html"
+    if index_file.exists():
+        return FileResponse(open(index_file, "rb"), content_type="text/html")
+    return HttpResponse(
+        "<h1>Academic Advisor & Degree Planning System API</h1>"
+        "<p>Backend service is active. Frontend bundle is not compiled yet.</p>"
+        "<p><a href='/api/docs/'>Interactive API Documentation (Swagger UI)</a></p>"
+        "<p><a href='/admin/'>Django Admin Portal</a></p>",
+        content_type="text/html",
+    )
+
+
+def spa_assets_view(request, path):
+    """
+    Serve frontend built assets (JS, CSS, images, etc.) from frontend/dist/assets/.
+    """
+    asset_file = settings.BASE_DIR / "frontend" / "dist" / "assets" / path
+    if asset_file.exists():
+        content_type, _ = mimetypes.guess_type(str(asset_file))
+        return FileResponse(
+            open(asset_file, "rb"),
+            content_type=content_type or "application/octet-stream",
+        )
+    return HttpResponse(status=404)
+
