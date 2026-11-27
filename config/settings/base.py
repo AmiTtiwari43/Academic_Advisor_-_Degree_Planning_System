@@ -107,7 +107,18 @@ WSGI_APPLICATION = "config.wsgi.application"
 ASGI_APPLICATION = "config.asgi.application"
 
 # Database
+# Connect to Neon Serverless PostgreSQL using psycopg 3 driver
 DATABASES = {"default": env.db("DATABASE_URL")}
+
+# Neon Best Practices:
+# When connecting through Neon's PgBouncer connection pooler (-pooler),
+# set CONN_MAX_AGE to 0 so transactions release pooled server connections cleanly
+if "pooler" in DATABASES["default"].get("HOST", ""):
+    DATABASES["default"]["CONN_MAX_AGE"] = 0
+
+# Neon Serverless Postgres Branch Metadata
+NEON_BRANCH = env.str("NEON_BRANCH", default="")
+NEON_BRANCH_ID = env.str("NEON_BRANCH_ID", default="")
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

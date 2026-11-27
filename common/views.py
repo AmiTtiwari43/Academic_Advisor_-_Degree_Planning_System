@@ -21,6 +21,8 @@ class HealthResponseSerializer(serializers.Serializer):
     status = serializers.CharField()
     service = serializers.CharField()
     version = serializers.CharField()
+    database = serializers.CharField(required=False)
+    neon_branch = serializers.CharField(required=False)
     timestamp = serializers.CharField()
 
 
@@ -86,16 +88,27 @@ class GlobalSearchResultsSerializer(serializers.Serializer):
 @permission_classes([AllowAny])
 def health_check(request):
     """
-    Public health check endpoint returning service liveness and timestamp.
+    Public health check endpoint returning service liveness, database status, and timestamp.
     """
-    return Response(
-        {
-            "status": "ok",
-            "service": "academic-advisor-system",
-            "version": "1.0.0",
-            "timestamp": datetime.now(timezone.utc).isoformat(),
-        }
-    )
+    from django.db import connection
+    db_status = "connected"
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1;")
+    except Exception as exc:
+        db_status = f"unhealthy: {exc}"
+
+    payload = {
+        "status": "ok" if db_status == "connected" else "degraded",
+        "service": "academic-advisor-system",
+        "version": "1.0.0",
+        "database": f"neon-postgresql ({db_status})",
+        "timestamp": datetime.now(timezone.utc).isoformat(),
+    }
+    neon_branch = getattr(settings, "NEON_BRANCH", "")
+    if neon_branch:
+        payload["neon_branch"] = neon_branch
+    return Response(payload)
 
 
 @extend_schema(
