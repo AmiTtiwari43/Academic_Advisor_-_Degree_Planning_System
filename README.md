@@ -97,6 +97,7 @@ Every phase enforces the quality gate via `make check`:
 
 ## 5. Architectural Documentation
 
+- [Project & Feature Architecture Guide (No-Code Overview)](PROJECT_FEATURE_AND_ARCHITECTURE_GUIDE.md)
 - [Build Plan & Phased Roadmap](docs/ANTIGRAVITY_BUILD_PLAN.md)
 - [Architecture Specification](docs/architecture.md)
 - [Visual Design System](docs/design-system.md)
